@@ -1,38 +1,40 @@
 {
-  "name": "covid2019_hexagon01",
-  "version": "0.1.0",
-  "private": true,
+  "name": "react-three-fiber-typescript",
+  "version": "1.0.0",
+  "description": "⚛🟦 react-three-fiber TypeScript starterpack",
+  "keywords": [
+    "react",
+    "typescript",
+    "three",
+    "threejs",
+    "three.js",
+    "react-three-fiber"
+  ],
+  "main": "src/index.tsx",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.15.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.2"
+    "@react-three/drei": "3.8.2",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-postprocessing": "1.4.0",
+    "react-scripts": "4.0.0",
+    "react-three-fiber": "5.3.18",
+    "three": "0.125.2"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.0",
+    "@types/react-dom": "17.0.0",
+    "typescript": "4.1.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
