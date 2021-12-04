@@ -4,13 +4,11 @@ import { PbfHexagon } from './PbfHexagon';
 export class PbfHexagonBuilder implements ITypeBuilder<PbfHexagon, PbfHexagonBuilder> {
 
     private byteCount: number;
-    private codes: number[];
-    private coordinates: number[];
+    private values: number[];
 
     constructor() {
         this.byteCount = -1;
-        this.codes = [];
-        this.coordinates = [];
+        this.values = [];
     }
 
     setByteCount(byteCount: number): PbfHexagonBuilder {
@@ -18,18 +16,13 @@ export class PbfHexagonBuilder implements ITypeBuilder<PbfHexagon, PbfHexagonBui
         return this;
     }
 
-    setCodes(codes: number[]): PbfHexagonBuilder {
-        this.codes = codes;
-        return this;
-    }
-
-    setCoordinates(coordinates: number[]): PbfHexagonBuilder {
-        this.coordinates = coordinates;
+    setValues(values: number[]): PbfHexagonBuilder {
+        this.values = values;
         return this;
     }
 
     build(): PbfHexagon {
-        return new PbfHexagon(this.byteCount, this.codes, this.coordinates);
+        return new PbfHexagon(this.byteCount, this.values);
     }
 
 }

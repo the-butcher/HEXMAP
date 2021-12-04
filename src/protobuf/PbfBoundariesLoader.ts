@@ -4,8 +4,8 @@ import { CodedInputStream } from '../protobuf/base/source/CodedInputStream';
 import { ISubSource } from '../protobuf/base/source/ISubSource';
 import { SubSource } from '../protobuf/base/source/SubSource';
 import { ByteLoader } from '../util/ByteLoader';
-import { PbfHexagons } from './types/PbfHexagons';
-import { PbfHexagonsBuilder } from './types/PbfHexagonsBuilder';
+import { PbfBoundaries } from './types/PbfBoundaries';
+import { PbfBoundariesBuilder } from './types/PbfBoundariesBuilder';
 
 /**
  * helper for loading PBFRoot, decoding it from the bytes provided by a ByteLoader
@@ -14,19 +14,19 @@ import { PbfHexagonsBuilder } from './types/PbfHexagonsBuilder';
  * @since 12.10.2019
  *
  */
-export class PbfHexagonsLoader {
+export class PbfBoundariesLoader {
 
     // milliseconds per byte
     size: number = -1;
     time: number = -1;
 
-    async load(pbfUrl: string): Promise<PbfHexagons> {
+    async load(pbfUrl: string): Promise<PbfBoundaries> {
 
         const byteArray = await new ByteLoader().load(pbfUrl);
 
         const input = new CodedInputStream(byteArray);
         const subSource: ISubSource = SubSource.wrapped(input);
-        const protocolType: IProtocolTypeDefined<PbfHexagons, PbfHexagonsBuilder> = ProtocolTypes.fromTypeUid(ProtocolTypes.TYPE_UID_______HEXAGONS);
+        const protocolType: IProtocolTypeDefined<PbfBoundaries, PbfBoundariesBuilder> = ProtocolTypes.fromTypeUid(ProtocolTypes.TYPE_UID_____BOUNDARIES);
         const tsA = Date.now();
         const pbfRoot = await protocolType.decode(subSource);
         this.size = byteArray.length;

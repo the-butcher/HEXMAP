@@ -1,7 +1,13 @@
-import { PbfHexagon } from "../../hexagons/PbfHexagon";
-import { PbfHexagonBuilder } from "../../hexagons/PbfHexagonBuilder";
-import { PbfHexagons } from "../../hexagons/PbfHexagons";
-import { PbfHexagonsBuilder } from "../../hexagons/PbfHexagonsBuilder";
+import { PbfBoundaries } from "../../types/PbfBoundaries";
+import { PbfBoundariesBuilder } from "../../types/PbfBoundariesBuilder";
+import { PbfBoundary } from "../../types/PbfBoundary";
+import { PbfBoundaryBuilder } from "../../types/PbfBoundaryBuilder";
+import { PbfCoordinate } from "../../types/PbfCoordinate";
+import { PbfCoordinateBuilder } from "../../types/PbfCoordinateBuilder";
+import { PbfHexagon } from "../../types/PbfHexagon";
+import { PbfHexagonBuilder } from "../../types/PbfHexagonBuilder";
+import { PbfHexagons } from "../../types/PbfHexagons";
+import { PbfHexagonsBuilder } from "../../types/PbfHexagonsBuilder";
 import { IProtocolTypeDefined } from "./IProtocolTypeDefined";
 import { ITypeBuilder } from "./ITypeBuilder";
 import { ProtocolTypeDefined } from "./ProtocolTypeDefined";
@@ -29,6 +35,9 @@ export class ProtocolTypes {
     // report
     static TYPE_UID_______HEXAGONS: string = '0dfefe70-51e5-11ec-bf63-0242ac130002';
     static TYPE_UID________HEXAGON: string = '1b4d4082-51e5-11ec-bf63-0242ac130002';
+    static TYPE_UID_____BOUNDARIES: string = '552e8fa1-9225-42fb-a1ec-204af46d4d50';
+    static TYPE_UID_______BOUNDARY: string = '9a32c90d-6071-4925-aa6c-ce08df6feae0';
+    static TYPE_UID_____COORDINATE: string = 'ebb15d79-35d8-4b65-9efb-14eab6b983ba';
 
     static ALL: { [K in string ]: any } = {};
     static init() {
@@ -39,6 +48,9 @@ export class ProtocolTypes {
         ProtocolTypes.ALL[ProtocolTypes.TYPE_UID__VARINT_PACKED] = new ProtocolTypeVarintPacked();
         ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_______HEXAGONS] = ProtocolTypes.createPbfTypeHexagons();
         ProtocolTypes.ALL[ProtocolTypes.TYPE_UID________HEXAGON] = ProtocolTypes.createPbfTypeHexagon();
+        ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_____BOUNDARIES] = ProtocolTypes.createPbfTypeBoundaries();
+        ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_______BOUNDARY] = ProtocolTypes.createPbfTypeBoundary();
+        ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_____COORDINATE] = ProtocolTypes.createPbfTypeCoordinate();
     };
 
     static define<T, F extends ITypeBuilder<T, F>>(name: string, supplierOfFactory: Function): IProtocolTypeDefined<T, F> {
@@ -64,10 +76,29 @@ export class ProtocolTypes {
 
     static createPbfTypeHexagon(): IProtocolTypeDefined<PbfHexagon, PbfHexagonBuilder> {
         const protocolType: IProtocolTypeDefined<PbfHexagon, PbfHexagonBuilder> = ProtocolTypes.define('hexagon', () => new PbfHexagonBuilder());
-        protocolType.defineKey('key_____________codes', 0x1, ProtocolTypes.TYPE_UID__VARINT_PACKED, (builder: PbfHexagonBuilder, codes: number[]) => builder.setCodes(codes));
-        protocolType.defineKey('key_______coordinates', 0x2, ProtocolTypes.TYPE_UID__VARINT_PACKED, (builder: PbfHexagonBuilder, coordinates: number[]) => builder.setCoordinates(coordinates));
+        protocolType.defineKey('key____________values', 0x1, ProtocolTypes.TYPE_UID__VARINT_PACKED, (builder: PbfHexagonBuilder, values: number[]) => builder.setValues(values));
         return protocolType;
     }
+
+    static createPbfTypeBoundaries(): IProtocolTypeDefined<PbfBoundaries, PbfBoundariesBuilder> {
+        const protocolType: IProtocolTypeDefined<PbfBoundaries, PbfBoundariesBuilder> = ProtocolTypes.define('boundaries', () => new PbfBoundariesBuilder());
+        protocolType.defineKey('key________boundaries', 0x1, ProtocolTypes.TYPE_UID_______BOUNDARY, (builder: PbfBoundariesBuilder, boundary: PbfBoundary) => builder.addBoundary(boundary));
+        return protocolType;
+    }
+
+    static createPbfTypeBoundary(): IProtocolTypeDefined<PbfBoundary, PbfBoundaryBuilder> {
+        const protocolType: IProtocolTypeDefined<PbfBoundary, PbfBoundaryBuilder> = ProtocolTypes.define('boundary', () => new PbfBoundaryBuilder());
+        protocolType.defineKey('key_______coordinates', 0x1, ProtocolTypes.TYPE_UID_____COORDINATE, (builder: PbfBoundaryBuilder, coordinate: PbfCoordinate) => builder.addCoordinate(coordinate));
+        protocolType.defineKey('key________directions', 0x2, ProtocolTypes.TYPE_UID__VARINT_PACKED, (builder: PbfBoundaryBuilder, directions: number[]) => builder.setDirections(directions));
+        return protocolType;
+    }    
+
+    static createPbfTypeCoordinate(): IProtocolTypeDefined<PbfCoordinate, PbfCoordinateBuilder> {
+        const protocolType: IProtocolTypeDefined<PbfCoordinate, PbfCoordinateBuilder> = ProtocolTypes.define('boundary', () => new PbfCoordinateBuilder());
+        protocolType.defineKey('key_________________x', 0x1, ProtocolTypes.TYPE_UID_______VARINT32, (builder: PbfCoordinateBuilder, x: number) => builder.setX(x));
+        protocolType.defineKey('key_________________y', 0x2, ProtocolTypes.TYPE_UID_______VARINT32, (builder: PbfCoordinateBuilder, y: number) => builder.setY(y));
+        return protocolType;
+    }    
 
 }
 ProtocolTypes.init();
