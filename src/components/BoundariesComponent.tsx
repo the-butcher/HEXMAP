@@ -123,11 +123,11 @@ const BoundariesComponent = () => {
     <group>
       <mesh ref={ meshHood } frustumCulled={ false }> 
         <bufferGeometry ref={ geomHood } />
-        <meshBasicMaterial color={[0.5, 0.5, 0.5]} wireframe={ false } />
+        <meshBasicMaterial color={[0.9, 0.9, 0.9]} wireframe={ false } />
       </mesh>
       <mesh ref={ meshWall } frustumCulled={ false }> 
         <bufferGeometry ref={ geomWall } />
-        <meshStandardMaterial color={[0.5, 0.5, 0.5]} wireframe={ false } flatShading={ true } />
+        <meshStandardMaterial color={[0.9, 0.9, 0.9]} wireframe={ false } flatShading={ true } />
       </mesh>
     </group>
   );

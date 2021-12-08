@@ -7,6 +7,8 @@ export interface IHexagonRendererSchedule {
 
 export interface IHexagonRenderer {
 
+    id: string;
+
     getSchedule: () => IHexagonRendererSchedule;
 
     getHeight: (values: IHexagonValues) => number;

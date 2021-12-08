@@ -1,109 +1,14 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { Stats } from '@react-three/drei';
-import { Canvas, RootState } from "@react-three/fiber";
-import BoundariesComponent from "./components/BoundariesComponent";
-import ControlsComponent from "./components/ControlsComponent";
-import HexagonsComponent from './components/HexagonsComponent';
-import { IHexagonRenderer, IHexagonRendererSchedule } from './components/IHexagonRenderer';
-import { IHexagonValues } from './components/IHexagonValues';
-import "./styles.css";
-import { ColorUtil } from './util/ColorUtil';
-import { SpatialUtil } from './util/SpatialUtil';
-import * as three from 'three';
-import LightCompoment from './components/LightCompoment';
-
+import MapComponent from './components/MapComponent';
+import UserInterfaceComponent from './components/UserInterfaceComponent';
 
 export default () => {
 
-  const noopSchedule: IHexagonRendererSchedule = {
-    instantA: 0,
-    instantB: 0
-  }
-
-  let [renderer] = useState<IHexagonRenderer>({
-    getSchedule: () => noopSchedule,
-    getColor: (values, target) => ColorUtil.getCorineColor(values.luc, target),
-    getHeight: (values) => values.ele
-  });
-  
-  function onCreated(state: RootState): void {
-    state.gl.setClearColor("#c5c5c5");
-  }
-
-  const handlePointerUp = () => {
-    // console.log('pointer up in document');
-    
-  }
-
-  const handleChange = () => {
-
-    const instantA = Date.now();
-    const instantB = instantA + 1000;
-    const schedule: IHexagonRendererSchedule = {
-      instantA,
-      instantB
-    }
-
-
-
-    renderer.getSchedule = () => schedule;
-    renderer.getColor = (values, target) => {
-      return ColorUtil.getCorineColor(values.luc, target);
-      // if (values.gkz.toString().startsWith('502')) {
-      //   return [0.5, 0, 0];
-      // } else if (values.gkz.toString().startsWith('503')) {
-      //   return [0, 0.5, 0];
-      // } else {
-      //   return [0, 0, 0];
-      // }
-    } 
-    renderer.getHeight = (values) => {
-      return values.ele;
-      // if (values.gkz.toString().startsWith('502')) {
-      //   return values.y + 2;
-      // }else if (values.gkz.toString().startsWith('503')) {
-      //   return values.y + 1;
-      // } else {
-      //   return values.y;
-      // }
-    }
-
-  }
-
+  // TODO find out if this compoment can be the data-hub of the application, otherwise it may make sense to deprecate this component
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-      <div style={{ position:'absolute', height: '100%', width: '100%' }} onPointerUp={ handlePointerUp }>
-        <Canvas onCreated={ onCreated } camera={{position: [0, 300, 0], fov: 40, far: 1000000}}> 
-          <ControlsComponent />
-          <Stats />
-          <LightCompoment position={{x: 100000, y: 500000, z: -1000000}} />
-          <LightCompoment position={{x: 1000000, y: 500000, z: -1000000}} />
-          <ambientLight intensity={ 0.25 } />
-          {/* <gridHelper args={[1000, 10, '#ff0000', '#cccccc']}  /> */}
-          {/* <axesHelper /> */}
-          <HexagonsComponent renderer={ renderer! } />
-          <BoundariesComponent />
-        </Canvas>
-        
-      </div>
-      <div style={{ margin: '20px' }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={10}
-            label="Age"
-            onChange={handleChange}
-          >
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
+      <MapComponent />
+      <UserInterfaceComponent />
     </div>
   );
   

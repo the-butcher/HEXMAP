@@ -1,44 +1,69 @@
 // import { OrbitControls, OrbitControlsProps } from '@react-three/drei';
-import { FormControlLabel } from '@mui/material';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as three from 'three';
-import { PerspectiveCamera } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const ControlsComponent = () => {
 
-
-
-    // camera.position.set(-120, 150, 350);
-    // Ref to the controls, so that we can update them on every frame using useFrame
-    // const controls = useRef<OrbitControlsProps>({
-    //     camera,
-    //     domElement,
-    //     enableZoom: true,
-    // });
-
     const { camera, gl } = useThree();
 
+    let controls = useRef<OrbitControls>();
+    let isLeftButtonPressed = useRef<boolean>(false);
     useEffect(() => {
 
-        const controls = new OrbitControls(camera, gl.domElement);
-        controls.minPolarAngle = Math.PI / 4;
-        controls.maxPolarAngle = Math.PI / 2.2;
-        controls.minAzimuthAngle = -Math.PI / 4,
-        controls.maxAzimuthAngle = Math.PI / 8;
+        controls.current = new OrbitControls(camera, gl.domElement);
+        controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
+        // controls.enableZoom = false;
+
+        controls.current.enableDamping = true;
+        controls.current.dampingFactor = 0.05;
+        controls.current.minPolarAngle = Math.PI / 4;
+        controls.current.maxPolarAngle = Math.PI / 2.05;
+        controls.current.minAzimuthAngle = -Math.PI / 4,
+        controls.current.maxAzimuthAngle = Math.PI / 8;
 
         camera.position.set(-132, 190, 385);
-        controls.target.set(0, 0, 0);
-        controls.update();
+        controls.current.target.set(0, 0, 0);
+        controls.current.update();
+
+        window.addEventListener('pointerdown', e => {
+            if (e.button === 0) {
+                isLeftButtonPressed.current = true;
+            }
+        });
+        window.addEventListener('pointerup', e => {
+            if (e.button === 0) {
+                isLeftButtonPressed.current = false;
+            }
+        });
+
         return () => {
-            controls!.dispose();
-        };        
+            // controls!.dispose();
+        };     
+        
+        controls.current?.addEventListener('end', () => {
+            console.log('interaction ended');
+        });
 
     }, []);         
 
     useFrame((state) => {
-        // console.log('state', state);
+
+        controls.current!.update();
+
+        // only do this while not orbiting
+        // if (isLeftButtonPressed.current) {
+        //     // do nothing, scene is orbiting, readjusting the target would cause flickering
+        // } else {
+        //     var raycaster = new three.Raycaster();
+        //     raycaster.setFromCamera( new three.Vector3(0, 0, -0.5), camera );  
+        //     var intersects = raycaster.intersectObjects( state.scene.children, true );
+        //     if (intersects.length > 0) {
+        //         controls.current!.target = intersects[0].point;
+        //     }
+        // }
+
     });
 
     return null;
