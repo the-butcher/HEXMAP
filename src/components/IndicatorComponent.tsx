@@ -1,11 +1,12 @@
 import { ExpandMore, KeyboardTab } from "@mui/icons-material"
 import { Card, CardActions, CardContent, IconButton } from "@mui/material"
-import { IIndicatorComponentProps } from "./IIndicatorComponentProps"
+import { IIndicatorProps } from "./IIndicatorProps"
 import { useEffect, useRef } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from "@amcharts/amcharts5/xy";
+import { ObjectUtil } from "../util/ObjectUtil";
 
-export default (props: IIndicatorComponentProps) => {
+export default (props: IIndicatorProps) => {
 
     const { onExpand } = props;
 
@@ -16,11 +17,12 @@ export default (props: IIndicatorComponentProps) => {
         expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
     }
 
-    console.log(props.title, props.state);
+    // console.log(props.title, props.state);
 
     const handleExpand = () => {
       onExpand(props.id);
     }
+   
 
     useEffect(() => {
 
@@ -43,18 +45,18 @@ export default (props: IIndicatorComponentProps) => {
       );
       xAxis.data.setAll([
         {
-          category: "Research"
+          category: "x-axis-val-1"
         }, {
-          category: "Marketing"
+          category: "x-axis-val-2"
         }, {
-          category: "Sales"
+          category: "x-axis-val-2"
         }]);            
 
     }, []);    
 
     useEffect(() => {
 
-      console.log('props.state has changed', props);
+      // console.log('props.state has changed', props);
 
     }, [props.state]);  
 

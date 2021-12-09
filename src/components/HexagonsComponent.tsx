@@ -1,13 +1,16 @@
-import { ThreeEvent, useFrame } from '@react-three/fiber';
+import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as three from 'three';
 import { BufferGeometry, Material } from 'three';
 import { PbfHexagonsLoader } from '../protobuf/PbfHexagonsLoader';
+import { IColor } from '../util/IColor';
 import { SpatialUtil } from '../util/SpatialUtil';
-import { IHexagonsComponentProps } from './IHexagonsComponentProps';
+import { IHexagonsProps } from './IHexagonsProps';
 import { IHexagonValues } from './IHexagonValues';
 
-export default (props: IHexagonsComponentProps) => {
+export default (props: IHexagonsProps) => {
+
+  const { invalidate } = useThree();
 
   const valueIndexGkz = 0;
   const valueIndexLuc = 1;
@@ -33,12 +36,8 @@ export default (props: IHexagonsComponentProps) => {
    */
   const data = Array.from({ length: 168858 }, () => ({ color: '#FF0000', scale: 1 }))
   const colorArray = useMemo(() => new Float32Array(168858 * 3), []);
-
-  // TODO maybe reduce to a lighter data structure (values only)
-  // let pbfHexagonArray: PbfHexagon[];
   
   let hexagonValue: IHexagonValues;
-
   useEffect(() => {
 
     if (meshRef.current && geomRef.current) {
@@ -129,7 +128,7 @@ export default (props: IHexagonsComponentProps) => {
             ele: SpatialUtil.toZ(values[valueIndexZ] / SpatialUtil.SCALE_PRECISION)
           };
           hexagonValues.current.push(hexagonValue);
-          hexagonValue.y = props.renderer.getHeight(hexagonValue);
+          hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
   
           // place at 0 (height will be handled though scaling)
           tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
@@ -151,6 +150,36 @@ export default (props: IHexagonsComponentProps) => {
 
   }, []);      
 
+  useEffect(() => {
+
+    console.log('props.id changed', props);
+
+    let yDest: number;
+    let counter = 0;
+    let rgb: number[];
+    hexagonValues.current.forEach(hexagonValue => {
+  
+      yDest = props.getHeight(hexagonValue);
+      tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
+      tempObject.updateMatrix();
+      meshRef.current.setMatrixAt(counter, tempObject.matrix);
+      meshRef.current.instanceMatrix.needsUpdate = true     
+      
+      rgb = props.getColor(hexagonValue).getRgb();
+      colorArray[counter * 3 + 0] = rgb[0];
+      colorArray[counter * 3 + 1] = rgb[1];
+      colorArray[counter * 3 + 2] = rgb[2];
+      meshRef.current.geometry.attributes.color.needsUpdate = true;
+
+      counter++;
+
+    });    
+
+    invalidate();
+
+  }, [props.id]);        
+
   let handlePointerMove = (e:ThreeEvent<PointerEvent>) => { // 
     e.stopPropagation();
     if (e.instanceId) {
@@ -169,72 +198,10 @@ export default (props: IHexagonsComponentProps) => {
     // }
   }
 
-  useFrame(() => {
-
-    const schedule = props.renderer.getSchedule();
-
-    // any schedule in place => need to apply
-    if (schedule.instantA >= 0 && schedule.instantB >= 0) {
-
-      // console.log('handling schedule', hexagonValues.current.length);
-
-      const instant = Date.now();
-      const fraction = three.MathUtils.smootherstep(instant, schedule.instantA, schedule.instantB);
-
-      let color = [0, 0, 0];
-      let yDest;
-      let yCurr;
-      let done = instant > schedule.instantB;
-      let counter = 0;
-
-      hexagonValues.current.forEach(hexagonValue => {
-
-          yDest = props.renderer.getHeight(hexagonValue);
-
-          if (yDest != hexagonValue.y) {
-            yCurr = hexagonValue.y + (yDest - hexagonValue.y) * fraction;
-            // tempObject.position.set(hexagonValue.x, 0, hexagonValue.z); // yCurr - SpatialUtil.HEXAGON_SEMIHEIGHT
-            tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yCurr) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
-            tempObject.updateMatrix();
-            meshRef.current.setMatrixAt(counter, tempObject.matrix);
-            meshRef.current.instanceMatrix.needsUpdate = true            
-            if (done) {
-              hexagonValue.y = yDest;
-            }
-          }
-
-          color = props.renderer.getColor(hexagonValue, color);
-          if (color[0] !== hexagonValue.r || color[1] !== hexagonValue.g || color[2] !== hexagonValue.b) {
-            hexagonValue.y = hexagonValue.y + (yDest - hexagonValue.y) * fraction;
-            colorArray[counter * 3 + 0] = hexagonValue.r + (color[0] - hexagonValue.r) * fraction;
-            colorArray[counter * 3 + 1] = hexagonValue.g + (color[1] - hexagonValue.g) * fraction;
-            colorArray[counter * 3 + 2] = hexagonValue.b + (color[2] - hexagonValue.b) * fraction;
-            meshRef.current.geometry.attributes.color.needsUpdate = true;
-            if (done) {
-              hexagonValue.r = color[0];
-              hexagonValue.g = color[1];
-              hexagonValue.b = color[2];
-            }
-          }
-
-          counter++;
-    
-      });
-
-      if (done) {
-        // console.log('clearing schedule', schedule.instantB, Date.now());
-        schedule.instantA = -1;
-        schedule.instantB = -1;
-      }
-
-    } else {
-      // no need to change anything
-    }
-
-  });
+  useFrame(() => null);
 
   return (
-    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]}> 
+    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow> 
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>

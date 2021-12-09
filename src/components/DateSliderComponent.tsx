@@ -1,14 +1,19 @@
 import { Slider } from "@mui/material";
+import { useState } from "react";
 import { ObjectUtil } from "../util/ObjectUtil";
 import { TimeUtil } from "../util/TimeUtil";
-import { IDateSliderComponentProps } from "./IDateSliderProps";
+import { IInstantProps } from "./IInstantProps";
 
-export default (props: IDateSliderComponentProps) => {
+export default (props: IInstantProps) => {
 
-    const { onValueChange } = props;
+    // console.log('slider props', props);
 
-    const handleValueChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        onValueChange(value as number);
+    const [key, setKey] = useState<string>(ObjectUtil.createId())
+
+    const { onInstantChange, source } = props;
+
+    const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
+        onInstantChange(source, value as number);
     }
 
     /**
@@ -22,7 +27,7 @@ export default (props: IDateSliderComponentProps) => {
     });
 
     return (
-        <Slider key={ ObjectUtil.createId() } onChange={ handleValueChange } valueLabelFormat={ formatLabel } size="small" min={ props.instantMin } max={ props.instantMax } step={ TimeUtil.MILLISECONDS_PER____DAY } defaultValue={ Date.now() } aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px', marginLeft: '24px' }}/>
+        <Slider key={ key } onChange={ handleInstantChange } valueLabelFormat={ formatLabel } size="small"  value={ props.instantCur } min={ props.instantMin } max={ props.instantMax } step={ TimeUtil.MILLISECONDS_PER____DAY } aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px', marginLeft: '24px' }}/>
     );
 
 }

@@ -1,4 +1,4 @@
-export interface ILightComponentProps { 
+export interface ILightProps { 
     position: {
         x: number;
         y: number;

@@ -1,6 +1,5 @@
-import { PointerEvent } from "react";
 
-export interface IIndicatorComponentProps {
+export interface IIndicatorProps {
 
     id: string; 
 
@@ -17,6 +16,8 @@ export interface IIndicatorComponentProps {
      * callback to be triggered when an indicator wants to open horizontally
      */
     onExpand: (id: string) => void;
+
+    source: string;
 
 
 }

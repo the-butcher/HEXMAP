@@ -1,11 +1,17 @@
 import { IHexagonValues } from "./IHexagonValues";
 
+/**
+ * @deprecated
+ */
 export interface IHexagonRendererSchedule {
     instantA: number,
     instantB: number
 }
 
-export interface IHexagonRenderer {
+/**
+ * @deprecated
+ */
+ export interface IHexagonRenderer {
 
     id: string;
 

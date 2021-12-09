@@ -6,22 +6,26 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const ControlsComponent = () => {
 
-    const { camera, gl } = useThree();
+    const { invalidate, camera, gl } = useThree();
 
     let controls = useRef<OrbitControls>();
     let isLeftButtonPressed = useRef<boolean>(false);
+
     useEffect(() => {
+
 
         controls.current = new OrbitControls(camera, gl.domElement);
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
         // controls.enableZoom = false;
+        controls.current.addEventListener('change', invalidate)
 
-        controls.current.enableDamping = true;
-        controls.current.dampingFactor = 0.05;
-        controls.current.minPolarAngle = Math.PI / 4;
-        controls.current.maxPolarAngle = Math.PI / 2.05;
-        controls.current.minAzimuthAngle = -Math.PI / 4,
-        controls.current.maxAzimuthAngle = Math.PI / 8;
+
+        controls.current.enableDamping = false;
+        // controls.current.dampingFactor = 0.05;
+        // controls.current.minPolarAngle = Math.PI / 4;
+        // controls.current.maxPolarAngle = Math.PI / 2.05;
+        // controls.current.minAzimuthAngle = -Math.PI / 4,
+        // controls.current.maxAzimuthAngle = Math.PI / 8;
 
         camera.position.set(-132, 190, 385);
         controls.current.target.set(0, 0, 0);

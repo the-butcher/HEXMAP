@@ -1,14 +1,14 @@
-import { ExpandMore, LastPage } from "@mui/icons-material";
-import { AppBar, Breadcrumbs, Card, CardActions, CardContent, Collapse, createTheme, IconButton, Link, Paper, ThemeProvider, Toolbar } from "@mui/material";
-import "./../styles.css";
-import NavigationTopComponent from "./NavigationTopComponent";
-import NavigationBotComponent from "./NavigationBotComponent";
-import IndicatorComponent from "./IndicatorComponent";
-import { IIndicatorComponentProps } from "./IIndicatorComponentProps";
+import { createTheme, ThemeProvider } from "@mui/material";
 import { ObjectUtil } from "../util/ObjectUtil";
-import { PointerEvent, useRef, useState } from "react";
+import "./../styles.css";
+import IndicatorComponent from "./IndicatorComponent";
+import { IUserInterfaceProps } from "./IUserInterfaceProps";
+import NavigationBotComponent from "./NavigationBotComponent";
+import NavigationTopComponent from "./NavigationTopComponent";
 
-export default () => {
+export default (props: IUserInterfaceProps) => {
+
+  const { indicatorProps, navigationTopProps, navigationBotProps } = props;
 
   const theme = createTheme({
     components: {
@@ -102,66 +102,15 @@ export default () => {
     },
   });
 
-  const handleExpand = (id: string) => {
-
-    indicatorComponentProps.forEach(indicatorComponentProp => {
-      if (indicatorComponentProp.id === id) {
-        indicatorComponentProp.state = indicatorComponentProp.state === 'open-horizontal' ? 'open-vertical' : 'open-horizontal';
-      } else {
-        indicatorComponentProp.state = 'closed';
-      }
-    });
-    setIndicatorComponentProps([...indicatorComponentProps]);    
-
-  }
-
-  const [indicatorComponentProps, setIndicatorComponentProps] = useState<IIndicatorComponentProps[]>([
-    {
-      id: ObjectUtil.createId(),
-      title: 'Inzidenz',
-      value: '1.001',
-      onExpand: handleExpand,
-      state: 'open-horizontal'
-    },
-    {
-      id: ObjectUtil.createId(),
-      title: 'Impfquote',
-      value: '64.10%',
-      onExpand: handleExpand,
-      state: 'closed'
-    },
-    {
-      id: ObjectUtil.createId(),
-      title: 'Tests/100.000',
-      value: '80.000',
-      onExpand: handleExpand,
-      state: 'closed'
-    },
-    {
-      id: ObjectUtil.createId(),
-      title: 'Fälle/100.000',
-      value: '80.000',
-      onExpand: handleExpand,
-      state: 'closed'
-    },
-    {
-      id: ObjectUtil.createId(),
-      title: 'Tote/100.000',
-      value: '114.20',
-      onExpand: handleExpand,
-      state: 'closed'
-    }
-  ]);
-
   return (
     <ThemeProvider theme={theme}>
       <div style={{ width: '100%', position: 'absolute', display: 'flex', flexDirection: 'column' }}>
-        <NavigationTopComponent />
+        <NavigationTopComponent {...navigationTopProps} />
         <div style={{ width: 'calc(100%-24px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '12px' }}>
-          { indicatorComponentProps.map(indicatorComponentProp => <IndicatorComponent key={ indicatorComponentProp.id } id={ indicatorComponentProp.id } state={ indicatorComponentProp.state } onExpand={ handleExpand } title={ indicatorComponentProp.title } value={ indicatorComponentProp.value }/>) }
+          { indicatorProps.map(props => <IndicatorComponent key={ props.id } {...props} />) }
         </div>
        </div>
-       <NavigationBotComponent />
+       <NavigationBotComponent {...navigationBotProps} />
     </ThemeProvider>
   );
 
