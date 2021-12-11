@@ -3,10 +3,11 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as three from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { IControlsProps } from './IControlsProps';
 
-const ControlsComponent = () => {
+export default (props: IControlsProps) => {
 
-    const { invalidate, camera, gl } = useThree();
+    const { invalidate, camera, gl, scene } = useThree();
 
     let controls = useRef<OrbitControls>();
     let isLeftButtonPressed = useRef<boolean>(false);
@@ -54,7 +55,7 @@ const ControlsComponent = () => {
 
     useFrame((state) => {
 
-        controls.current!.update();
+        // controls.current!.update();
 
         // only do this while not orbiting
         // if (isLeftButtonPressed.current) {
@@ -70,24 +71,44 @@ const ControlsComponent = () => {
 
     });
 
+    useEffect(() => {
+
+        // console.log('props.instant changed', props); // , glRenderer?.domElement.toDataURL()
+        // // setExportCanvas(true);
+
+        // if (gl.domElement) {
+        //     gl.render(scene, camera);
+        //     gl.domElement.toBlob(blob => {
+        //         var link = document.createElement("a");
+        //         link.download = 'name_' + Date.now();
+        //         link.href = window.URL.createObjectURL(blob!);
+        //         document.body.appendChild(link);
+        //         link.click();
+        //         document.body.removeChild(link);
+        //     })
+        // }        
+
+    
+    }, [props.instant]);     
+
+    // useFrame(() => {
+
+    //     // if (glRenderer && exportCanvas) {
+    //     //     glRenderer!.domElement.toBlob(blob => {
+    //     //         var link = document.createElement("a");
+    //     //         link.download = 'name_' + Date.now();
+    //     //         link.href = window.URL.createObjectURL(blob!);
+    //     //         document.body.appendChild(link);
+    //     //         link.click();
+    //     //         document.body.removeChild(link);
+    //     //     })
+    //     //     // delete link;        
+    
+    //     // }
+    //     setExportCanvas(false);
+
+    // });    
+
     return null;
-        // <OrbitControls
-        //     // ref={controls}
-        //     args={ [camera, domElement] }
-        //     camera={ camera }
-        //     enableZoom={ true }
-        //     screenSpacePanning={ false }
-        // />
 
-
-    // minPolarAngle={ -Math.PI }
-    // maxPolarAngle={ Math.PI / 2.2 }
-
-
-};
-
-export default () => {
-    return (
-        <ControlsComponent />
-    );
 };

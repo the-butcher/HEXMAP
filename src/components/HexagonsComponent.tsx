@@ -123,7 +123,7 @@ export default (props: IHexagonsProps) => {
             r: 0,
             g: 0,
             b: 0,
-            gkz: values[valueIndexGkz],
+            gkz: values[valueIndexGkz] >= 0 ? values[valueIndexGkz].toString() : undefined,
             luc: values[valueIndexLuc],
             ele: SpatialUtil.toZ(values[valueIndexZ] / SpatialUtil.SCALE_PRECISION)
           };
@@ -152,7 +152,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.log('props.id changed', props);
+    // console.log('props.id changed', props);
 
     let yDest: number;
     let counter = 0;
@@ -197,8 +197,6 @@ export default (props: IHexagonsProps) => {
     //   }      
     // }
   }
-
-  useFrame(() => null);
 
   return (
     <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow> 

@@ -3,7 +3,7 @@ export class SpatialUtil {
     static readonly SCALE_SCENE = 0.001;
     static readonly SCALE_PRECISION = 4;
 
-    static readonly HEXAGON_OFFSET_Y = 10000 * SpatialUtil.SCALE_SCENE;
+    static readonly HEXAGON_OFFSET_Y = 50000 * SpatialUtil.SCALE_SCENE;
 
     static readonly  HEXAGON_ORIGIN_X = -280535.3734 * SpatialUtil.SCALE_SCENE;
     static readonly  HEXAGON_ORIGIN_Y = 212166.0648 * SpatialUtil.SCALE_SCENE;

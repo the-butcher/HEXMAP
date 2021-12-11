@@ -28,8 +28,8 @@ const BoundariesComponent = () => {
     directionMultsY.push(- Math.sin(Math.PI * i / 3) * directionDim);
   }
 
-  const boundaryMaxZ = SpatialUtil.toZ(3500); // 3500
-  const boundaryMinZ = SpatialUtil.toZ(-3500);
+  const boundaryMaxZ = SpatialUtil.toZ(0); // 3500
+  const boundaryMinZ = SpatialUtil.toZ(-7000);
 
   useEffect(() => {
 

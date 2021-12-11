@@ -17,7 +17,7 @@ export interface IHexagonValues {
     /**
      * gemeindekennziffer
      */
-    gkz: number;
+    gkz: string | undefined;
 
     /**
      * corine land use code
