@@ -1,3 +1,10 @@
+/**
+ * utility for spatial position, scaling, ...
+ * TODO :: reorganize and clarify
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 export class SpatialUtil {
 
     static readonly SCALE_SCENE = 0.001;
@@ -5,10 +12,10 @@ export class SpatialUtil {
 
     static readonly HEXAGON_OFFSET_Y = 50000 * SpatialUtil.SCALE_SCENE;
 
-    static readonly  HEXAGON_ORIGIN_X = -280535.3734 * SpatialUtil.SCALE_SCENE;
+    static readonly  HEXAGON_ORIGIN_X = -310535.3734 * SpatialUtil.SCALE_SCENE;
     static readonly  HEXAGON_ORIGIN_Y = 212166.0648 * SpatialUtil.SCALE_SCENE;
 
-    static readonly BOUNDARY_ORIGIN_X = 42630 * SpatialUtil.SCALE_SCENE;
+    static readonly BOUNDARY_ORIGIN_X = 12630 * SpatialUtil.SCALE_SCENE;
     static readonly BOUNDARY_ORIGIN_Y = 299630 * SpatialUtil.SCALE_SCENE;
   
     static readonly  HEXAGON_SPACING_X = 759.8356857 * SpatialUtil.SCALE_SCENE;

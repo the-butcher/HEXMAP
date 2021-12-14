@@ -3,7 +3,7 @@ import { IColor } from "./IColor";
 
 export class ColorUtil { 
 
-    static readonly COLOR_WATER = [122,213,245];
+    static readonly COLOR_WATER = [122,213,255];
     static readonly COLORS: { [K in string]: number[] } = {
         '111': [168,63,63],
         '112': [179,103,103],
@@ -55,8 +55,8 @@ export class ColorUtil {
     static getCorineColor(code: number): IColor {
         if (ColorUtil.COLORS[code]) {
             const hsv = [0, 0, 0]
-            ColorUtil.rgbToHsv(ColorUtil.COLORS[code].map((c, i) => c / 1000), hsv);
-            return new Color(hsv[0], hsv[1], hsv[2]);
+            ColorUtil.rgbToHsv(ColorUtil.COLORS[code].map((c, i) => c / 750), hsv);
+            return new Color(hsv[0], Math.min(1, hsv[1] * 1.5), hsv[2]);
         } else {
             return new Color(0, 0, 1);
         }

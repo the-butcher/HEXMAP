@@ -1,12 +1,20 @@
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame, useLoader, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as three from 'three';
 import { ShapeUtils, Vector2 } from 'three';
 import { PbfBoundariesLoader } from '../protobuf/PbfBoundariesLoader';
 import { SpatialUtil } from '../util/SpatialUtil';
-
+import { Reflector, ReflectorOptions } from "three/examples/jsm/objects/Reflector";
+/**
+ * functional react component responsible for drawing the boundary around austria
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 const BoundariesComponent = () => {
 
+  const { scene } = useThree();
+   
   /**
    * vertical part of the boundary - standard material, so the hexagon boundary has structure
    */
@@ -127,10 +135,23 @@ const BoundariesComponent = () => {
         const wallNormals32 = new Float32Array(wallNormals);
 
         if (geomHood.current && geomWall.current) {
+
           geomHood.current.setAttribute('position', new three.BufferAttribute(hoodVertices32, 3));
           geomHood.current.setAttribute('normal', new three.BufferAttribute(hoodNormals32, 3));
           geomWall.current.setAttribute('position', new three.BufferAttribute(wallVertices32, 3));
           geomWall.current.setAttribute('normal', new three.BufferAttribute(wallNormals32, 3));
+
+          // const reflectorOptions: ReflectorOptions = {
+          //   clipBias: 0.000003,
+          //   textureWidth: 8192,
+          //   textureHeight: 8192,
+          //   color: 0x777777
+          // }
+          // const reflector: Reflector = new Reflector( geomHood.current, reflectorOptions);
+          // scene.add( reflector );
+          // reflector.position.y = 0;
+          // reflector.position.z = 0;          
+
         }        
     
     });
@@ -152,11 +173,11 @@ const BoundariesComponent = () => {
     <group>
       <mesh ref={ meshHood } frustumCulled={ false } receiveShadow> 
         <bufferGeometry ref={ geomHood } />
-        <meshPhongMaterial color={[0.9, 0.9, 0.9]} wireframe={ false } />
+        <meshStandardMaterial color={[0.95, 0.95, 0.95]} wireframe={ false } />
       </mesh>
       <mesh ref={ meshWall } frustumCulled={ false } castShadow> 
         <bufferGeometry ref={ geomWall } />
-        <meshPhongMaterial color={[0.5, 0.5, 0.5]} wireframe={ false } />
+        <meshStandardMaterial color={[0.95, 0.95, 0.95]} wireframe={ false } />
       </mesh>
     </group>
   );

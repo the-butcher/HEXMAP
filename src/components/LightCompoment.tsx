@@ -1,33 +1,54 @@
-import { useFrame } from '@react-three/fiber';
+import { useHelper } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as three from 'three';
+import { Camera, CameraHelper, PerspectiveCamera, PointLightHelper } from 'three';
 import { ILightProps } from './ILightProps';
 
-
+/**
+ * functional react component managing a single directional light
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 export default (props: ILightProps) => {
 
-    const directionalLight = useRef<three.DirectionalLight>();
-    // const directionalLightHelper = useHelper(directionalLight, three.DirectionalLightHelper, 1)
-
+    const pointLight = useRef<three.DirectionalLight>();
+    const { scene } = useThree();
+ 
     useEffect(() => {
 
-        directionalLight.current!.position.set(props.position.x, props.position.y, props.position.z); 
-        directionalLight.current!.lookAt(0, 0, 0);
-        directionalLight.current!.castShadow = true;
-        // directionalLight.current!.shadow.autoUpdate = true;
-        directionalLight.current!.shadowMapWidth = 4096;
-        directionalLight.current!.shadowMapHeight = 4096
+        pointLight.current!.position.set(props.position.x, props.position.y, props.position.z); 
+        pointLight.current!.lookAt(0, 0, 0);
+        pointLight.current!.castShadow = true;
+        pointLight.current!.shadow.autoUpdate = false;
 
-        
+        // pointLight.current!.shadow.camera.left = 200;
+        pointLight.current!.shadow.camera.top = 140;
+        pointLight.current!.shadow.camera.bottom = -120;
+        pointLight.current!.shadow.camera.left = -260;
+        pointLight.current!.shadow.camera.right = 260;
+        pointLight.current!.shadow.camera.far = 1000;
+        pointLight.current!.shadow.camera.lookAt(0, 0, 0);
 
-    }, []);      
+        pointLight.current!.shadow.mapSize.width = 8192;
+        pointLight.current!.shadow.mapSize.height = 4096;
+
+        // const helper = new three.CameraHelper( pointLight.current!.shadow.camera );
+        // scene.add( helper );
+
+    }, []);    
+    
+    useEffect(() => {
+        pointLight.current!.shadow.needsUpdate = true;
+    }, [props.instant]);      
 
     useFrame((state) => {
         // console.log('state', state);
     });
 
     return (
-        <pointLight intensity={ 1 } ref={ directionalLight } castShadow shadowCameraFar={ 1000 } shadowMapWidth={ 4096 } shadowMapHeight={ 4096 } />
+        <directionalLight intensity={ 1 } ref={ pointLight } castShadow />
     );
 
 };

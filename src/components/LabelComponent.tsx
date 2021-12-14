@@ -1,60 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as three from 'three';
-import { Font, FontLoader, Material, Mesh, Shape, ShapeGeometry, TextGeometry } from 'three';
+import { Font, FontLoader } from 'three';
 import { ILabelProps } from './ILabelProps';
 
+/**
+ * functional react component placing a 3d-text into the scene
+ * unfinished, would require placement, ... 
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 export default (props: ILabelProps) => {
 
-  const geomRef = useRef<three.TextGeometry>();
+  const { size, position } = props;
+
+  const geomRef = useRef<three.ShapeGeometry>();
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
   const meshRef = useRef<three.Mesh>();
 
   const [font, setFont] = useState<three.Font>();
 
   useEffect(() => {
+
     const loader = new FontLoader();
     loader.load( './droid_sans_mono_regular.typeface.json', (response:Font) => {
       setFont(new three.Font(response.data));
     });
+
   }, []);      
   
   useEffect(() => {
 
-    geomRef.current = new TextGeometry( props.label, {
+    if (font) {
 
-      font: font!,
+      // console.log('props.label', props.label, font);
+      const shapes = font!.generateShapes( props.label, size );
+      geomRef.current = new three.ShapeGeometry( shapes );
+      geomRef.current.computeBoundingBox();      
+  
+      geomRef.current.rotateX(-Math.PI / 2);
+      geomRef.current.translate(position.x, position.y, position.z);
 
-      size: 18,
-      height: 0.2,
-      curveSegments: 10,
+      meshRef.current!.geometry = geomRef.current;
 
-      bevelThickness: 0.5,
-      bevelSize: 0.5,
-      bevelEnabled: true
-
-    });
-
-    geomRef.current.computeBoundingBox();      
-    // geomRef.current.rotateX(-Math.PI / 2);
-    geomRef.current.translate(-200, 1.1, -50);
+    }
     
-    meshRef.current!.geometry = geomRef.current;
-    // meshRef.current!.position.set(-20, 0, -3);
-    // meshRef.current!.updateMatrix();
-    // meshRef.current!.matrix.needsUpdate = true
-
   }, [props.label]);      
 
-  
-
   return (
-    <mesh ref={ meshRef } castShadow > 
+    <mesh ref={ meshRef }> 
       <textGeometry ref={ geomRef } />
-      <meshStandardMaterial ref={ mtrlRef } color={[0.01, 0.01, 0.01]} />
+      <meshStandardMaterial ref={ mtrlRef } color={ [0.01, 0.01, 0.01] } side={ three.DoubleSide } />
     </mesh>
   );
-
-  
   
 };
 

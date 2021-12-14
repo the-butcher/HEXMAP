@@ -1,7 +1,13 @@
+import { IBreadcrumbProps } from "./IBreadcrumbProps";
 
 export interface IIndicatorProps {
 
     id: string; 
+
+    /**
+     * flag that can be listened to in i.e. useEffect method
+     */
+    stamp: string;
 
     title: string;
 
@@ -17,7 +23,12 @@ export interface IIndicatorProps {
      */
     onExpand: (id: string) => void;
 
+    /**
+     * points to the data, retrievable from DataRepository
+     */
     source: string;
+
+    breadcrumbProps: IBreadcrumbProps[];
 
 
 }

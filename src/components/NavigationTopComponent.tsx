@@ -13,9 +13,6 @@ export default (props: INavigationTopProps) => {
     <div style={{ width: 'inherit'}}>
       <AppBar elevation={ 4 } position="static">
         <Toolbar>
-          <Breadcrumbs aria-label="breadcrumb" style={{ width: '100%' }}>
-            { props.breadcrumbProps.map(props => <BreadcrumbComponent {...props} />) }
-          </Breadcrumbs>            
           <FormControl variant="standard">
             <Input id="input-with-icon-adornment" endAdornment={
               <InputAdornment position="end">

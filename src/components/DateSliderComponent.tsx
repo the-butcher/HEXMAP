@@ -4,16 +4,29 @@ import { ObjectUtil } from "../util/ObjectUtil";
 import { TimeUtil } from "../util/TimeUtil";
 import { IInstantProps } from "./IInstantProps";
 
+/**
+ * functional react component holding a matertial-ui slider
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 export default (props: IInstantProps) => {
-
-    // console.log('slider props', props);
 
     const [key, setKey] = useState<string>(ObjectUtil.createId())
 
     const { onInstantChange, source } = props;
 
+    const [to, setTo] = useState<number>();
+
+    /**
+     * triggered from the slider, calling the callback specified in props
+     * @param event 
+     * @param value 
+     */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        onInstantChange(source, value as number);
+        window.requestAnimationFrame(() => {
+            onInstantChange(source, value as number);
+        });
     }
 
     /**

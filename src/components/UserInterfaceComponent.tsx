@@ -18,7 +18,7 @@ export default (props: IUserInterfaceProps) => {
           // Name of the slot
           root: {
             // fontSize: '12px',
-            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
             fontFamily: 'Consolas',
             fontSize: '0.95em',
             overflow: 'auto',
@@ -29,7 +29,7 @@ export default (props: IUserInterfaceProps) => {
       MuiCard: {
         styleOverrides: {
           root: {
-            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
             fontFamily: 'Consolas',
             fontSize: '0.95em',
             overflow: 'auto',
@@ -61,8 +61,7 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             fontFamily: 'Consolas',
-            fontSize: '1.1em',
-
+            fontSize: '1.0em',
           },
         },
       },
@@ -71,7 +70,7 @@ export default (props: IUserInterfaceProps) => {
           root: {
             fontFamily: 'Consolas',
             width: 'unset',
-            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
             height: '50px',
             padding: '0px'
             // padding: '6px'
@@ -95,10 +94,22 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           // Name of the slot
           root: {
+            fontFamily: 'Consolas',
+            fontSize: '0.95em',
+          },
+          input: {
+            padding: '0px'
+          }
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          // Name of the slot
+          root: {
             fontFamily: 'Consolas'
           },
         },
-      }
+      }      
     },
   });
 

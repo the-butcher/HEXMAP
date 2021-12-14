@@ -14,7 +14,7 @@
       "9" : "Wien"
     },
     "Altersgruppe" : {
-      "T" : "TOTAL",
+      "T" : "Alle Altersgruppen",
       "0" : "<= 05",
       "1" : "05-14",
       "2" : "15-24",

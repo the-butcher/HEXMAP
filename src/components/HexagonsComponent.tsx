@@ -1,13 +1,19 @@
-import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { FirstPersonControls } from '@react-three/drei';
+import { ThreeEvent, useThree } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as three from 'three';
 import { BufferGeometry, Material } from 'three';
 import { PbfHexagonsLoader } from '../protobuf/PbfHexagonsLoader';
-import { IColor } from '../util/IColor';
 import { SpatialUtil } from '../util/SpatialUtil';
 import { IHexagonsProps } from './IHexagonsProps';
 import { IHexagonValues } from './IHexagonValues';
 
+/**
+ * functional react component responsible for drawing the hexagons
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
 export default (props: IHexagonsProps) => {
 
   const { invalidate } = useThree();
@@ -78,7 +84,7 @@ export default (props: IHexagonsProps) => {
         normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
         normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
   
-        //vertical triangle A
+        //vertical triangle B
         vertices.push(cosLast * radius, SpatialUtil.HEXAGON_OFFSET_Y, sinLast * radius);
         vertices.push(cosCurr * radius, 0, sinCurr * radius);
         vertices.push(cosLast * radius, 0, sinLast * radius);
@@ -130,6 +136,8 @@ export default (props: IHexagonsProps) => {
           hexagonValues.current.push(hexagonValue);
           hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
   
+          // FirstPersonControls
+
           // place at 0 (height will be handled though scaling)
           tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
           tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + hexagonValue.y) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
@@ -160,8 +168,8 @@ export default (props: IHexagonsProps) => {
     hexagonValues.current.forEach(hexagonValue => {
   
       yDest = props.getHeight(hexagonValue);
-      tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
-      tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
+      tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y + yDest, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
       tempObject.updateMatrix();
       meshRef.current.setMatrixAt(counter, tempObject.matrix);
       meshRef.current.instanceMatrix.needsUpdate = true     
@@ -203,7 +211,7 @@ export default (props: IHexagonsProps) => {
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>
-      <meshStandardMaterial ref={ mtrlRef } vertexColors={ true } color={[0.5, 0.5, 0.5]} flatShading={ true }  />
+      <meshStandardMaterial ref={ mtrlRef } vertexColors={ true } color={[0.5, 0.5, 0.5]} flatShading={ true } />
     </instancedMesh>
   );
   

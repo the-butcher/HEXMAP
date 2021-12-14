@@ -1,3 +1,10 @@
+/**
+ * hexagon data-structure once the pbf has loaded
+ * 
+ * @author h.fleischer
+ * @since 11.12.2021
+ */
+
 export interface IHexagonValues {
 
     /**
@@ -20,12 +27,12 @@ export interface IHexagonValues {
     gkz: string | undefined;
 
     /**
-     * corine land use code
+     * land-use-code - corine land use code
      */
     luc: number;
 
     /**
-     * elevation at the center of the hexagon
+     * elevation at the center of the hexagon Math.round(meters * 4)
      */
     ele: number;
 
