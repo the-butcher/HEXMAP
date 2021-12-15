@@ -14,9 +14,27 @@ export default (props: IInstantProps) => {
 
     const [key, setKey] = useState<string>(ObjectUtil.createId())
 
-    const { onInstantChange, source } = props;
+    const { onInstantChange } = props;
 
-    const [to, setTo] = useState<number>();
+    const minDate = new Date(props.instantMin); // 2020
+    const maxDate = new Date(props.instantMax); // 2020
+    console.log(minDate.getFullYear(), minDate.getMonth());
+    console.log(maxDate.getFullYear(), maxDate.getMonth());
+
+    const marks: any[] = [];
+
+    // first year
+    for (let y = minDate.getFullYear(); y <= maxDate.getFullYear(); y++) {
+        for (let q = 0; q < 4; q++) {
+            const date = new Date(y, q * 3, 1);
+            if (date.getTime() >= minDate.getTime() && date.getTime() <= maxDate.getTime()) {
+                marks.push({
+                    value: date.getTime(),
+                    label: TimeUtil.formatCategoryDateFull(date.getTime())
+                });
+            }
+        }
+    }
 
     /**
      * triggered from the slider, calling the callback specified in props
@@ -24,9 +42,7 @@ export default (props: IInstantProps) => {
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        window.requestAnimationFrame(() => {
-            onInstantChange(source, value as number);
-        });
+        onInstantChange(value as number);
     }
 
     /**
@@ -40,7 +56,7 @@ export default (props: IInstantProps) => {
     });
 
     return (
-        <Slider key={ key } onChange={ handleInstantChange } valueLabelFormat={ formatLabel } size="small"  value={ props.instantCur } min={ props.instantMin } max={ props.instantMax } step={ TimeUtil.MILLISECONDS_PER____DAY } aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px', marginLeft: '24px' }}/>
+        <Slider key={ key } marks={ marks } onChange={ handleInstantChange } valueLabelFormat={ formatLabel } size="small"  value={ props.instantCur } min={ props.instantMin } max={ props.instantMax } step={ TimeUtil.MILLISECONDS_PER____DAY } aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }}/>
     );
 
 }

@@ -1,6 +1,6 @@
 export interface ILightProps { 
     id: string,
-    instant: number,
+    stamp: string,
     position: {
         x: number;
         y: number;

@@ -28,7 +28,7 @@ export default (props: IControlsProps) => {
         // controls.current.minAzimuthAngle = -Math.PI / 4,
         // controls.current.maxAzimuthAngle = Math.PI / 8;
 
-        camera.position.set(-132, 190, 385);
+        camera.position.set(-198, 450, 577);
         controls.current.target.set(0, 0, 0);
         controls.current.update();
 
@@ -89,7 +89,7 @@ export default (props: IControlsProps) => {
         // }        
 
     
-    }, [props.instant]);     
+    }, [props.stamp]);     
 
     // useFrame(() => {
 

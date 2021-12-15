@@ -5,10 +5,10 @@ import { IInstantProps } from "./IInstantProps";
 
 export default (props: IInstantProps) => {
 
-    const { onInstantChange, source } = props;
+    const { onInstantChange } = props;
 
     const handleInstantChange = (date: Date | null) => {
-        onInstantChange(source, date!.getTime());
+        onInstantChange(date!.getTime());
     }
 
     return (

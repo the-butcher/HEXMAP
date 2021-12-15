@@ -1,8 +1,12 @@
-import { FirstPersonControls } from '@react-three/drei';
-import { ThreeEvent, useThree } from '@react-three/fiber';
+import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as three from 'three';
-import { BufferGeometry, Material } from 'three';
+import { BufferGeometry, Material, Object3D, Vector2 } from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { PbfHexagonsLoader } from '../protobuf/PbfHexagonsLoader';
 import { SpatialUtil } from '../util/SpatialUtil';
 import { IHexagonsProps } from './IHexagonsProps';
@@ -16,7 +20,7 @@ import { IHexagonValues } from './IHexagonValues';
  */
 export default (props: IHexagonsProps) => {
 
-  const { invalidate } = useThree();
+  const { invalidate, gl, scene, camera } = useThree();
 
   const valueIndexGkz = 0;
   const valueIndexLuc = 1;
@@ -152,6 +156,32 @@ export default (props: IHexagonsProps) => {
 
         meshRef.current.instanceMatrix.needsUpdate = true
 
+
+        console.log( scene, camera, gl);
+
+        const composer = new EffectComposer( gl );
+        var renderPass = new RenderPass( scene, camera );
+        composer.addPass( renderPass );
+        
+       
+        const outlinePass = new OutlinePass( new Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+        outlinePass.edgeStrength = Number( 10 );
+        outlinePass.edgeGlow = Number( 0);
+        outlinePass.edgeThickness = Number( 10 );
+        outlinePass.pulsePeriod = Number( 0 );
+        outlinePass.visibleEdgeColor.set( "#ffffff" );
+        outlinePass.hiddenEdgeColor.set( "#000000" );
+    
+        outlinePass.selectedObjects = [meshRef.current! as Object3D];
+    
+        composer.addPass( outlinePass );
+        
+        const effectFXAA = new ShaderPass(FXAAShader);
+        effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+        effectFXAA.renderToScreen = true;
+        composer.addPass(effectFXAA);
+        composer.addPass(outlinePass);        
+
       });
 
     }
@@ -186,7 +216,13 @@ export default (props: IHexagonsProps) => {
 
     invalidate();
 
-  }, [props.id]);        
+  }, [props.stamp]);    
+  
+  useFrame(() => {
+
+
+
+  });
 
   let handlePointerMove = (e:ThreeEvent<PointerEvent>) => { // 
     e.stopPropagation();
@@ -207,7 +243,7 @@ export default (props: IHexagonsProps) => {
   }
 
   return (
-    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow> 
+    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow onPointerUp={ handlePointerMove }> 
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>

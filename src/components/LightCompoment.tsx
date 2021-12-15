@@ -40,8 +40,9 @@ export default (props: ILightProps) => {
     }, []);    
     
     useEffect(() => {
+        console.log('stamp updated, updating light');
         pointLight.current!.shadow.needsUpdate = true;
-    }, [props.instant]);      
+    }, [props.stamp]);      
 
     useFrame((state) => {
         // console.log('state', state);

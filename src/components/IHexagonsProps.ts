@@ -3,9 +3,7 @@ import { IHexagonValues } from "./IHexagonValues";
 
 export interface IHexagonsProps {
 
-    id: string;
-
-    // getSchedule: () => IHexagonRendererSchedule;
+    stamp: string;
 
     getHeight: (values: IHexagonValues) => number;
 

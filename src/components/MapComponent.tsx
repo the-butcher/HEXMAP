@@ -18,7 +18,7 @@ export default (props: IMapProps) => {
     const { lightProps, hexagonProps, controlsProps, labelProps } = props;
 
     function onCreated(state: RootState): void {
-        state.gl.setClearColor("#dfdfdf");
+        state.gl.setClearColor("#42423a");
     }
 
     const handlePointerUp = () => {

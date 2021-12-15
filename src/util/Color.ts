@@ -4,6 +4,8 @@ import { ObjectUtil } from './ObjectUtil';
 
 export class Color implements IColor {
 
+    static DARK_GREY = new Color(0, 0, 0.2);
+
     static readonly INDEX_H: number = 0;
     static readonly INDEX_S: number = 1;
     static readonly INDEX_V: number = 2;
@@ -45,7 +47,6 @@ export class Color implements IColor {
     getRgb(): number[] {
         return this.rgb;
     }
-
 
     getHexRgb(rgb: number[]): string {
         return '#' + this.getHexChannel(rgb[Color.INDEX_R]) + this.getHexChannel(rgb[Color.INDEX_G]) + this.getHexChannel(rgb[Color.INDEX_B]);

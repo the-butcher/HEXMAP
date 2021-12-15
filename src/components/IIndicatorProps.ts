@@ -1,9 +1,15 @@
+import { IColor } from "../util/IColor";
+import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
+
+export type INDICATOR_PROPS_STATE = 'closed' | 'open-horizontal' | 'open-vertical';
 
 export interface IIndicatorProps {
 
-    id: string; 
+    // id: string; 
 
+    date: string;
+ 
     /**
      * flag that can be listened to in i.e. useEffect method
      */
@@ -13,10 +19,12 @@ export interface IIndicatorProps {
 
     value: string;
 
+    valueFormatter: IFormattingDefinition;
+
     /**
      * the state that the parent component passes to the indicator
      */
-    state: 'closed' | 'open-horizontal' | 'open-vertical'
+    state: INDICATOR_PROPS_STATE
 
     /**
      * callback to be triggered when an indicator wants to open horizontally
@@ -30,5 +38,6 @@ export interface IIndicatorProps {
 
     breadcrumbProps: IBreadcrumbProps[];
 
+    getColor: (value: number) => IColor;
 
 }

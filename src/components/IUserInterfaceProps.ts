@@ -17,11 +17,6 @@ export interface IUserInterfaceProps {
     onDataPicked: (source: string) => void;
 
     /**
-     * properties for the app-bar (area-picking)
-     */
-    navigationTopProps: INavigationTopProps;
-
-    /**
      * properties for the indicator area
      */
     indicatorProps: IIndicatorProps[];

@@ -34,6 +34,7 @@ export default (props: ILabelProps) => {
     if (font) {
 
       // console.log('props.label', props.label, font);
+      
       const shapes = font!.generateShapes( props.label, size );
       geomRef.current = new three.ShapeGeometry( shapes );
       geomRef.current.computeBoundingBox();      
@@ -45,12 +46,12 @@ export default (props: ILabelProps) => {
 
     }
     
-  }, [props.label]);      
+  }, [props.label, font]);      
 
   return (
     <mesh ref={ meshRef }> 
       <textGeometry ref={ geomRef } />
-      <meshStandardMaterial ref={ mtrlRef } color={ [0.01, 0.01, 0.01] } side={ three.DoubleSide } />
+      <meshStandardMaterial ref={ mtrlRef } color={ [0.00, 0.00, 0.00] } />
     </mesh>
   );
   

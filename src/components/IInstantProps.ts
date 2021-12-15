@@ -1,7 +1,5 @@
 export interface IInstantProps {
 
-    source: string;
-
     /**
      * the initial instant that the slider shall display
      */
@@ -14,6 +12,6 @@ export interface IInstantProps {
     /**
      * callback function to be fired when the value of the slider changes
      */
-    onInstantChange: (source: string, instant: number) => void;
+    onInstantChange: (instant: number) => void;
 
 }

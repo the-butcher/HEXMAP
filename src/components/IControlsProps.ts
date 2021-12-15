@@ -5,5 +5,5 @@
  * @since 11.12.2021
  */
 export interface IControlsProps {
-    instant: number;
-}
+    stamp: string;
+} 
