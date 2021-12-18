@@ -10,7 +10,7 @@ import { ILabelProps } from './ILabelProps';
  * @author h.fleischer
  * @since 11.12.2021
  */
-export default (props: ILabelProps) => {
+export default (props: ILabelProps) => { 
 
   const { size, position } = props;
 

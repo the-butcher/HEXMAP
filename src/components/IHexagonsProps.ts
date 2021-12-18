@@ -3,6 +3,8 @@ import { IHexagonValues } from "./IHexagonValues";
 
 export interface IHexagonsProps {
 
+    onHover: (hovered) => void;
+
     stamp: string;
 
     getHeight: (values: IHexagonValues) => number;

@@ -144,7 +144,7 @@ export default (props: IIndicatorProps) => {
 
       const scrollbar = chart.set("scrollbarX", am5xy.XYChartScrollbar.new(root, {
         orientation: "horizontal",
-        height: 50,
+        height: 73,
       }));
       scrollbar.get('background')!.setAll({
         fill: am5.color(0x42423a),
@@ -244,8 +244,6 @@ export default (props: IIndicatorProps) => {
           s.appear(0);
         });
 
-        console.log('yAxisPre', yAxisPre)
-
       });
 
     }, [props.stamp]);  
@@ -266,17 +264,16 @@ export default (props: IIndicatorProps) => {
                 <div style={{ display: 'flex', flexDirection: 'column'}}>
                   <div style={{ fontSize: '2.6em', position: 'relative', top: '7px', height: '40px', width: '110px', textAlign: 'right' }}>{ props.value }</div>
                   <div style={{ textAlign: 'right' }}>{ props.date }</div>
+                  <div style={{ fontSize: '1.3em', position: 'relative', top: '10px', height: '40px', width: '110px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%' }}>+10,2%<br /><span style={{ fontSize: '0.4em' }}>gegenüber Vorwoche</span></div>
                 </div>
                 <CardActions disableSpacing style={{ padding: '0px', margin: 'auto', marginRight: '0px', transform: expandTransform }}>
                   <IconButton key={ props.source } aria-label='share' onPointerUp={ handleExpand }>
-                    <ExpandMore />
+                    <ExpandMore style={{ width: '24px', height: '24px', color: 'var(--color-text)' }} />
                   </IconButton>                  
                 </CardActions>       
                 </div>
-                
-
               </div>
-              <div style={{ overflow: 'hidden', width: '100%', height: openVertical ? '500px' : '70px', transition: 'all 250ms ease-in-out' }}>
+              <div style={{ overflow: 'hidden', width: '100%', height: openVertical ? '500px' : '90px', transition: 'all 250ms ease-in-out' }}>
                 <div id={ 'chartdiv_' + props.source } style={{ width: 'inherit', height: 'inherit', overflow: 'hidden', display: openHorizontal ? 'block' : 'none' }} />
               </div>
             </div>

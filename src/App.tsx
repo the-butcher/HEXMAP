@@ -28,20 +28,24 @@ export default () => {
    * @param instant 
    */
   const handleInstantChange = (instant1: number) => {
-    console.log('handling instant change (1)', state);
+    // console.log('handling instant change (1)', state);
     setState({
       ...state,
       instant: instant1,
-      stamp: ObjectUtil.createId()
+      action: {
+        updateScene: true,
+      }
     });
   }
 
   const handleSourceChange = (source1: string) => {
-    console.log('handling source change (1)', state);
+    // console.log('handling source change (1)', state);
     setState({
       ...state,
       source: source1,
-      stamp: ObjectUtil.createId()
+      action: {
+        updateScene: true,
+      }
     });
   }
 
@@ -51,11 +55,13 @@ export default () => {
     if (isSourceChange) {
       hatch = 'open-horizontal';
     }
-    console.log(source1, state.source, isSourceChange);
+    // console.log(source1, state.source, isSourceChange);
     setState({
       ...state,
       source: source1,
-      stamp: ObjectUtil.createId(),
+      action: {
+        updateScene: isSourceChange,
+      },
       hatch
     });
   }
@@ -68,20 +74,26 @@ export default () => {
       setState({
         ...state,
         source,
-        stamp: ObjectUtil.createId()
+        action: {
+          updateScene: true
+        }
       });        
     });
 
   };
 
-  const stamp = ObjectUtil.createId();
-  const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 10;
+  const [hovered, setHovered] = useState()
+  const selected1 = hovered ? [hovered] : undefined
+  console.log('selected1', selected1);
+
+  // const stamp = ObjectUtil.createId();
+  const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 14;
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleSourceChange,
     indicatorProps: [
       {
         date: '',
-        stamp: stamp,
+        stamp: ObjectUtil.createId(),
         title: 'Inzidenz nach Alter und Bundesland',
         value: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
@@ -94,7 +106,7 @@ export default () => {
       {
         // id: ObjectUtil.createId(),
         date: '',
-        stamp: stamp,
+        stamp: ObjectUtil.createId(),
         title: 'Inzidenz nach Bezirk',
         value: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
@@ -109,16 +121,17 @@ export default () => {
       instantProps: {
         instantCur: instant,
         instantMin: new Date('2020-03-01').getTime(),
-        instantMax: Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 10,
+        instantMax: instant,
         onInstantChange: handleInstantChange
       }
     }
   });
   const [mapProps, setMapProps] = useState<IMapProps>({
+    selected: selected1,
     lightProps: [
       {
         id: ObjectUtil.createId(),
-        stamp: stamp, 
+        stamp: ObjectUtil.createId(), 
         position: {
           x: 300,
           y: 200,
@@ -127,7 +140,7 @@ export default () => {
       },
       {
         id: ObjectUtil.createId(),
-        stamp: stamp,
+        stamp: ObjectUtil.createId(),
         position: {
           x: -300,
           y: 200,
@@ -136,9 +149,10 @@ export default () => {
       }      
     ],
     controlsProps: {
-      stamp: stamp,
+      stamp: ObjectUtil.createId(),
     },
     hexagonProps: {
+        onHover: setHovered,
         stamp: ObjectUtil.createId(),
         getColor: (values) => ColorUtil.getCorineColor(values.luc),
         getHeight: (values) => values.ele
@@ -187,11 +201,15 @@ export default () => {
     ] 
   });
 
+
+
   const indicatorProps = userInterfaceProps.indicatorProps[0];
   const [state, setState] = useState<IAppState>({
     source: indicatorProps.source,
-    instant: Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 10,
-    stamp: ObjectUtil.createId(),
+    instant,
+    action: {
+      updateScene: false
+    },
     hatch: indicatorProps.state
   });
 
@@ -261,13 +279,14 @@ export default () => {
           return new Color(h, s, v);
         }
 
+        // console.log('data', data, );
         const values = data.data[TimeUtil.formatCategoryDateFull(state.instant)][areaPointer + dataPointer];
         if (selected) {
           indicatorProps.push({
             ...indicatorPropsInstance,
             value: indicatorPropsInstance.valueFormatter.format(values),
             breadcrumbProps: breadcrumbProps,
-            stamp: state.stamp,
+            stamp: ObjectUtil.createId(),
             state: state.hatch,
             date: TimeUtil.formatCategoryDateFull(state.instant),
             onExpand: handleIndicatorExpand,
@@ -286,7 +305,8 @@ export default () => {
 
         if (selected) {
           hexagonProps = {
-            stamp: ObjectUtil.createId(),
+            onHover: setHovered,
+            stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getColor: (values) => {
               if (values.gkz) {
                 // const corineColor = ColorUtil.getCorineColor(values.luc);
@@ -369,7 +389,7 @@ export default () => {
       */
       const controlsProps = {
         ...mapProps.controlsProps,
-        stamp: state.stamp
+        // stamp: state.stamp
       }
  
       /**
@@ -378,29 +398,30 @@ export default () => {
       const lightProps = mapProps.lightProps.map(props => {
         return {
           ...props,
-          stamp: ObjectUtil.createId()
+          stamp: state.action.updateScene ? ObjectUtil.createId() : props.stamp
         }
       });  
  
-      console.log('labelProps', labelProps);
- 
+      console.log('selectedE', selected1);
       /**
       * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
       */
-      setTimeout(() => {
+      // requestAnimationFrame(() => {
         setMapProps({
+          selected: selected1,
           labelProps: [...labelProps],
           lightProps,
           controlsProps,
-          hexagonProps: hexagonProps!
+          hexagonProps: hexagonProps! 
         });      
-      }, 500);
+      // })
+      // }, 10);
 
     });
 
 
 
-  }, [state.instant, state.source, state.stamp]);   
+  }, [state.instant, state.source, state.action]);   
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>

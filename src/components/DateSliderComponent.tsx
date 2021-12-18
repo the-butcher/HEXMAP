@@ -18,12 +18,8 @@ export default (props: IInstantProps) => {
 
     const minDate = new Date(props.instantMin); // 2020
     const maxDate = new Date(props.instantMax); // 2020
-    console.log(minDate.getFullYear(), minDate.getMonth());
-    console.log(maxDate.getFullYear(), maxDate.getMonth());
-
     const marks: any[] = [];
 
-    // first year
     for (let y = minDate.getFullYear(); y <= maxDate.getFullYear(); y++) {
         for (let q = 0; q < 4; q++) {
             const date = new Date(y, q * 3, 1);

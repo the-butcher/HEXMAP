@@ -4,6 +4,7 @@ import DatePickerComponent from "./DatePickerComponent";
 import DateSliderComponent from "./DateSliderComponent";
 import IndicatorComponent from "./IndicatorComponent";
 import { IUserInterfaceProps } from "./IUserInterfaceProps";
+import MuiPickersDay from '@mui/lab/PickersDay';
 
 export default (props: IUserInterfaceProps) => {
 
@@ -17,7 +18,39 @@ export default (props: IUserInterfaceProps) => {
       MuiButtonBase: {
         styleOverrides: {
           root: {
-            backgroundColor: 'red'
+            // backgroundColor: 'red'
+          }
+        }
+      },
+      // @ts-ignore
+      MuiPickersDay: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#44443c',
+            fontFamily,
+            color: 'var(--color-text)',            
+            paddingTop: '3px',
+            '&.Mui-selected': {
+              backgroundColor: 'var(--color-text)',
+              color: '#44443c',                 
+            },
+            '&.Mui-selected:hover': {
+              backgroundColor: 'var(--color-text)',
+              color: '#44443c',                 
+            },         
+            '&:focus.Mui-selected': {
+              backgroundColor: 'var(--color-text)',
+              color: '#44443c',                 
+            }              
+          },
+        }
+      },
+      MuiSvgIcon: {
+        styleOverrides: {
+          // @ts-ignore
+          fontSizeMedium: {
+            width: '20px',
+            height: '20px'
           }
         }
       },

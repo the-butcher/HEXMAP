@@ -1,12 +1,7 @@
-import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { ThreeEvent, useThree } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
 import * as three from 'three';
-import { BufferGeometry, Material, Object3D, Vector2 } from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { BufferGeometry, Material } from 'three';
 import { PbfHexagonsLoader } from '../protobuf/PbfHexagonsLoader';
 import { SpatialUtil } from '../util/SpatialUtil';
 import { IHexagonsProps } from './IHexagonsProps';
@@ -154,39 +149,22 @@ export default (props: IHexagonsProps) => {
     
         });
 
+        /**
+         * sorting is crucial for perfomance
+         * if the front-most hexagons draw last it will be expensive
+         * if the front-most hexagons draw first it will be fast
+         */
+        hexagonValues.current.sort((a, b) => b.z - a.z)
+
         meshRef.current.instanceMatrix.needsUpdate = true
-
-
-        console.log( scene, camera, gl);
-
-        const composer = new EffectComposer( gl );
-        var renderPass = new RenderPass( scene, camera );
-        composer.addPass( renderPass );
-        
-       
-        const outlinePass = new OutlinePass( new Vector2( window.innerWidth, window.innerHeight ), scene, camera );
-        outlinePass.edgeStrength = Number( 10 );
-        outlinePass.edgeGlow = Number( 0);
-        outlinePass.edgeThickness = Number( 10 );
-        outlinePass.pulsePeriod = Number( 0 );
-        outlinePass.visibleEdgeColor.set( "#ffffff" );
-        outlinePass.hiddenEdgeColor.set( "#000000" );
-    
-        outlinePass.selectedObjects = [meshRef.current! as Object3D];
-    
-        composer.addPass( outlinePass );
-        
-        const effectFXAA = new ShaderPass(FXAAShader);
-        effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-        effectFXAA.renderToScreen = true;
-        composer.addPass(effectFXAA);
-        composer.addPass(outlinePass);        
 
       });
 
     }
 
   }, []);      
+
+
 
   useEffect(() => {
 
@@ -199,6 +177,7 @@ export default (props: IHexagonsProps) => {
   
       yDest = props.getHeight(hexagonValue);
       tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y + yDest, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      // tempObject.rotateY(Math.PI);
       // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
       tempObject.updateMatrix();
       meshRef.current.setMatrixAt(counter, tempObject.matrix);
@@ -217,12 +196,6 @@ export default (props: IHexagonsProps) => {
     invalidate();
 
   }, [props.stamp]);    
-  
-  useFrame(() => {
-
-
-
-  });
 
   let handlePointerMove = (e:ThreeEvent<PointerEvent>) => { // 
     e.stopPropagation();
@@ -242,18 +215,28 @@ export default (props: IHexagonsProps) => {
     // }
   }
 
+  const hovered = useRef();
+  const handleHover = (e:ThreeEvent<PointerEvent>) => {
+    console.log(e.object);
+    //@ts-ignore
+    hovered.current = e.object;
+    props.onHover(hovered);
+    
+  }
+
   return (
-    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow onPointerUp={ handlePointerMove }> 
+    <instancedMesh ref={ meshRef } onPointerOver={ handleHover } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow onPointerUp={ handlePointerMove }> 
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>
-      <meshStandardMaterial ref={ mtrlRef } vertexColors={ true } color={[0.5, 0.5, 0.5]} flatShading={ true } />
+      <meshStandardMaterial ref={ mtrlRef } vertexColors={ true } color={[0.5, 0.5, 0.5]} flatShading={ true }/>
     </instancedMesh>
   );
   
 };
 
 /**
+ *   transparent={ true } opacity={ 0.1 }
  *   onPointerMove={ handlePointerMove }
  *       <cylinderBufferGeometry args={[440 * SpatialUtil.SCALE_SCENE, 440 * SpatialUtil.SCALE_SCENE, SpatialUtil.HEXAGON_SEMIHEIGHT * 2, 6, 1, false, 0, Math.PI * 2]}>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>

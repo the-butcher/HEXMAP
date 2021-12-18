@@ -1,4 +1,5 @@
 import { INDICATOR_PROPS_STATE as INDICATOR_PROPS_HATCH } from "./components/IIndicatorProps";
+import { IAppAction } from "./IAppAction";
 
 export interface IAppState {
 
@@ -15,7 +16,7 @@ export interface IAppState {
     /**
      * a synthetic variable usable to force a state update
      */
-    stamp: string;
+    action: IAppAction;
 
     hatch: INDICATOR_PROPS_HATCH;
 

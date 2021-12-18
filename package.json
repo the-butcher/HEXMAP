@@ -21,6 +21,7 @@
     "@mui/material": "^5.2.2",
     "@react-three/drei": "7.25.3",
     "@react-three/fiber": "7.0.21",
+    "@react-three/postprocessing": "^2.0.5",
     "@types/delaunator": "^3.0.0",
     "date-fns": "^2.27.0",
     "delaunator": "^5.0.0",
