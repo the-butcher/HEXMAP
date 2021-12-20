@@ -22,8 +22,8 @@ export default (props: IIndicatorProps) => {
     const [ series, setSeries ] = useState<am5xy.LineSeries[]>([]);
     const [ yAxisPre, setYAxisPre ] = useState<am5xy.ValueAxis<am5xy.AxisRendererY>>();
 
-    const openHorizontal = props.state === 'open-horizontal' || props.state === 'open-vertical';
-    const openVertical = props.state === 'open-vertical';
+    const openHorizontal = props.fold === 'open-horizontal' || props.fold === 'open-vertical';
+    const openVertical = props.fold === 'open-vertical';
     let expandTransform = 'rotate(-90deg)'
     if (openHorizontal) {
         expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
@@ -152,7 +152,7 @@ export default (props: IIndicatorProps) => {
 
       const gStI = scrollbar.startGrip.get('icon');
       const gStB = scrollbar.startGrip.get('background')
-      console.log(gStI, gStB);
+      // console.log(gStI, gStB);
 
       /**
        * some start grip modification
@@ -216,7 +216,7 @@ export default (props: IIndicatorProps) => {
 
     useEffect(() => {
 
-      // console.log('stamp changed, updating chart', props.title);
+      console.log('source changed, updating chart', props.path);
 
       DataRepository.getInstance().getOrLoad(props.source).then(data => {
 
@@ -246,7 +246,7 @@ export default (props: IIndicatorProps) => {
 
       });
 
-    }, [props.stamp]);  
+    }, [props.path]);  
 
     return (
       <div style={{ flexGrow: openHorizontal ? '2' : '0', transition: 'all 250ms ease-in-out' }}>

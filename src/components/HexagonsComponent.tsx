@@ -18,6 +18,7 @@ import { IHexagonsProps } from './IHexagonsProps';
 export default (props: IHexagonsProps) => {
 
   const { invalidate, gl, scene, camera } = useThree();
+  const { onPathChange } = props;
 
   const geomRef = useRef<three.BufferGeometry>(new three.BufferGeometry());
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
@@ -100,7 +101,7 @@ export default (props: IHexagonsProps) => {
 
       HexagonRepository.getInstance().load().then(() => {
 
-        console.log('HexagonRepository.getInstance().getHexagons()', HexagonRepository.getInstance().getHexagons());
+        // console.log('HexagonRepository.getInstance().getHexagons()', HexagonRepository.getInstance().getHexagons());
         HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
           // place at 0 (height will be handled though scaling)
@@ -115,73 +116,6 @@ export default (props: IHexagonsProps) => {
       
       });
 
-      // new PbfHexagonsLoader().load('./hexagons.pbf').then(pbfHexagons => {
-  
-      //   // console.log('loading hexagons');
-  
-      //   let values: number[];
-      //   let yOffset: number;
-      //   let color: number[];
-  
-      //   pbfHexagons.getHexagons().forEach(pbfHexagon => {
-  
-      //     // color = ColorUtil.getCorineColor(values[valueIndexCode]);
-      //     values = pbfHexagon.getValues();
-      //     yOffset = values[valueIndexX] % 2 === 0 ? 0 : SpatialUtil.HEXAGON_SPACING_X / 2;
-  
-      //     /**
-      //      * intial values
-      //      */
-      //      hexagonValue = {
-      //       i: -1,
-      //       x: values[valueIndexX] * SpatialUtil.HEXAGON_SPACING_Y + SpatialUtil.HEXAGON_ORIGIN_X,
-      //       y: 0,
-      //       z: values[valueIndexY] * SpatialUtil.HEXAGON_SPACING_X - yOffset - SpatialUtil.HEXAGON_ORIGIN_Y,
-      //       r: 0,
-      //       g: 0,
-      //       b: 0,
-      //       col: values[valueIndexX],
-      //       row: values[valueIndexY],
-      //       gkz: values[valueIndexGkz] >= 0 ? values[valueIndexGkz].toString() : undefined,
-      //       luc: values[valueIndexLuc],
-      //       ele: SpatialUtil.toZ(values[valueIndexZ] / SpatialUtil.SCALE_PRECISION)
-      //     };
-      //     hexagonValues.current.push(hexagonValue);
-      //     hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
-        
-      //   });
-
-      //   hexagonValues.current.sort((a, b) => b.z - a.z);
-
-      //   let counter = 0;
-      //   hexagonValues.current.forEach(hexagonValue => {
-  
-      //     // FirstPersonControls
-      //     hexagonValue.i = counter;
-
-      //     // place at 0 (height will be handled though scaling)
-      //     tempObject.position.set(hexagonValue.x, -SpatialUtil.HEXAGON_OFFSET_Y, hexagonValue.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
-      //     tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + hexagonValue.y) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
-      //     tempObject.updateMatrix();
-      //     meshRef.current.setMatrixAt(counter, tempObject.matrix);
-  
-      //     // ColorUtil.getCorineColor(values[valueIndexLuc]).map((value, index) => colorArray[counter * 3 + index] = value);
-  
-      //     counter++;
-    
-      //   });
-
-      //   /**
-      //    * sorting is crucial for perfomance
-      //    * if the front-most hexagons draw last it will be expensive
-      //    * if the front-most hexagons draw first it will be fast
-      //    */
-      //   // hexagonValues.current.sort((a, b) => b.z - a.z)
-
-      //   meshRef.current.instanceMatrix.needsUpdate = true
-
-      // });
-
     }
 
   }, []);      
@@ -190,7 +124,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    // console.log('props.id changed', props);
+    console.log('stamp changed, updating hexagons');
 
     let yDest: number;
     let counter = 0;
@@ -217,7 +151,20 @@ export default (props: IHexagonsProps) => {
 
       counter++;
 
-    });    
+    });   
+    
+    // console.log('props.path', props.path, props.keys);
+    props.keys.forEach(path => {
+      const borderHexagons = HexagonRepository.getInstance().getBorder(path, props);
+      borderHexagons.forEach(borderHexagon => {
+          let color = props.getColor(borderHexagon);
+          let rgb = path === props.path ? color.hilight().getRgb() : color.outline().getRgb();
+          colorArray[borderHexagon.i * 3 + 0] = rgb[0]; 
+          colorArray[borderHexagon.i * 3 + 1] = rgb[1];
+          colorArray[borderHexagon.i * 3 + 2] = rgb[2];
+          meshRef.current.geometry.attributes.color.needsUpdate = true;
+      });
+    });
 
     invalidate();
 
@@ -227,31 +174,16 @@ export default (props: IHexagonsProps) => {
 
     e.stopPropagation();
     if (e.instanceId) {
-
-      // should issue a callback which would then toggle the chart and the map
-
-      const borderHexagons = HexagonRepository.getInstance().getBorder(e.instanceId, props);
-      borderHexagons.forEach(borderHexagon => {
-          let rgb = props.getColor(borderHexagon).outline().getRgb();
-          colorArray[borderHexagon.i * 3 + 0] = rgb[0];
-          colorArray[borderHexagon.i * 3 + 1] = rgb[1];
-          colorArray[borderHexagon.i * 3 + 2] = rgb[2];
-          meshRef.current.geometry.attributes.color.needsUpdate = true;
-      });
-      invalidate();
+      const hexagonValue = HexagonRepository.getInstance().getHexagon(e.instanceId);
+      const path = props.getPath(hexagonValue);
+      if (path !== props.path) {
+        // console.log('firing path change event');
+        onPathChange(props.source, props.name, path);  
+      }
 
     }
 
   }
-
-  // const hovered = useRef();
-  // const handleHover = (e:ThreeEvent<PointerEvent>) => {
-  //   console.log(e.object);
-  //   //@ts-ignore
-  //   hovered.current = e.object;
-  //   props.onHover(hovered);
-    
-  // }
 
   return (
     <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow onPointerUp={ handlePointerUp }> 

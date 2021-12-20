@@ -1,4 +1,4 @@
-import { INDICATOR_PROPS_STATE as INDICATOR_PROPS_HATCH } from "./components/IIndicatorProps";
+import { INDICATOR_PROPS_FOLD as INDICATOR_PROPS_HATCH } from "./components/IIndicatorProps";
 import { IAppAction } from "./IAppAction";
 
 export interface IAppState {
@@ -18,7 +18,7 @@ export interface IAppState {
      */
     action: IAppAction;
 
-    hatch: INDICATOR_PROPS_HATCH;
+    fold: INDICATOR_PROPS_HATCH;
 
     // userInterfaceProps: IUserInterfaceProps;
 

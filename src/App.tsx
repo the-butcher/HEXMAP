@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
 import { IHexagon } from './components/IHexagon';
-import { IIndicatorProps, INDICATOR_PROPS_STATE } from './components/IIndicatorProps';
+import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { IMapProps } from './components/IMapProps';
 import { IUserInterfaceProps } from './components/IUserInterfaceProps';
@@ -17,8 +17,11 @@ import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
+import { UpdateDisabled } from '@mui/icons-material';
 
 export default () => {
+
+  
 
   /**
    * handles changes originating from either date-slider or data-picker
@@ -35,26 +38,29 @@ export default () => {
       instant: instant1,
       action: {
         updateScene: true,
+        updateLight: true,
+        updateDelay: 250
       }
     });
   }
 
-  const handleSourceChange = (source1: string) => {
-    // console.log('handling source change (1)', state);
-    setState({
-      ...state,
-      source: source1,
-      action: {
-        updateScene: true,
-      }
-    });
-  }
+  // const handleSourceChange = (source1: string) => {
+  //   // console.log('handling source change (1)', state);
+  //   setState({
+  //     ...state,
+  //     source: source1,
+  //     action: {
+  //       updateScene: true,
+  //       updateLight: true
+  //     }
+  //   });
+  // }
 
   const handleIndicatorExpand = (source1: string) => {
     const isSourceChange = source1 !== state.source;
-    let hatch: INDICATOR_PROPS_STATE = state.hatch === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
+    let fold: INDICATOR_PROPS_FOLD = state.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
-      hatch = 'open-horizontal';
+      fold = 'open-horizontal';
     }
     // console.log(source1, state.source, isSourceChange);
     setState({
@@ -62,12 +68,16 @@ export default () => {
       source: source1,
       action: {
         updateScene: isSourceChange,
+        updateLight: isSourceChange,
+        updateDelay: 350
       },
-      hatch
+      fold
     });
   }
 
   const handlePathChange = (source: string, name: string, path: string) => {
+
+    // console.log('path-change', source, name, path);
 
     // console.log('handling pach update (1)', state);
     DataRepository.getInstance().getOrLoad(source).then(data => {
@@ -76,44 +86,44 @@ export default () => {
         ...state,
         source,
         action: {
-          updateScene: true
-        }
+          updateScene: true,
+          updateLight: false,
+          updateDelay: 1
+        },
       });        
     });
 
   };
 
-  // const [hovered, setHovered] = useState()
-  // const selected1 = hovered ? [hovered] : undefined
-  // console.log('selected1', selected1);
 
-  // const stamp = ObjectUtil.createId();
   const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 14;
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
-    onDataPicked: handleSourceChange,
+    onDataPicked: handleIndicatorExpand,
     indicatorProps: [
       {
         date: '',
-        stamp: ObjectUtil.createId(),
+        // stamp: ObjectUtil.createId(),
         title: 'Inzidenz nach Alter und Bundesland',
         value: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
-        state: 'open-horizontal',
+        fold: 'open-horizontal',
         source: './hexmap-data-bundesland-alter.json',
+        path: '',
         breadcrumbProps: [],
         getColor: value => Color.DARK_GREY
       },
       {
         // id: ObjectUtil.createId(),
         date: '',
-        stamp: ObjectUtil.createId(),
+        // stamp: ObjectUtil.createId(),
         title: 'Inzidenz nach Bezirk',
         value: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
-        state: 'closed',
+        fold: 'closed',
         source: './hexmap-data-bundesland-bezirk.json',
+        path: '',
         breadcrumbProps: [],
         getColor: value => Color.DARK_GREY
       }  
@@ -127,6 +137,8 @@ export default () => {
       }
     }
   });
+
+  const [updateMapTo, setUpdateMapTo] = useState<number>(-1);
   const [mapProps, setMapProps] = useState<IMapProps>({
     // selected: selected1,
     lightProps: [
@@ -154,10 +166,15 @@ export default () => {
     },
     hexagonProps: {
         // onHover: setHovered,
+        source: '',
+        name: '',
+        keys: [],
+        path: '',
         stamp: ObjectUtil.createId(),
+        onPathChange: handlePathChange,
         getColor: (values) => ColorUtil.getCorineColor(values.luc),
         getHeight: (values) => values.ele,
-        getKey: (values) => values.gkz
+        getPath: (values) => values.gkz
     },
     labelProps: [
       {
@@ -210,9 +227,11 @@ export default () => {
     source: indicatorProps.source,
     instant,
     action: {
-      updateScene: false
+      updateScene: false,
+      updateLight: false,
+      updateDelay: 1
     },
-    hatch: indicatorProps.state
+    fold: indicatorProps.fold
   });
 
   useEffect(() => {
@@ -282,14 +301,16 @@ export default () => {
         }
 
         // console.log('data', data, );
-        const values = data.data[TimeUtil.formatCategoryDateFull(state.instant)][areaPointer + dataPointer];
+        const fullPointer = areaPointer + dataPointer;
+        const values = data.data[TimeUtil.formatCategoryDateFull(state.instant)][fullPointer];
         if (selected) {
           indicatorProps.push({
             ...indicatorPropsInstance,
             value: indicatorPropsInstance.valueFormatter.format(values),
             breadcrumbProps: breadcrumbProps,
-            stamp: ObjectUtil.createId(),
-            state: state.hatch,
+            path: fullPointer,
+            // stamp: ObjectUtil.createId(),
+            fold: state.fold,
             date: TimeUtil.formatCategoryDateFull(state.instant),
             onExpand: handleIndicatorExpand,
             getColor
@@ -298,18 +319,26 @@ export default () => {
           indicatorProps.push({
             ...indicatorPropsInstance,
             value: indicatorPropsInstance.valueFormatter.format(values),
-            state: 'closed',
+            fold: 'closed',
             date: TimeUtil.formatCategoryDateFull(state.instant),
-            onExpand: handleIndicatorExpand
+            onExpand: handleIndicatorExpand 
           });
   
         }
 
         if (selected) {
+
+          // console.log('areaPointer', areaPointer);
+
           hexagonProps = {
             // onHover: setHovered,
+            source: state.source,
+            name: names[0],
+            keys: Object.keys(data.keys[names[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
+            path: areaPointer,
+            onPathChange: handlePathChange,
             stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
-            getKey: (values) => {
+            getPath: (values) => {
               return values.gkz.substring(0, areaPointer.length);
             },
             getColor: (values) => {
@@ -319,7 +348,7 @@ export default () => {
               // return ColorUtil.getCorineColor(values.luc);
             },
             getHeight: (values) => {
-              let ele = values.ele / 4 - 7.5 - refEle; // - 7.5;
+              let ele = values.ele / 2 - 7.5 - refEle; // - 7.5;
               const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
               ele += interpolatedHeight.getOut(data.data[data.date][fullPointer][0]);
               return ele;
@@ -372,7 +401,7 @@ export default () => {
           ...userInterfaceProps.navigationBotProps,
           instantProps
         },
-        onDataPicked: handleSourceChange,
+        onDataPicked: handleIndicatorExpand,
       });    
  
       /**
@@ -389,7 +418,7 @@ export default () => {
       const lightProps = mapProps.lightProps.map(props => {
         return {
           ...props,
-          stamp: state.action.updateScene ? ObjectUtil.createId() : props.stamp
+          stamp: state.action.updateLight ? ObjectUtil.createId() : props.stamp
         }
       });  
  
@@ -397,16 +426,15 @@ export default () => {
       /**
       * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
       */
-      // requestAnimationFrame(() => {
+      window.clearTimeout(updateMapTo);
+      setUpdateMapTo(window.setTimeout(() => {
         setMapProps({
-          // selected: selected1,
           labelProps: [...labelProps],
           lightProps,
           controlsProps,
           hexagonProps: hexagonProps! 
         });      
-      // })
-      // }, 10);
+      }, state.action.updateDelay));
 
     });
 

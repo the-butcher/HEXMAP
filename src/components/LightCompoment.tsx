@@ -31,8 +31,8 @@ export default (props: ILightProps) => {
         pointLight.current!.shadow.camera.far = 1000;
         pointLight.current!.shadow.camera.lookAt(0, 0, 0);
 
-        pointLight.current!.shadow.mapSize.width = 4096;
-        pointLight.current!.shadow.mapSize.height = 2048;
+        pointLight.current!.shadow.mapSize.width = 4096; // 4096;
+        pointLight.current!.shadow.mapSize.height = 4096; // 2048;
 
         // const helper = new three.CameraHelper( pointLight.current!.shadow.camera );
         // scene.add( helper );
@@ -40,7 +40,7 @@ export default (props: ILightProps) => {
     }, []);    
     
     useEffect(() => {
-        console.log('stamp updated, updating light');
+        console.log('stamp changed, updating light');
         pointLight.current!.shadow.needsUpdate = true;
     }, [props.stamp]);      
 

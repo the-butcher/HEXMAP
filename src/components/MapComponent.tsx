@@ -32,32 +32,16 @@ export default (props: IMapProps) => {
 
     const { lightProps, hexagonProps, controlsProps, labelProps } = props; // , selected
 
-    // console.log('selectedM', selected);
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
+        // state.gl.toneMapping = three.ReinhardToneMapping;
+        // state.gl.physicallyCorrectLights = true;
     }
 
     const handlePointerUp = () => {
         // console.log('pointer up in document');
     }
-
-    
-
-
-    // const [hovered, setHovered] = useState()
-    // const selected = hovered ? [hovered] : undefined
-
-    // const handleHover0 = (ref1) => {
-    //     console.log('ref1', ref1, ref1.current);
-    //     setHovered(ref1);
-    // }
-
-    // useEffect(() => {
-    //     console.log('hovered', hovered);
-    //     selected = hovered ? hovered : undefined;
-    // }, [hovered]);       
-
 
     return (
         <div style={{ position:'absolute', height: '100%', width: '100%' }} onPointerUp={ handlePointerUp }>

@@ -38,7 +38,9 @@ export default (props: IInstantProps) => {
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        onInstantChange(value as number);
+        // requestAnimationFrame(() => {
+            onInstantChange(value as number);
+        // });
     }
 
     /**

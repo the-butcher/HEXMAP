@@ -3,9 +3,17 @@ import { IHexagon } from "./IHexagon";
 
 export interface IHexagonsProps {
 
-    // onHover: (hovered) => void;
+    source: string;
+
+    name: string;
+
+    keys: string[];
+
+    path: string;
 
     stamp: string;
+
+    onPathChange: (source: string, name: string, path: string) => void;
 
     getHeight: (values: IHexagon) => number;
 
@@ -14,6 +22,6 @@ export interface IHexagonsProps {
     /**
      * get the currently used portion of the gkz number 
      */
-    getKey: (values: IHexagon) => string;
+    getPath: (values: IHexagon) => string;
 
 }

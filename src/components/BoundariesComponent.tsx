@@ -1,4 +1,4 @@
-import { useFrame, useLoader, useThree } from '@react-three/fiber';
+import { ThreeEvent, useFrame, useLoader, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as three from 'three';
 import { ShapeUtils, Vector2 } from 'three';
@@ -158,6 +158,13 @@ const BoundariesComponent = () => {
 
   }, []);    
   
+  /**
+   * stop propagation of events to prevent object selection when the ray intersects the boundary geometry
+   * @param e 
+   */
+  let handlePointerUp = (e:ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+  }
 
   useFrame(() => {
 
@@ -171,7 +178,7 @@ const BoundariesComponent = () => {
 
   return (
     <group>
-      <mesh ref={ meshHood } frustumCulled={ false } receiveShadow> 
+      <mesh ref={ meshHood } frustumCulled={ false } receiveShadow  onPointerUp={ handlePointerUp }> 
         <bufferGeometry ref={ geomHood } />
         <meshStandardMaterial color={[0.04, 0.04, 0.03]} wireframe={ false } />
       </mesh>

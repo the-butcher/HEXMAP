@@ -24,106 +24,105 @@ export class HexagonRepository {
     private static instance: HexagonRepository;
 
     private readonly hexagons: IHexagon[];
-    private readonly hexagonBorders: { [K in string]: IHexagonBorders[] };
+    private readonly borderHexagons: { [K in string]: IHexagon[] };
 
     constructor() {
         this.hexagons = [];
-        this.hexagonBorders = {};
+        this.borderHexagons = {};
     }
 
     getHexagons(): IHexagon[] {
         return this.hexagons;
     }
 
-    // getHexagon(i: number): IHexagon {
-    //     return this.hexagons[i];
-    // }
+    getHexagon(i: number): IHexagon {
+        return this.hexagons[i];
+    }
 
-    getBorder(i: number, props: IHexagonsProps): IHexagon[] {
+    getBorder(path: string, props: IHexagonsProps): IHexagon[] {
 
-        const hexagonValue = this.hexagons[i];
-        const key = props.getKey(hexagonValue);
-        // console.log('key', key);
+        if (!this.borderHexagons[path]) {
 
-        const borderHexagons: IHexagon[] = [];
+            this.borderHexagons[path] = [];
+            const joinableValues = this.hexagons.filter(v => props.getPath(v) === path);
 
-        const joinableValues = this.hexagons.filter(v => props.getKey(v) === key);
-
-        // collect by column and find min/max col
-        let minCol = Number.MAX_SAFE_INTEGER;
-        let maxCol = Number.MIN_SAFE_INTEGER;
-        let joinableValuesByColAndRow: { [K in string]: { [K in string]: IHexagonBorders } } = {};
-        joinableValues.forEach(v => {
-            if (!joinableValuesByColAndRow[v.col]) {
-                joinableValuesByColAndRow[v.col] = {};
-            }
-            joinableValuesByColAndRow[v.col][v.row] = {
-                i: v.i
-            }
-            minCol = Math.min(minCol, v.col);
-            maxCol = Math.max(maxCol, v.col);
-        });
-
-        // all column keys
-        const cols: string[] = Object.keys(joinableValuesByColAndRow);
-        let rows: string[];
-        let joinableCol: { [K in string]: IHexagonBorders };
-        let joinableBorder: IHexagonBorders;
-        let joinableHexagon: IHexagon;
-
-        for (let c = 0; c < cols.length; c++) {
-
-            joinableCol = joinableValuesByColAndRow[cols[c]];
-
-            rows = Object.keys(joinableCol);
-            for (let r = 0; r < rows.length; r++) {
-
-                joinableBorder = joinableCol[rows[r]];
-                joinableHexagon = this.hexagons[joinableBorder.i];
-
-                // south
-                joinableBorder.b090 = joinableValuesByColAndRow[joinableHexagon.col][joinableHexagon.row - 1] === undefined;
-
-                // north
-                joinableBorder.b270 = joinableValuesByColAndRow[joinableHexagon.col][joinableHexagon.row + 1] === undefined;
-
-                // southwest
-                if (joinableValuesByColAndRow[joinableHexagon.col - 1] === undefined) {
-                    joinableBorder.b150 = true;
-                    joinableBorder.b210 = true;
-                } else {
-                    if (joinableHexagon.col % 2 === 0) {
-                        joinableBorder.b150 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row + 1] === undefined;
-                        joinableBorder.b210 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row] === undefined;
+            // collect by column and find min/max col
+            let minCol = Number.MAX_SAFE_INTEGER;
+            let maxCol = Number.MIN_SAFE_INTEGER;
+            let joinableValuesByColAndRow: { [K in string]: { [K in string]: IHexagonBorders } } = {};
+            joinableValues.forEach(v => {
+                if (!joinableValuesByColAndRow[v.col]) {
+                    joinableValuesByColAndRow[v.col] = {};
+                }
+                joinableValuesByColAndRow[v.col][v.row] = {
+                    i: v.i
+                }
+                minCol = Math.min(minCol, v.col);
+                maxCol = Math.max(maxCol, v.col);
+            });
+    
+            // all column keys
+            const cols: string[] = Object.keys(joinableValuesByColAndRow);
+            let rows: string[];
+            let joinableCol: { [K in string]: IHexagonBorders };
+            let joinableBorder: IHexagonBorders;
+            let joinableHexagon: IHexagon;
+    
+            for (let c = 0; c < cols.length; c++) {
+    
+                joinableCol = joinableValuesByColAndRow[cols[c]];
+    
+                rows = Object.keys(joinableCol);
+                for (let r = 0; r < rows.length; r++) {
+    
+                    joinableBorder = joinableCol[rows[r]];
+                    joinableHexagon = this.hexagons[joinableBorder.i];
+    
+                    // south
+                    joinableBorder.b090 = joinableValuesByColAndRow[joinableHexagon.col][joinableHexagon.row - 1] === undefined;
+    
+                    // north
+                    joinableBorder.b270 = joinableValuesByColAndRow[joinableHexagon.col][joinableHexagon.row + 1] === undefined;
+    
+                    // southwest
+                    if (joinableValuesByColAndRow[joinableHexagon.col - 1] === undefined) {
+                        joinableBorder.b150 = true;
+                        joinableBorder.b210 = true;
                     } else {
-                        joinableBorder.b150 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row] === undefined;
-                        joinableBorder.b210 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row - 1] === undefined;
+                        if (joinableHexagon.col % 2 === 0) {
+                            joinableBorder.b150 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row + 1] === undefined;
+                            joinableBorder.b210 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row] === undefined;
+                        } else {
+                            joinableBorder.b150 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row] === undefined;
+                            joinableBorder.b210 = joinableValuesByColAndRow[joinableHexagon.col - 1][joinableHexagon.row - 1] === undefined;
+                        }
                     }
-                }
-
-                if (joinableValuesByColAndRow[joinableHexagon.col + 1] === undefined) {
-                    joinableBorder.b030 = true;
-                    joinableBorder.b330 = true;
-                } else {
-                    if (joinableHexagon.col % 2 === 0) {
-                        joinableBorder.b030 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row + 1] === undefined;
-                        joinableBorder.b330 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row] === undefined;
+    
+                    if (joinableValuesByColAndRow[joinableHexagon.col + 1] === undefined) {
+                        joinableBorder.b030 = true;
+                        joinableBorder.b330 = true;
                     } else {
-                        joinableBorder.b030 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row] === undefined;
-                        joinableBorder.b330 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row - 1] === undefined;
+                        if (joinableHexagon.col % 2 === 0) {
+                            joinableBorder.b030 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row + 1] === undefined;
+                            joinableBorder.b330 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row] === undefined;
+                        } else {
+                            joinableBorder.b030 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row] === undefined;
+                            joinableBorder.b330 = joinableValuesByColAndRow[joinableHexagon.col + 1][joinableHexagon.row - 1] === undefined;
+                        }
                     }
+    
+                    const isBorderHexagon = [joinableBorder.b030, joinableBorder.b090, joinableBorder.b150, joinableBorder.b210, joinableBorder.b270, joinableBorder.b330].find(v => v);
+                    if (isBorderHexagon) {
+                        this.borderHexagons[path].push(joinableHexagon);
+                    }
+    
                 }
-
-                const isBorderHexagon = [joinableBorder.b030, joinableBorder.b090, joinableBorder.b150, joinableBorder.b210, joinableBorder.b270, joinableBorder.b330].find(v => v);
-                if (isBorderHexagon) {
-                    borderHexagons.push(joinableHexagon);
-                }
-
+    
             }
 
         }
 
-        return borderHexagons;
+        return this.borderHexagons[path];
 
     }
 
