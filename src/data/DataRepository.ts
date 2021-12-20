@@ -1,6 +1,12 @@
 import { JsonLoader } from "../util/JsonLoader";
 import { IDataRoot } from "./IDataRoot";
 
+/**
+ * utility type for managing data that needs to be loaded or has already been loaded
+ * 
+ * @author h.fleischer
+ * @since 19.12.2021
+ */
 export class DataRepository {
 
     static getInstance(): DataRepository {
@@ -13,7 +19,6 @@ export class DataRepository {
     private static instance: DataRepository;
 
     private readonly dataset: { [K in string]: IDataRoot };
-
 
     private constructor() {
         this.dataset = {};

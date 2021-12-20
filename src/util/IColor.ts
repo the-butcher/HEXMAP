@@ -21,7 +21,9 @@ export interface IColor {
 
     getHexRgb(rgb: number[]): string;
 
-    brighter(): IColor;
+    outline(): IColor;
+
+    hilight(): IColor;
 
     darker(steps: number): IColor;
 

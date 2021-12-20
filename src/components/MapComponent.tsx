@@ -11,16 +11,16 @@ import LabelComponent from "./LabelComponent";
 import LightCompoment from "./LightCompoment";
 
 
-function Box({ handleHover1, ...props }) {
-    const ref = useRef<three.Mesh>()
-    useFrame((state, delta) => (ref.current.rotation.x = ref.current.rotation.y += delta))
-    return (
-      <mesh ref={ref} {...props} onPointerOver={(e) => handleHover1(ref)} onPointerOut={(e) => handleHover1(null)}>
-        <boxGeometry />
-        <meshStandardMaterial color="orange" />
-      </mesh>
-    )
-  }    
+// function Box({ handleHover1, ...props }) {
+//     const ref = useRef<three.Mesh>()
+//     useFrame((state, delta) => (ref.current.rotation.x = ref.current.rotation.y += delta))
+//     return (
+//       <mesh ref={ref} {...props} onPointerOver={(e) => handleHover1(ref)} onPointerOut={(e) => handleHover1(null)}>
+//         <boxGeometry />
+//         <meshStandardMaterial color="orange" />
+//       </mesh>
+//     )
+//   }    
 
 /**
  * functional react component describing the entire map / scene
@@ -30,9 +30,9 @@ function Box({ handleHover1, ...props }) {
  */
 export default (props: IMapProps) => {
 
-    const { lightProps, hexagonProps, controlsProps, labelProps, selected } = props;
+    const { lightProps, hexagonProps, controlsProps, labelProps } = props; // , selected
 
-    console.log('selectedM', selected);
+    // console.log('selectedM', selected);
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
@@ -72,10 +72,10 @@ export default (props: IMapProps) => {
                     <BoundariesComponent />
                     { labelProps.map(props => <LabelComponent key={ props.id } {...props} />)}
                 </group>
-                <Box handleHover1={ hexagonProps.onHover } position={[1, 0, 0]} />
-                <EffectComposer multisampling={8} autoClear={false}>
+                {/* <Box handleHover1={ hexagonProps.onHover } position={[1, 0, 0]} /> */}
+                {/* <EffectComposer multisampling={8} autoClear={false}>
                     <Outline blur selection={ props.selected } visibleEdgeColor={ 0xFFFFFF } hiddenEdgeColor={ 0x333333 } xRay={ true } edgeStrength={1} width={5000} />
-                </EffectComposer>                
+                </EffectComposer>                 */}
             </Canvas>
         </div>
     );

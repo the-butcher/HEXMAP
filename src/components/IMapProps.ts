@@ -11,7 +11,7 @@ import { ILightProps } from "./ILightProps";
  */
 export interface IMapProps {
 
-    selected,
+    // selected,
 
     lightProps: ILightProps[];
 

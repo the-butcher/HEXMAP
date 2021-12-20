@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
+import { IHexagon } from './components/IHexagon';
 import { IIndicatorProps, INDICATOR_PROPS_STATE } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { IMapProps } from './components/IMapProps';
@@ -82,9 +83,9 @@ export default () => {
 
   };
 
-  const [hovered, setHovered] = useState()
-  const selected1 = hovered ? [hovered] : undefined
-  console.log('selected1', selected1);
+  // const [hovered, setHovered] = useState()
+  // const selected1 = hovered ? [hovered] : undefined
+  // console.log('selected1', selected1);
 
   // const stamp = ObjectUtil.createId();
   const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 14;
@@ -127,7 +128,7 @@ export default () => {
     }
   });
   const [mapProps, setMapProps] = useState<IMapProps>({
-    selected: selected1,
+    // selected: selected1,
     lightProps: [
       {
         id: ObjectUtil.createId(),
@@ -152,10 +153,11 @@ export default () => {
       stamp: ObjectUtil.createId(),
     },
     hexagonProps: {
-        onHover: setHovered,
+        // onHover: setHovered,
         stamp: ObjectUtil.createId(),
         getColor: (values) => ColorUtil.getCorineColor(values.luc),
-        getHeight: (values) => values.ele
+        getHeight: (values) => values.ele,
+        getKey: (values) => values.gkz
     },
     labelProps: [
       {
@@ -274,9 +276,9 @@ export default () => {
 
         const getColor = (value: number) => {
           const h = interpolatedH.getOut(value);
-          const s = interpolatedS.getOut(value);
-          const v = interpolatedV.getOut(value);
-          return new Color(h, s, v);
+          // const s = interpolatedS.getOut(value);
+          // const v = interpolatedV.getOut(value);
+          return new Color(h, 1, 0.4);
         }
 
         // console.log('data', data, );
@@ -305,33 +307,22 @@ export default () => {
 
         if (selected) {
           hexagonProps = {
-            onHover: setHovered,
+            // onHover: setHovered,
             stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
+            getKey: (values) => {
+              return values.gkz.substring(0, areaPointer.length);
+            },
             getColor: (values) => {
-              if (values.gkz) {
-                // const corineColor = ColorUtil.getCorineColor(values.luc);
-                const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
-                const value = data.data[data.date][fullPointer][0];
-                return getColor(value);
-                // const h = interpolatedH.getOut(data.data[data.date][fullPointer][0]);
-                // const s = interpolatedS.getOut(data.data[data.date][fullPointer][0]);
-                // const v = interpolatedV.getOut(data.data[data.date][fullPointer][0]);
-                // return new Color(h, s, v);
-              }
-              return ColorUtil.getCorineColor(values.luc);
+              const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
+              const value = data.data[data.date][fullPointer][0];
+              return getColor(value);
+              // return ColorUtil.getCorineColor(values.luc);
             },
             getHeight: (values) => {
               let ele = values.ele / 4 - 7.5 - refEle; // - 7.5;
-              if (values.gkz) {
-                
-                // const dataPointer = values.gkz.toString().substring(0, 1) + postPointer;
-                const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
-                ele += interpolatedHeight.getOut(data.data[data.date][fullPointer][0]);
-
-              }
+              const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
+              ele += interpolatedHeight.getOut(data.data[data.date][fullPointer][0]);
               return ele;
-              // return values.ele - 7.5;
-              
             }
           }      
         }  
@@ -340,8 +331,8 @@ export default () => {
 
       // TODO needs to be dynamic, especially color wise
       const interpolatedH = new InterpolatedValue(0.25, 0.00, 0, 500, 1);
-      const interpolatedS = new InterpolatedValue(1.00, 1.00, 0, 750, 1);
-      const interpolatedV = new InterpolatedValue(0.50, 0.75, 0, 750, 1);
+      // const interpolatedS = new InterpolatedValue(1.00, 1.00, 0, 750, 1);
+      // const interpolatedV = new InterpolatedValue(0.33, 0.33, 0, 750, 1);
       const interpolatedHeight = new InterpolatedValue(0, 100, 0, 5000, 1);
       const refEle = 0; // interpolatedHeight.getOut(data.data[data.date]['A' + postPointer][0]);
 
@@ -402,13 +393,13 @@ export default () => {
         }
       });  
  
-      console.log('selectedE', selected1);
+      // console.log('selectedE', selected1);
       /**
       * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
       */
       // requestAnimationFrame(() => {
         setMapProps({
-          selected: selected1,
+          // selected: selected1,
           labelProps: [...labelProps],
           lightProps,
           controlsProps,

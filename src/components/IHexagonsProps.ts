@@ -1,14 +1,19 @@
 import { IColor } from "../util/IColor";
-import { IHexagonValues } from "./IHexagonValues";
+import { IHexagon } from "./IHexagon";
 
 export interface IHexagonsProps {
 
-    onHover: (hovered) => void;
+    // onHover: (hovered) => void;
 
     stamp: string;
 
-    getHeight: (values: IHexagonValues) => number;
+    getHeight: (values: IHexagon) => number;
 
-    getColor: (values: IHexagonValues) => IColor;
+    getColor: (values: IHexagon) => IColor;
+
+    /**
+     * get the currently used portion of the gkz number 
+     */
+    getKey: (values: IHexagon) => string;
 
 }

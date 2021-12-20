@@ -5,7 +5,12 @@
  * @since 11.12.2021
  */
 
-export interface IHexagonValues {
+export interface IHexagon {
+
+    /**
+     * the index of this hexagon
+     */
+    i: number;
 
     /**
      * positions of the hexagon
@@ -13,6 +18,9 @@ export interface IHexagonValues {
     x: number;
     y: number;
     z: number;
+
+    col: number;
+    row: number;
 
     /**
      * color of the hexagon

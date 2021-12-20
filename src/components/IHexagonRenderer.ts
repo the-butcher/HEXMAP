@@ -1,4 +1,4 @@
-import { IHexagonValues } from "./IHexagonValues";
+import { IHexagon } from "./IHexagon";
 
 /**
  * @deprecated
@@ -17,8 +17,8 @@ export interface IHexagonRendererSchedule {
 
     getSchedule: () => IHexagonRendererSchedule;
 
-    getHeight: (values: IHexagonValues) => number;
+    getHeight: (values: IHexagon) => number;
 
-    getColor: (values: IHexagonValues, target: number[]) => number[];
+    getColor: (values: IHexagon, target: number[]) => number[];
 
 }

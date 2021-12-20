@@ -28,8 +28,12 @@ export class Color implements IColor {
         return this.hsv;
     }
 
-    brighter(): IColor {
-        return new Color(this.hsv[0], this.hsv[1], Math.min(1, this.hsv[2] * 1.25));
+    outline(): IColor {
+        return new Color(this.hsv[0], 1.00, 0.70); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
+    }
+
+    hilight(): IColor {
+        return new Color(this.hsv[0], 1.00, 1.00); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
     }
 
     darker(steps: number): IColor {
