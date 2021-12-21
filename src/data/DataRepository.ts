@@ -1,4 +1,5 @@
 import { JsonLoader } from "../util/JsonLoader";
+import { TimeUtil } from "../util/TimeUtil";
 import { IDataRoot } from "./IDataRoot";
 
 /**
@@ -30,5 +31,19 @@ export class DataRepository {
         }
         return this.dataset[source];
     }
+
+    async clampInstant(source: string, instant: number): Promise<number> {
+
+        const data = await DataRepository.getInstance().getOrLoad(source)
+        const dates = Object.keys(data.data);
+        const instantMin = TimeUtil.parseCategoryDateFull(dates[0]);
+        const instantMax = TimeUtil.parseCategoryDateFull(dates[dates.length - 1]);
+    
+        instant = Math.max(instant, instantMin);
+        instant = Math.min(instant, instantMax);
+    
+        return instant;
+    
+      }
 
 }

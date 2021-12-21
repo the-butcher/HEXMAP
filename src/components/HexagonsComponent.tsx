@@ -22,7 +22,7 @@ export default (props: IHexagonsProps) => {
 
   const geomRef = useRef<three.BufferGeometry>(new three.BufferGeometry());
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
-  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, 168858));
+  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, 167934));
   // console.log('hex compoment default (1)', meshRef.current.id, geomRef.current.id, mtrlRef.current.id);
   
   /**
@@ -34,8 +34,8 @@ export default (props: IHexagonsProps) => {
   /**
    * helpers for updating color
    */
-  const data = Array.from({ length: 168858 }, () => ({ color: '#FF0000', scale: 1 }))
-  const colorArray = useMemo(() => new Float32Array(168858 * 3), []);
+  const data = Array.from({ length: 167934 }, () => ({ color: '#FF0000', scale: 1 }))
+  const colorArray = useMemo(() => new Float32Array(167934 * 3), []);
   
   let hexagonValue: IHexagon;
   useEffect(() => {
@@ -186,7 +186,7 @@ export default (props: IHexagonsProps) => {
   }
 
   return (
-    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 168858]} castShadow receiveShadow onPointerUp={ handlePointerUp }> 
+    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 167934]} castShadow receiveShadow onPointerUp={ handlePointerUp }> 
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>

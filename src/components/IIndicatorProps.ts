@@ -1,5 +1,6 @@
 import { IColor } from "../util/IColor";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
+import { InterpolatedValue } from "../util/InterpolatedValue";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 
 export type INDICATOR_PROPS_FOLD = 'closed' | 'open-horizontal' | 'open-vertical';
@@ -39,5 +40,9 @@ export interface IIndicatorProps {
     breadcrumbProps: IBreadcrumbProps[];
 
     getColor: (value: number) => IColor;
+
+    interpolatedHue: InterpolatedValue;
+     
+    interpolatedEle: InterpolatedValue;
 
 }

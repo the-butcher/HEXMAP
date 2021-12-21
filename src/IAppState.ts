@@ -13,15 +13,8 @@ export interface IAppState {
      */
     instant: number;
 
-    /**
-     * a synthetic variable usable to force a state update
-     */
     action: IAppAction;
 
     fold: INDICATOR_PROPS_HATCH;
-
-    // userInterfaceProps: IUserInterfaceProps;
-
-    // mapProps: IMapProps;
 
 }
