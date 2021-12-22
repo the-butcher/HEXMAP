@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
-import { IHexagon } from './components/IHexagon';
 import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { IMapProps } from './components/IMapProps';
@@ -17,7 +16,6 @@ import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
-import { UpdateDisabled } from '@mui/icons-material';
 
 export default () => {
 
@@ -31,16 +29,14 @@ export default () => {
    */
   const handleInstantChange = (instant1: number) => {
 
-    DataRepository.getInstance().clampInstant(state.source, instant1).then(instant2 => {
-      setState({
-        ...state,
-        instant: instant2,
-        action: {
-          updateScene: true,
-          updateLight: true,
-          updateDelay: 250
-        }
-      });
+    setState({
+      ...state,
+      instant: DataRepository.getInstance().clampInstant(state.source, instant1),
+      action: {
+        updateScene: true,
+        updateLight: true,
+        updateDelay: 250
+      }
     });
 
   }
@@ -53,23 +49,34 @@ export default () => {
       fold = 'open-horizontal';
     }
 
-    DataRepository.getInstance().clampInstant(source1, state.instant).then(instant1 => {
-
-      setState({
-        ...state,
-        source: source1,
-        instant: instant1,
-        action: {
-          updateScene: isSourceChange,
-          updateLight: isSourceChange,
-          updateDelay: 350
-        },
-        fold
-      });
-
+    setState({
+      ...state,
+      source: source1,
+      instant:  DataRepository.getInstance().clampInstant(source1, state.instant),
+      action: {
+        updateScene: isSourceChange,
+        updateLight: isSourceChange,
+        updateDelay: 350
+      },
+      fold
     });
 
+  }
 
+  const handleIndxChange = (source: string, name: string, path: string) => {
+
+    DataRepository.getInstance().getOrLoad(source).then(data => {
+      data.indx = parseInt(path);
+      setState({
+        ...state,
+        source,
+        action: {
+          updateScene: true,
+          updateLight: true,
+          updateDelay: 1
+        },
+      });        
+    });
 
   }
 
@@ -82,7 +89,7 @@ export default () => {
         source,
         action: {
           updateScene: true,
-          updateLight: false,
+          updateLight: true,
           updateDelay: 1
         },
       });        
@@ -91,7 +98,7 @@ export default () => {
   };
 
 
-  const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY * 14;
+  const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY;
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
@@ -134,8 +141,8 @@ export default () => {
         path: '',
         breadcrumbProps: [],
         getColor: value => Color.DARK_GREY,
-        interpolatedHue: new InterpolatedValue(0.00, 0.25, 50, 90, 1),
-        interpolatedEle: new InterpolatedValue(0, 20, 0, 100, 1)
+        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
+        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1)
       }  
     ],
     navigationBotProps: {  
@@ -251,6 +258,7 @@ export default () => {
     // const interpolatedS = new InterpolatedValue(1.00, 1.00, 0, 750, 1);
     // const interpolatedV = new InterpolatedValue(0.33, 0.33, 0, 750, 1);
     // const interpolatedHeight = new InterpolatedValue(0, 100, 0, 5000, 1);
+
     const refEle = 0; // interpolatedHeight.getOut(data.data[data.date]['A' + postPointer][0]);
 
     const allPromises: Promise<IDataRoot>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoad(props.source));
@@ -268,8 +276,9 @@ export default () => {
         const data = allData[i];
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === state.source;
+        const clampedInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, state.instant);
 
-        data.date = TimeUtil.formatCategoryDateFull(state.instant);
+        data.date = TimeUtil.formatCategoryDateFull(clampedInstant);
 
         /**
          * set up breadcrumbs to show options of current indicator
@@ -300,10 +309,25 @@ export default () => {
             path: data.path[name],
             onPathChange: handlePathChange,
           });
-        };        
+        };  
+        if (data.idxs.length > 1) {
+          console.log('idxs', data.idxs);
+          const keys = {};
+          for (let i = 0; i < data.idxs.length; i++) {
+            keys[i] = data.idxs[i];
+          }
+          const path = data.indx.toString();
+          breadcrumbProps.push({
+            source: state.source, 
+            name: 'index',
+            keys,
+            path,
+            onPathChange: handleIndxChange,
+          });
+        }
 
         if (selected) {
-          labelProps[names.length].label = TimeUtil.formatCategoryDateFull(state.instant);
+          labelProps[names.length].label = TimeUtil.formatCategoryDateFull(clampedInstant);
         }
 
         const getColor = (value: number) => {
@@ -315,17 +339,15 @@ export default () => {
 
         // console.log('data', data, );
         const fullPointer = areaPointer + dataPointer;
-        // TODO 
-        const values = data.data[TimeUtil.formatCategoryDateFull(state.instant)][fullPointer];
+        const values = data.data[TimeUtil.formatCategoryDateFull(clampedInstant)][fullPointer];
         if (selected) {
           indicatorProps.push({
             ...indicatorPropsInstance,
             value: indicatorPropsInstance.valueFormatter.format(values),
             breadcrumbProps: breadcrumbProps,
             path: fullPointer,
-            // stamp: ObjectUtil.createId(),
             fold: state.fold,
-            date: TimeUtil.formatCategoryDateFull(state.instant),
+            date: TimeUtil.formatCategoryDateFull(clampedInstant),
             onExpand: handleIndicatorExpand,
             getColor
           });
@@ -334,16 +356,13 @@ export default () => {
             ...indicatorPropsInstance,
             value: indicatorPropsInstance.valueFormatter.format(values),
             fold: 'closed',
-            date: TimeUtil.formatCategoryDateFull(state.instant),
+            date: TimeUtil.formatCategoryDateFull(clampedInstant),
             onExpand: handleIndicatorExpand 
           });
   
         }
 
         if (selected) {
-
-          // console.log('areaPointer', areaPointer);
-          
 
           hexagonProps = {
             // onHover: setHovered,
@@ -362,7 +381,7 @@ export default () => {
               const dailyValues = dailyDataset[fullPointer];              
               let val = 0;
               if (dailyValues) {
-                val += dailyValues[dailyValues.length - 1]; // last value
+                val += dailyValues[data.indx]; // last value
               }
               return getColor(val);
               // return ColorUtil.getCorineColor(values.luc);
@@ -373,9 +392,9 @@ export default () => {
               const dailyDataset = data.data[data.date];
               const dailyValues = dailyDataset[fullPointer];
               if (dailyValues) {
-                ele += indicatorPropsInstance.interpolatedEle.getOut(dailyValues[dailyValues.length - 1]);
+                ele += indicatorPropsInstance.interpolatedEle.getOut(dailyValues[data.indx]);
               } else {
-                console.log('missing data', fullPointer);
+                // console.log('missing data', fullPointer);
               }
               return ele;
             }

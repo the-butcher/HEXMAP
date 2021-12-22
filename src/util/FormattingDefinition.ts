@@ -24,7 +24,7 @@ export class FormattingDefinition {
     }
 
     static readonly FORMATTER_PERCENT: IFormattingDefinition = {
-        format: values => `${values[0].toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}%`
+        format: values => `${(values[0] * 100).toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}%`
     }
 
 

@@ -1,6 +1,7 @@
 export interface IHexagonBorders {
 
     i: number;
+    path: string;
     b030?: boolean;
     b090?: boolean;
     b150?: boolean;

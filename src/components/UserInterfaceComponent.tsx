@@ -103,7 +103,7 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             fontFamily,
-            fontSize: '1.0em',
+            fontSize: '14px',
           },
         },
       },
@@ -137,7 +137,7 @@ export default (props: IUserInterfaceProps) => {
           // Name of the slot
           root: {
             fontFamily,
-            fontSize: '0.95em',
+            fontSize: '14px',
             color: 'var(--color-text)',
             '&:after': {
               borderBottom: '2px solid var(--color-text)'
@@ -152,7 +152,7 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             fontFamily,
-            fontSize: '0.95em',
+            fontSize: '14px',
             color: 'var(--color-text)',            
             backgroundColor,
             padding: '2px 6px 2px 6px'
@@ -163,7 +163,7 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             fontFamily,
-            fontSize: '0.95em',
+            fontSize: '10px',
             color: 'var(--color-text)',            
             height: '1px',
             padding: '10px 0px',
@@ -171,9 +171,14 @@ export default (props: IUserInterfaceProps) => {
           },
           markLabel: {
             fontFamily,
-            fontSize: '0.75em',
+            fontSize: '10px',
             color: 'var(--color-text)',       
             top: '16px'
+          },
+          valueLabel: {
+            fontFamily,
+            fontSize: '12px',
+            color: 'var(--color-text)',            
           }
         },
       }   

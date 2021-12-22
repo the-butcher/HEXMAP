@@ -1,5 +1,4 @@
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { ObjectUtil } from "../util/ObjectUtil";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 
 export default (props: IBreadcrumbProps) => {
@@ -12,11 +11,11 @@ export default (props: IBreadcrumbProps) => {
 
     const items: JSX.Element[] = [];
     Object.keys(props.keys).forEach(key => {
-      items.push(<MenuItem key={ObjectUtil.createId()} value={key}>{props.keys[key]}</MenuItem>);
+      items.push(<MenuItem key={ key } value={key}>{props.keys[key]}</MenuItem>);
     });    
 
     return (
-        <Select key={name} variant='standard' value={props.path} onChange={handleValueChange}>
+        <Select style={{ fontSize: '14px' }} key={name} variant='standard' value={props.path} onChange={handleValueChange}>
             {items}
         </Select>
     );

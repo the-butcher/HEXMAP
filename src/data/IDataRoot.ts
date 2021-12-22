@@ -6,6 +6,10 @@ export interface IDataRoot {
 
     data: { [K in string]: { [K in string]: number[] }};
 
+    idxs: string[];
+
+    indx: number;
+
     path: { [K in string]: string }; 
 
     date: string;
