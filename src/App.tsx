@@ -8,6 +8,7 @@ import { IUserInterfaceProps } from './components/IUserInterfaceProps';
 import MapComponent from './components/MapComponent';
 import UserInterfaceComponent from './components/UserInterfaceComponent';
 import { DataRepository } from './data/DataRepository';
+import { HexagonRepository } from './data/HexagonRepository';
 import { IDataRoot } from './data/IDataRoot';
 import { IAppState } from './IAppState';
 import { Color } from './util/Color';
@@ -15,6 +16,7 @@ import { ColorUtil } from './util/ColorUtil';
 import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
+import { SpatialUtil } from './util/SpatialUtil';
 import { TimeUtil } from './util/TimeUtil';
 
 export default () => {
@@ -105,7 +107,8 @@ export default () => {
       {
         date: '',
         title: 'Inzidenz nach Alter und Bundesland',
-        value: '',
+        value00: '',
+        value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         fold: 'open-horizontal',
@@ -114,12 +117,13 @@ export default () => {
         breadcrumbProps: [],
         getColor: value => Color.DARK_GREY,
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
-        interpolatedEle: new InterpolatedValue(0, 100, 0, 5000, 1) 
+        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1) 
       },
       {
         date: '',
         title: 'Inzidenz nach Bezirk',
-        value: '',
+        value00: '',
+        value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         fold: 'closed',
@@ -128,12 +132,13 @@ export default () => {
         breadcrumbProps: [],
         getColor: value => Color.DARK_GREY,
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
-        interpolatedEle: new InterpolatedValue(0, 100, 0, 5000, 1)
+        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1)
       },
       {
         date: '',
         title: 'Impfung nach Gemeinde',
-        value: '',
+        value00: '',
+        value07: '',
         valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
         onExpand: handleIndicatorExpand,
         fold: 'closed',
@@ -199,30 +204,33 @@ export default () => {
         label: '',
         size: 6.5,
         position: {
-          x: -255,
+          x: -210,
           y: 0.2,
           z: -10
-        }
+        },
+        rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
         label: '',
         size: 5,
         position: {
-          x: -255,
+          x: -210,
           y: 0.2,
           z: 0
-        }
+        },
+        rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
         label: '',
         size: 5,
         position: {
-          x: -255,
+          x: -210,
           y: 0.2,
           z: 10
-        }
+        },
+        rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
@@ -232,9 +240,34 @@ export default () => {
           x: -255,
           y: 0.2,
           z: 20
-        }
-      }           
-    ] 
+        },
+        rotationY: 0
+      }
+    ],
+    legendLabelProps: [
+      {
+        id: ObjectUtil.createId(),
+        label: '0',
+        size: 6,
+        position: {
+          x: -247,
+          y: 0.2,
+          z: -88
+        },
+        rotationY: 0
+      },
+      {
+        id: ObjectUtil.createId(),
+        label: '0',
+        size: 6,
+        position: {
+          x: -80,
+          y: 0.2,
+          z: -88
+        },
+        rotationY: 0
+      }       
+    ]
   });
 
 
@@ -269,6 +302,7 @@ export default () => {
       labelProps.forEach(props => {
         props.label = '';
       });
+      const legendLabelProps = mapProps.legendLabelProps;
       let hexagonProps: IHexagonsProps;
 
       for (let i=0; i<allData.length; i++) {
@@ -276,9 +310,10 @@ export default () => {
         const data = allData[i];
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === state.source;
-        const clampedInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, state.instant);
+        const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, state.instant);
+        const clampedInstantM7 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 7);
 
-        data.date = TimeUtil.formatCategoryDateFull(clampedInstant);
+        data.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
         /**
          * set up breadcrumbs to show options of current indicator
@@ -290,16 +325,16 @@ export default () => {
           labelProps[0].label = data.name;
         }
   
-        let areaPointer: string = '';
-        let dataPointer: string = '';
+        let prefPointer: string = '';
+        let postPointer: string = '';
         for (let i=0; i<names.length; i++) {
           const name = names[i];
           if (i === 0) {
-            areaPointer = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
+            prefPointer = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
           } else {
-            dataPointer += data.path[name];
+            postPointer += data.path[name];
             if (selected) {
-              labelProps[i].label = data.keys[name][dataPointer];
+              labelProps[i].label = data.keys[name][postPointer];
             }
           }
           breadcrumbProps.push({
@@ -311,7 +346,7 @@ export default () => {
           });
         };  
         if (data.idxs.length > 1) {
-          console.log('idxs', data.idxs);
+          // console.log('idxs', data.idxs);
           const keys = {};
           for (let i = 0; i < data.idxs.length; i++) {
             keys[i] = data.idxs[i];
@@ -326,8 +361,21 @@ export default () => {
           });
         }
 
-        if (selected) {
-          labelProps[names.length].label = TimeUtil.formatCategoryDateFull(clampedInstant);
+        let minLegendVal = Number.MAX_VALUE; // Math.min(indicatorPropsInstance.interpolatedHue.getValMin(), indicatorPropsInstance.interpolatedEle.getValMin());
+        let maxLegendVal = Number.MIN_VALUE; // Math.max(indicatorPropsInstance.interpolatedHue.getValMax(), indicatorPropsInstance.interpolatedEle.getValMax());
+        if (selected) { 
+          labelProps[names.length].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
+          const dailyDataset = data.data[data.date];
+          const keys = Object.keys(dailyDataset);
+          console.log('areaPointer', prefPointer, postPointer);
+          keys.forEach(key => {
+            if (key.endsWith(postPointer)) {
+              minLegendVal = Math.min(minLegendVal, dailyDataset[key][data.indx]);
+              maxLegendVal = Math.max(maxLegendVal, dailyDataset[key][data.indx]);
+            }
+          });
+          legendLabelProps[0].label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
+          legendLabelProps[1].label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
         }
 
         const getColor = (value: number) => {
@@ -335,28 +383,32 @@ export default () => {
           // const s = interpolatedS.getOut(value);
           // const v = interpolatedV.getOut(value);
           return new Color(h, 1, 0.4);
-        }
+        } 
 
         // console.log('data', data, );
-        const fullPointer = areaPointer + dataPointer;
-        const values = data.data[TimeUtil.formatCategoryDateFull(clampedInstant)][fullPointer];
+        const dataPointer = prefPointer + postPointer;
+        const value00 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant00)][dataPointer][data.indx];
+        const valueM7 = data.data[TimeUtil.formatCategoryDateFull(clampedInstantM7)][dataPointer][data.indx];
+        const value07 = (value00 - valueM7) / valueM7;
         if (selected) {
           indicatorProps.push({
             ...indicatorPropsInstance,
-            value: indicatorPropsInstance.valueFormatter.format(values),
+            value00: indicatorPropsInstance.valueFormatter.format(value00),
+            value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             breadcrumbProps: breadcrumbProps,
-            path: fullPointer,
+            path: dataPointer,
             fold: state.fold,
-            date: TimeUtil.formatCategoryDateFull(clampedInstant),
+            date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand,
             getColor
           });
         } else {
           indicatorProps.push({
             ...indicatorPropsInstance,
-            value: indicatorPropsInstance.valueFormatter.format(values),
+            value00: indicatorPropsInstance.valueFormatter.format(value00),
+            value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
-            date: TimeUtil.formatCategoryDateFull(clampedInstant),
+            date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand 
           });
   
@@ -369,32 +421,41 @@ export default () => {
             source: state.source,
             name: names[0],
             keys: Object.keys(data.keys[names[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
-            path: areaPointer,
+            path: prefPointer,
             onPathChange: handlePathChange,
             stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getPath: (values) => {
-              return values.gkz.substring(0, areaPointer.length);
+              return values.gkz.substring(0, prefPointer.length);
             },
             getColor: (values) => {
-              const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
+              const _prefPointer = values.gkz.substring(0, prefPointer.length)
+              const dataPointer = _prefPointer + postPointer;
               const dailyDataset = data.data[data.date];
-              const dailyValues = dailyDataset[fullPointer];              
+              const dailyValues = dailyDataset[dataPointer];              
               let val = 0;
               if (dailyValues) {
-                val += dailyValues[data.indx]; // last value
+                val = dailyValues[data.indx]; // last value
+              } else if (_prefPointer === '0') {
+                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
+                val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
               }
               return getColor(val);
               // return ColorUtil.getCorineColor(values.luc);
             },
             getHeight: (values) => {
               let ele = values.ele / 2 - 7.5 - refEle; // - 7.5;
-              const fullPointer = values.gkz.substring(0, areaPointer.length) + dataPointer;
+              const _prefPointer = values.gkz.substring(0, prefPointer.length)
+              const dataPointer = _prefPointer + postPointer;
               const dailyDataset = data.data[data.date];
-              const dailyValues = dailyDataset[fullPointer];
+              const dailyValues = dailyDataset[dataPointer];
               if (dailyValues) {
                 ele += indicatorPropsInstance.interpolatedEle.getOut(dailyValues[data.indx]);
+              } else if (_prefPointer === '0') {
+                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
+                const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
+                ele += indicatorPropsInstance.interpolatedEle.getOut(val);
               } else {
-                // console.log('missing data', fullPointer);
+                // missing data
               }
               return ele;
             }
@@ -455,6 +516,7 @@ export default () => {
       setUpdateMapTo(window.setTimeout(() => {
         setMapProps({
           labelProps: [...labelProps],
+          legendLabelProps: [...legendLabelProps],
           lightProps,
           controlsProps,
           hexagonProps: hexagonProps! 

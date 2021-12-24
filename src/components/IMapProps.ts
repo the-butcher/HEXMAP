@@ -21,4 +21,6 @@ export interface IMapProps {
 
     labelProps: ILabelProps[];
 
+    legendLabelProps: ILabelProps[];
+
 }

@@ -12,5 +12,6 @@ export interface ILabelProps {
         x: number;
         y: number;
         z: number;
-    };    
+    };  
+    rotationY: number;  
 }

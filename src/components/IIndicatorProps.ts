@@ -16,7 +16,9 @@ export interface IIndicatorProps {
 
     title: string;
 
-    value: string;
+    value00: string;
+
+    value07: string;
 
     valueFormatter: IFormattingDefinition;
 

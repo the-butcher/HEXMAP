@@ -6,5 +6,5 @@
  * @since 14.12.2021
   */
 export interface IFormattingDefinition {
-    format(values: number[]): string;
+    format(value: number): string;
 }

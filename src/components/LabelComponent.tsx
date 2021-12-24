@@ -41,6 +41,7 @@ export default (props: ILabelProps) => {
   
       geomRef.current.rotateX(-Math.PI / 2);
       geomRef.current.translate(position.x, position.y, position.z);
+      geomRef.current.rotateY(props.rotationY);
 
       meshRef.current!.geometry = geomRef.current;
 
@@ -51,7 +52,7 @@ export default (props: ILabelProps) => {
   return (
     <mesh ref={ meshRef }> 
       <textGeometry ref={ geomRef } />
-      <meshStandardMaterial ref={ mtrlRef } color={ [0.00, 0.00, 0.00] } />
+      <meshStandardMaterial ref={ mtrlRef } color={ [0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2] } />
     </mesh>
   );
   

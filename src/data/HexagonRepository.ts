@@ -125,6 +125,12 @@ export class HexagonRepository {
 
     }
 
+    getLegendFraction(values: IHexagon): number {
+        // 164 - 180
+        const fraction = ((values.x -  SpatialUtil.HEXAGON_ORIGIN_X) / SpatialUtil.HEXAGON_SPACING_Y - 179) / 150;
+        return fraction;
+    }
+
     async load(): Promise<void> {
 
         let hexagonValue: IHexagon;

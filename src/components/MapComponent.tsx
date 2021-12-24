@@ -30,7 +30,7 @@ import LightCompoment from "./LightCompoment";
  */
 export default (props: IMapProps) => {
 
-    const { lightProps, hexagonProps, controlsProps, labelProps } = props; // , selected
+    const { lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps } = props; // , selected
 
 
     function onCreated(state: RootState): void {
@@ -51,10 +51,11 @@ export default (props: IMapProps) => {
                 { lightProps.map(props => <LightCompoment key={ props.id } {...props} />)}
                 <ambientLight intensity={ 0.20 } />
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']}  /> */}
-                <group name={'root'}>
+                <group name={ 'root' }>
                     <HexagonsComponent {...hexagonProps} />
                     <BoundariesComponent />
                     { labelProps.map(props => <LabelComponent key={ props.id } {...props} />)}
+                    { legendLabelProps.map(props => <LabelComponent key={ props.id } {...props} />)}
                 </group>
                 {/* <Box handleHover1={ hexagonProps.onHover } position={[1, 0, 0]} /> */}
                 {/* <EffectComposer multisampling={8} autoClear={false}>

@@ -56,7 +56,7 @@ export default (props: IControlsProps) => {
     useEffect(() => {
 
         console.log('props.instant changed', props); // , glRenderer?.domElement.toDataURL()
-        // // setExportCanvas(true);
+        // setExportCanvas(true);
 
         // if (gl.domElement) {
         //     gl.render(scene, camera);

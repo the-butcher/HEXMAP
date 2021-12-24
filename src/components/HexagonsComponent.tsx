@@ -22,7 +22,7 @@ export default (props: IHexagonsProps) => {
 
   const geomRef = useRef<three.BufferGeometry>(new three.BufferGeometry());
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
-  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, 167934));
+  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, 171174));
   // console.log('hex compoment default (1)', meshRef.current.id, geomRef.current.id, mtrlRef.current.id);
   
   /**
@@ -34,8 +34,8 @@ export default (props: IHexagonsProps) => {
   /**
    * helpers for updating color
    */
-  const data = Array.from({ length: 167934 }, () => ({ color: '#FF0000', scale: 1 }))
-  const colorArray = useMemo(() => new Float32Array(167934 * 3), []);
+  const data = Array.from({ length: 171174 }, () => ({ color: '#FF0000', scale: 1 }))
+  const colorArray = useMemo(() => new Float32Array(171174 * 3), []);
   
   let hexagonValue: IHexagon;
   useEffect(() => {
@@ -175,18 +175,19 @@ export default (props: IHexagonsProps) => {
     e.stopPropagation();
     if (e.instanceId) {
       const hexagonValue = HexagonRepository.getInstance().getHexagon(e.instanceId);
-      const path = props.getPath(hexagonValue);
-      if (path !== props.path) {
-        // console.log('firing path change event');
-        onPathChange(props.source, props.name, path);  
+      if (hexagonValue.luc > 0) {
+        const path = props.getPath(hexagonValue);
+        if (path !== props.path) {
+          // console.log('firing path change event');
+          onPathChange(props.source, props.name, path);  
+        }
       }
-
     }
 
   }
 
   return (
-    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 167934]} castShadow receiveShadow onPointerUp={ handlePointerUp }> 
+    <instancedMesh ref={ meshRef } args={[null as unknown as BufferGeometry, null as unknown as Material, 171174]} castShadow receiveShadow onPointerUp={ handlePointerUp }> 
       <bufferGeometry ref={ geomRef }>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>
@@ -197,8 +198,9 @@ export default (props: IHexagonsProps) => {
 };
 
 /**
+ *  transparent={ true } opacity={ 0.8 }
  *  onPointerOver={ handleHover }
- *   transparent={ true } opacity={ 0.1 }
+ *   
  *   onPointerMove={ handlePointerMove }
  *       <cylinderBufferGeometry args={[440 * SpatialUtil.SCALE_SCENE, 440 * SpatialUtil.SCALE_SCENE, SpatialUtil.HEXAGON_SEMIHEIGHT * 2, 6, 1, false, 0, Math.PI * 2]}>
         <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>

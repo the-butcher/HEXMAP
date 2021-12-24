@@ -50,7 +50,7 @@ export default (props: IIndicatorProps) => {
         }
         const date = data.date;
         const valueCount = data.data[date][dataPointer].length;
-        console.log('valueCount', valueCount);
+        // console.log('valueCount', valueCount);
 
         const root = am5.Root.new('chartdiv_' + source);
         root.setThemes([
@@ -293,7 +293,7 @@ export default (props: IIndicatorProps) => {
           chartData.push(dataItem);
         });
 
-        console.log('chartData', chartData);
+        // console.log('chartData', chartData);
         series.forEach(s => {
           s.data.setAll(chartData);
           s.appear(0);
@@ -317,9 +317,9 @@ export default (props: IIndicatorProps) => {
               <div style={{ display: 'flex', flexDirection: 'column'}}>
                 <div style={{ display: 'flex', flexDirection: 'row'}}>
                 <div style={{ display: 'flex', flexDirection: 'column'}}>
-                  <div style={{ fontSize: '36px', position: 'relative', top: '7px', height: '40px', width: '140px', textAlign: 'right' }}>{ props.value }</div>
+                  <div style={{ fontSize: '36px', position: 'relative', top: '7px', height: '40px', width: '140px', textAlign: 'right' }}>{ props.value00 }</div>
                   <div style={{ fontSize: '10px', textAlign: 'right' }}>{ props.date }</div>
-                  <div style={{ fontSize: '18px', position: 'relative', top: '10px', height: '40px', width: '140px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%' }}>+10,2%<br /><span style={{ fontSize: '10px' }}>gegenüber Vorwoche</span></div>
+                  <div style={{ fontSize: '18px', position: 'relative', top: '10px', height: '40px', width: '140px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%' }}>{ props.value07 }<br /><span style={{ fontSize: '10px' }}>gegenüber Vorwoche</span></div>
                 </div>
                 <CardActions disableSpacing style={{ padding: '0px', margin: 'auto', marginRight: '0px', transform: expandTransform }}>
                   <IconButton key={ props.source } aria-label='share' onPointerUp={ handleExpand }>
