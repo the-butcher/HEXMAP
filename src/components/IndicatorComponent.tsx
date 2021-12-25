@@ -1,16 +1,14 @@
 import * as am5 from '@amcharts/amcharts5';
+import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { ExpandMore } from '@mui/icons-material';
 import { Breadcrumbs, Card, CardActions, CardContent, IconButton, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
 import { TimeUtil } from '../util/TimeUtil';
+import BreadcrumbComponent from './BreadcrumbComponent';
 import { IIndicatorProps } from './IIndicatorProps';
 
-import BreadcrumbComponent from './BreadcrumbComponent';
-import am5themes_Dark from "@amcharts/amcharts5/themes/Dark";
-import { max } from 'date-fns/esm';
-import { ObjectUtil } from '../util/ObjectUtil';
 
 export default (props: IIndicatorProps) => {
 
@@ -56,6 +54,7 @@ export default (props: IIndicatorProps) => {
         root.setThemes([
           am5themes_Dark.new(root)
         ]);
+        root.numberFormatter.set('numberFormat', props.valueFormatter.chartFormat);
   
         const chart = root.container.children.push(
           am5xy.XYChart.new(root, {
@@ -68,6 +67,7 @@ export default (props: IIndicatorProps) => {
             paddingTop: 0,
           })
         );     
+        
   
         // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
         var cursor = chart.set('cursor', am5xy.XYCursor.new(root, {
@@ -79,14 +79,20 @@ export default (props: IIndicatorProps) => {
         yRendererVal.labels.template.setAll({
           fontFamily,
           fontSize: 12,
-          fill: labelColor
+          fill: labelColor,
+          // text: `{valueY.formatNumber('${props.valueFormatter.chartFormat}')}`          
         });
+        yRendererVal.labels.template.adapters.add('text', (value) => {
+          console.log('value', value);
+          return value;
+        })
         const yAxisVal = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             renderer: yRendererVal,
             interpolationDuration: 0,
             stateAnimationDuration: 0,
+            min: 0
         }));
-  
+
         const xRendererVal = am5xy.AxisRendererX.new(root, {
           pan: "zoom"
         });
@@ -142,15 +148,16 @@ export default (props: IIndicatorProps) => {
             interpolationDuration: 0,
             sequencedInterpolation: false,
             tooltip: am5.Tooltip.new(root, {}),
-            stroke: am5.color(fontColor),
+            stroke: am5.color(fontColor)
           }));
           seriesVal.strokes.template.set('strokeWidth', 3);
 
           allSeries.push(seriesVal);
 
+          
           const tooltip = seriesVal.get('tooltip')!;
           tooltip.setAll({
-            labelText: '{valueY}',
+            labelText: '{valueY}', // `{valueY.formatNumber('${props.valueFormatter.chartFormat}')}`,
             paddingTop: 4,
             paddingRight: 4,
             paddingBottom: 4,
@@ -171,7 +178,7 @@ export default (props: IIndicatorProps) => {
           }); 
           tooltip.label.adapters.add('fill', (value, target) => {
             return labelColor;
-          });          
+          }); 
 
         }
   
@@ -279,6 +286,7 @@ export default (props: IIndicatorProps) => {
 
         const chartData: unknown[] = [];
         const dates = Object.keys(data.data);
+        let maxValue = Number.MIN_VALUE;
         dates.forEach(dateRaw => {
           const dataVals = data.data[dateRaw][dataPointer];
           const dataItem = {
@@ -286,8 +294,10 @@ export default (props: IIndicatorProps) => {
           };
           for (let valueIndex = 0; valueIndex < valueCount; valueIndex ++) {
             if (dataVals[valueIndex] !== 0) {
-              dataItem[`valueVal_${valueIndex}`] = dataVals[valueIndex];
-              dataItem[`valuePre_${valueIndex}`] = dataVals[valueIndex];
+              const valueY = dataVals[valueIndex];
+              dataItem[`valueVal_${valueIndex}`] = valueY;
+              dataItem[`valuePre_${valueIndex}`] = valueY;
+              maxValue = Math.max(maxValue, valueY);
             }
           }
           chartData.push(dataItem);
@@ -295,6 +305,7 @@ export default (props: IIndicatorProps) => {
 
         // console.log('chartData', chartData);
         series.forEach(s => {
+          (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', maxValue);
           s.data.setAll(chartData);
           s.appear(0);
         });

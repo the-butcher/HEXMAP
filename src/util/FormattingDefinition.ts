@@ -16,15 +16,18 @@ export class FormattingDefinition {
     };
 
     static readonly FORMATTER____FIXED: IFormattingDefinition = {
-        format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FIXED)}`
+        format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FIXED)}`,
+        chartFormat: '#'
     }
 
     static readonly FORMATTER__FLOAT_2: IFormattingDefinition = {
-        format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}`
+        format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}`,
+        chartFormat: '#.00'
     }
 
     static readonly FORMATTER_PERCENT: IFormattingDefinition = {
-        format: value => `${(value * 100).toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}%`
+        format: value => `${(value * 100).toLocaleString(undefined, FormattingDefinition.OPTIONS_FLOAT_2)}%`,
+        chartFormat: '#.00%'
     }
 
 

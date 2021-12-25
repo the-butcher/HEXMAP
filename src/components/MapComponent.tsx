@@ -57,10 +57,6 @@ export default (props: IMapProps) => {
                     { labelProps.map(props => <LabelComponent key={ props.id } {...props} />)}
                     { legendLabelProps.map(props => <LabelComponent key={ props.id } {...props} />)}
                 </group>
-                {/* <Box handleHover1={ hexagonProps.onHover } position={[1, 0, 0]} /> */}
-                {/* <EffectComposer multisampling={8} autoClear={false}>
-                    <Outline blur selection={ props.selected } visibleEdgeColor={ 0xFFFFFF } hiddenEdgeColor={ 0x333333 } xRay={ true } edgeStrength={1} width={5000} />
-                </EffectComposer>                 */}
             </Canvas>
         </div>
     );
