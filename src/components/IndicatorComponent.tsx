@@ -34,7 +34,7 @@ export default (props: IIndicatorProps) => {
    
     useEffect(() => {
 
-      console.log('building chart', props.source);
+      console.log('building chart', props.source, props.path);
 
       DataRepository.getInstance().getOrLoad(props.source).then(data => {
 
@@ -82,10 +82,6 @@ export default (props: IIndicatorProps) => {
           fill: labelColor,
           // text: `{valueY.formatNumber('${props.valueFormatter.chartFormat}')}`          
         });
-        yRendererVal.labels.template.adapters.add('text', (value) => {
-          console.log('value', value);
-          return value;
-        })
         const yAxisVal = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             renderer: yRendererVal,
             interpolationDuration: 0,
@@ -268,7 +264,7 @@ export default (props: IIndicatorProps) => {
 
     useEffect(() => {
 
-      console.log('source changed, updating chart', props.path);
+      console.log('updating chart', props.source, props.path);
 
       DataRepository.getInstance().getOrLoad(props.source).then(data => {
 
@@ -321,7 +317,7 @@ export default (props: IIndicatorProps) => {
             <div style={{ display: 'flex', flexDirection: 'row', width: 'inherit', height: '22px'}}>
               <div style={{ fontSize: '14px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', paddingTop: '1px' }}>{ props.title }</div>
               <Breadcrumbs aria-label="breadcrumb" style={{ display: openHorizontal ? 'block' : 'none', paddingLeft: '12px' }}>
-              { breadcrumbProps.map(props => <BreadcrumbComponent {...props} />) }
+              { breadcrumbProps.map(props => <BreadcrumbComponent key={ props.name } {...props} />) }
               </Breadcrumbs>              
             </div>
             <div style={{ display: 'flex', flexDirection: 'row'}}>

@@ -1,8 +1,10 @@
+import { invalidate } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
 import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
+import { ILightProps } from './components/ILightProps';
 import { IMapProps } from './components/IMapProps';
 import { IUserInterfaceProps } from './components/IUserInterfaceProps';
 import MapComponent from './components/MapComponent';
@@ -270,8 +272,6 @@ export default () => {
     ]
   });
 
-
-
   const indicatorProps = userInterfaceProps.indicatorProps[0];
   const [state, setState] = useState<IAppState>({
     source: indicatorProps.source,
@@ -286,13 +286,10 @@ export default () => {
 
   useEffect(() => {
 
-    // TODO needs to be dynamic, especially color wise
-    // const interpolatedH = new InterpolatedValue(0.25, 0.00, 0, 500, 1);
-    // const interpolatedS = new InterpolatedValue(1.00, 1.00, 0, 750, 1);
-    // const interpolatedV = new InterpolatedValue(0.33, 0.33, 0, 750, 1);
-    // const interpolatedHeight = new InterpolatedValue(0, 100, 0, 5000, 1);
 
-    const refEle = 0; // interpolatedHeight.getOut(data.data[data.date]['A' + postPointer][0]);
+    console.log('updating app')
+
+    const refEle = 0;
 
     const allPromises: Promise<IDataRoot>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoad(props.source));
     Promise.all(allPromises).then(allData => {
@@ -367,7 +364,7 @@ export default () => {
           labelProps[names.length].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
           const dailyDataset = data.data[data.date];
           const keys = Object.keys(dailyDataset);
-          console.log('areaPointer', prefPointer, postPointer);
+          // console.log('areaPointer', prefPointer, postPointer);
           keys.forEach(key => {
             if (key.endsWith(postPointer)) {
               minLegendVal = Math.min(minLegendVal, dailyDataset[key][data.indx]);
@@ -495,7 +492,7 @@ export default () => {
       */
       const controlsProps = {
         ...mapProps.controlsProps,
-        // stamp: state.stamp
+        stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp
       }
  
       /**
@@ -527,7 +524,24 @@ export default () => {
 
 
 
-  }, [state.instant, state.source, state.action]);   
+  }, [state.instant, state.source, state.action]);  
+  
+  
+
+  useEffect(() => {
+    
+    window.setTimeout(() => {
+      setState({
+        ...state,
+        action: {
+          updateScene: true,
+          updateLight: true,
+          updateDelay: 1
+        }
+      });
+    }, 100);
+
+  }, []);      
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>

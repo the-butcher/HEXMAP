@@ -10,9 +10,12 @@ export default (props: IBreadcrumbProps) => {
     }
 
     const items: JSX.Element[] = [];
-    Object.keys(props.keys).forEach(key => {
-      items.push(<MenuItem key={ key } value={key}>{props.keys[key]}</MenuItem>);
-    });    
+    const keys = Object.keys(props.keys);
+    let key: string;
+    for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+        key = keys[keyIndex];
+        items.push(<MenuItem key={ `${key}_${keyIndex}` } value={ key }>{ props.keys[key] }</MenuItem>);
+    }
 
     return (
         <Select style={{ fontSize: '14px' }} key={name} variant='standard' value={props.path} onChange={handleValueChange}>

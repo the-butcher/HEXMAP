@@ -2,7 +2,7 @@ import { Canvas, RootState, useFrame } from "@react-three/fiber";
 import { EffectComposer, Outline } from '@react-three/postprocessing';
 import { useEffect, useRef, useState } from "react";
 import * as three from 'three';
-import { PCFSoftShadowMap } from "three";
+import { BasicShadowMap, PCFSoftShadowMap } from "three";
 import BoundariesComponent from "./BoundariesComponent";
 import ControlsComponent from "./ControlsComponent";
 import HexagonsComponent from "./HexagonsComponent";
@@ -35,6 +35,7 @@ export default (props: IMapProps) => {
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
+        // state.gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
         // state.gl.toneMapping = three.ReinhardToneMapping;
         // state.gl.physicallyCorrectLights = true;
     }
@@ -49,7 +50,7 @@ export default (props: IMapProps) => {
                 <ControlsComponent {...controlsProps} />
                 {/* <Stats /> */}
                 { lightProps.map(props => <LightCompoment key={ props.id } {...props} />)}
-                <ambientLight intensity={ 0.20 } />
+                <ambientLight intensity={ 0.30 } />
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']}  /> */}
                 <group name={ 'root' }>
                     <HexagonsComponent {...hexagonProps} />

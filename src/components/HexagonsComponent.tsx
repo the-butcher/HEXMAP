@@ -117,6 +117,7 @@ export default (props: IHexagonsProps) => {
       });
 
     }
+   
 
   }, []);      
 
@@ -124,7 +125,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.log('stamp changed, updating hexagons');
+    console.log('updating hexagons');
 
     let yDest: number;
     let counter = 0;

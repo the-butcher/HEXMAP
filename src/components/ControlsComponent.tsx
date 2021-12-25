@@ -1,13 +1,15 @@
 // import { OrbitControls, OrbitControlsProps } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
+import { Camera, useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useRef, useState } from 'react';
 import * as three from 'three';
+import { Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { IControlsProps } from './IControlsProps';
 
 export default (props: IControlsProps) => {
 
-    const { invalidate, camera, gl, scene } = useThree();
+    const { invalidate, gl, camera } = useThree(); // camera, gl, scene
+    const [screenshotRequested, setSreenshotRequested] = useState<boolean>(false);
 
     let controls = useRef<OrbitControls>();
     let isLeftButtonPressed = useRef<boolean>(false);
@@ -19,14 +21,15 @@ export default (props: IControlsProps) => {
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
         // controls.enableZoom = false;
         controls.current.addEventListener('change', invalidate)
+        controls.current.rotateSpeed = 0.25;
 
 
         controls.current.enableDamping = false;
-        // controls.current.dampingFactor = 0.05;
-        // controls.current.minPolarAngle = Math.PI / 4;
-        // controls.current.maxPolarAngle = Math.PI / 2.05;
-        // controls.current.minAzimuthAngle = -Math.PI / 4,
-        // controls.current.maxAzimuthAngle = Math.PI / 8;
+        controls.current.dampingFactor = 0.05;
+        controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+        controls.current.maxPolarAngle = Math.PI / 2.05;
+        controls.current.minAzimuthAngle = -Math.PI / 4,
+            controls.current.maxAzimuthAngle = Math.PI / 8;
 
         camera.position.set(-198, 450, 577);
         controls.current.target.set(0, 0, 0);
@@ -40,56 +43,66 @@ export default (props: IControlsProps) => {
         window.addEventListener('pointerup', e => {
             if (e.button === 0) {
                 isLeftButtonPressed.current = false;
+                
+                
+            }
+        });
+        window.addEventListener('keyup', e => {
+            if (e.key === 'k') {
+                console.log('set to true');
+                setSreenshotRequested(true);
+                invalidate();
             }
         });
 
         return () => {
             // controls!.dispose();
-        };     
+        };
+
+        // controls.current?.addEventListener('end', () => {
+        //     console.log('interaction ended');
+        // });
+
+    }, []);
+
+
+    function renderToJPG(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+
+        gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
+        gl.render(scene, camera);
+
+        gl.domElement.toBlob(
+            function (blob) {
+                var a = document.createElement('a');
+                var url = URL.createObjectURL(blob);
+                a.href = url;
+                a.download = 'canvas.jpg';
+                a.click();
+            },
+            'image/jpg',
+            1.0
+        )
+        gl.domElement.getContext('webgl', { preserveDrawingBuffer: false });
+        console.log('set to false');
+        setSreenshotRequested(false);
+
+    }
+
+    useFrame(({ gl, scene, camera }) => {
+
+        if (screenshotRequested) {
+            renderToJPG(gl, scene, camera)
+        } else {
+            gl.render(scene, camera);
+        }
+
+    }, 10);
+
+    // useEffect(() => {
+
         
-        controls.current?.addEventListener('end', () => {
-            console.log('interaction ended');
-        });
 
-    }, []);         
-
-    useEffect(() => {
-
-        console.log('props.instant changed', props); // , glRenderer?.domElement.toDataURL()
-        // setExportCanvas(true);
-
-        // if (gl.domElement) {
-        //     gl.render(scene, camera);
-        //     gl.domElement.toBlob(blob => {
-        //         var link = document.createElement("a");
-        //         link.download = 'name_' + Date.now();
-        //         link.href = window.URL.createObjectURL(blob!);
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //     })
-        // }        
-
-    
-    }, [props.stamp]);     
-
-    // useFrame(() => {
-
-    //     // if (glRenderer && exportCanvas) {
-    //     //     glRenderer!.domElement.toBlob(blob => {
-    //     //         var link = document.createElement("a");
-    //     //         link.download = 'name_' + Date.now();
-    //     //         link.href = window.URL.createObjectURL(blob!);
-    //     //         document.body.appendChild(link);
-    //     //         link.click();
-    //     //         document.body.removeChild(link);
-    //     //     })
-    //     //     // delete link;        
-    
-    //     // }
-    //     setExportCanvas(false);
-
-    // });    
+    // }, [props.stamp]);
 
     return null;
 

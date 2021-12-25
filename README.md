@@ -1,3 +1,22 @@
+# Issues in Hexmap
+- map is completely broken in mobile
+  - either the softshadow or the size of the shadow map
+- mobile layout
+- sorting in path dropdown
+- add a twitter button linked to @FleischerHannes
+- move chart to specific chart component
+- logarithmic option in chart
+- tabular view
+- date in chart x-axis should show year
+
+# solved
+- ~~Timing in initial rendering~~
+  - ~~map shows only after a source or instant change~~
+  - ~~the preview chart does not show and only scales to max after a path change~~
+- ~~export option~~
+  - ~~shadows appear to be clipped to a much smaller area than needed~~
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
