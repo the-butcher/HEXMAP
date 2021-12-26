@@ -50,7 +50,7 @@ export default (props: ILabelProps) => {
   }, [props.label, font]);      
 
   return (
-    <mesh ref={ meshRef }> 
+    <mesh ref={ meshRef } onClick={ e => window.open('http://stackoverflow.com') }> 
       <textGeometry ref={ geomRef } />
       <meshStandardMaterial ref={ mtrlRef } color={ [0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2] } />
     </mesh>

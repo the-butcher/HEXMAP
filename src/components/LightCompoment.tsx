@@ -49,7 +49,7 @@ export default (props: ILightProps) => {
     });
 
     return (
-        <directionalLight intensity={ 1 } ref={ pointLight } castShadow />
+        <directionalLight intensity={ 1.25 } ref={ pointLight } castShadow />
     );
 
 };

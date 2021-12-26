@@ -1,4 +1,4 @@
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { ListSubheader, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 
 export default (props: IBreadcrumbProps) => {
@@ -10,11 +10,18 @@ export default (props: IBreadcrumbProps) => {
     }
 
     const items: JSX.Element[] = [];
-    const keys = Object.keys(props.keys);
+    const keys = Object.keys(props.keys).sort();
+    const hasCategories = false || keys.find(k => k.indexOf('#') >= 0);
+    // keys.sort();
+    // console.log('keys', keys);
     let key: string;
+    let val: string;
+    let pad: string;
     for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
         key = keys[keyIndex];
-        items.push(<MenuItem key={ `${key}_${keyIndex}` } value={ key }>{ props.keys[key] }</MenuItem>);
+        val = props.keys[key];
+        pad = (hasCategories && key.indexOf('#') === -1) ? '30px' : '6px';
+        items.push(<MenuItem key={ `${key}_${keyIndex}` } value={ key } style={{ paddingLeft: pad}}>{ val }</MenuItem>);
     }
 
     return (

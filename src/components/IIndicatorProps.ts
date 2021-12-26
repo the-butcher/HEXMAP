@@ -2,6 +2,7 @@ import { IColor } from "../util/IColor";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { InterpolatedValue } from "../util/InterpolatedValue";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
+import { IChartProps } from "./IChartProps";
 
 export type INDICATOR_PROPS_FOLD = 'closed' | 'open-horizontal' | 'open-vertical';
 
@@ -9,12 +10,9 @@ export interface IIndicatorProps {
 
     date: string;
  
-    /**
-     * flag that can be listened to in i.e. useEffect method
-     */
-    // stamp: string;
+    name: string;
 
-    title: string;
+    desc: string;
 
     value00: string;
 
@@ -39,9 +37,12 @@ export interface IIndicatorProps {
 
     path: string;  
 
-    breadcrumbProps: IBreadcrumbProps[];
+    /**
+     * properties for the chart unfoldable from the indicator
+     */
+    chartProps: IChartProps;
 
-    getColor: (value: number) => IColor;
+    breadcrumbProps: IBreadcrumbProps[];
 
     interpolatedHue: InterpolatedValue;
      

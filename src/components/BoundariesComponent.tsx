@@ -180,11 +180,11 @@ const BoundariesComponent = () => {
     <group>
       <mesh ref={ meshHood } frustumCulled={ false } receiveShadow  onPointerUp={ handlePointerUp }> 
         <bufferGeometry ref={ geomHood } />
-        <meshStandardMaterial color={[0.04, 0.04, 0.03]} wireframe={ false } />
+        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
       </mesh>
       <mesh ref={ meshWall } frustumCulled={ false } castShadow> 
         <bufferGeometry ref={ geomWall } />
-        <meshStandardMaterial color={[0.04, 0.04, 0.03]} wireframe={ false } />
+        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
       </mesh>
     </group>
   );

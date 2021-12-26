@@ -1,15 +1,20 @@
 # Issues in Hexmap
 - map is completely broken in mobile
-  - either the softshadow or the size of the shadow map
+  - either the softshadow or the size of the shadow map, because basicshadow with a smaller app works
 - mobile layout
-- sorting in path dropdown
+  - ~~in portrait the map is too small >> viewport copied from old map~~
+  - ~~breadcrumb component should not fold internally (or only after it has wrapped away from the title separately)~~
+  - implement an indicator switcher for mobile
 - add a twitter button linked to @FleischerHannes
-- move chart to specific chart component
+- unfolded chart height for different layouts
 - logarithmic option in chart
 - tabular view
-- date in chart x-axis should show year
 
 # solved
+- ~~sorting/grouping in path dropdown~~
+- ~~y axis label is visible when collapsed but should not~~
+- ~~date in chart x-axis should show year~~
+- ~~move chart to specific chart component~~
 - ~~Timing in initial rendering~~
   - ~~map shows only after a source or instant change~~
   - ~~the preview chart does not show and only scales to max after a path change~~

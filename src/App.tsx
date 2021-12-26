@@ -108,7 +108,8 @@ export default () => {
     indicatorProps: [
       {
         date: '',
-        title: 'Inzidenz nach Alter und Bundesland',
+        name: 'Inzidenz',
+        desc: 'Alter und Bundesland',
         value00: '',
         value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
@@ -117,13 +118,20 @@ export default () => {
         source: './hexmap-data-bundesland-alter.json',
         path: '',
         breadcrumbProps: [],
-        getColor: value => Color.DARK_GREY,
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
-        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1) 
+        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
+        chartProps: {
+          title: '7-Tages Inzidenz',
+          source: './hexmap-data-bundesland-alter.json',
+          path: '',
+          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+          fold: 'open-horizontal'
+        }
       },
       {
         date: '',
-        title: 'Inzidenz nach Bezirk',
+        name: 'Inzidenz',
+        desc: 'Bezirk',
         value00: '',
         value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
@@ -132,13 +140,20 @@ export default () => {
         source: './hexmap-data-bundesland-bezirk.json',
         path: '',
         breadcrumbProps: [],
-        getColor: value => Color.DARK_GREY,
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
-        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1)
+        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
+        chartProps: {
+          title: '7-Tages Inzidenz',
+          source: './hexmap-data-bundesland-bezirk.json',
+          path: '',
+          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+          fold: 'closed',
+        }        
       },
       {
         date: '',
-        title: 'Impfung nach Gemeinde',
+        name: 'Impfung',
+        desc: 'Gemeinde',
         value00: '',
         value07: '',
         valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
@@ -147,9 +162,15 @@ export default () => {
         source: './hexmap-data-vacc-gemeinde.json',
         path: '',
         breadcrumbProps: [],
-        getColor: value => Color.DARK_GREY,
         interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
-        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1)
+        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1),
+        chartProps: {
+          title: 'Impfquote',
+          source: './hexmap-data-vacc-gemeinde.json',
+          path: '',
+          valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
+          fold: 'closed',
+        }        
       }  
     ],
     navigationBotProps: {  
@@ -206,9 +227,9 @@ export default () => {
         label: '',
         size: 6.5,
         position: {
-          x: -210,
+          x: -202,
           y: 0.2,
-          z: -10
+          z: -60
         },
         rotationY: 0
       },
@@ -217,9 +238,9 @@ export default () => {
         label: '',
         size: 5,
         position: {
-          x: -210,
+          x: -202,
           y: 0.2,
-          z: 0
+          z: -50
         },
         rotationY: 0
       },
@@ -228,9 +249,9 @@ export default () => {
         label: '',
         size: 5,
         position: {
-          x: -210,
+          x: -202,
           y: 0.2,
-          z: 10
+          z: -40
         },
         rotationY: 0
       },
@@ -239,9 +260,9 @@ export default () => {
         label: '',
         size: 5,
         position: {
-          x: -255,
+          x: -202,
           y: 0.2,
-          z: 20
+          z: -30
         },
         rotationY: 0
       }
@@ -286,8 +307,7 @@ export default () => {
 
   useEffect(() => {
 
-
-    console.log('updating app')
+    console.log('updating app', '90111'.startsWith(''));
 
     const refEle = 0;
 
@@ -319,7 +339,8 @@ export default () => {
   
         const names = Object.keys(data.keys);
         if (selected) {
-          labelProps[0].label = data.name;
+          labelProps[0].label = indicatorPropsInstance.name;
+          labelProps[1].label = indicatorPropsInstance.desc;
         }
   
         let prefPointer: string = '';
@@ -331,7 +352,7 @@ export default () => {
           } else {
             postPointer += data.path[name];
             if (selected) {
-              labelProps[i].label = data.keys[name][postPointer];
+              labelProps[i + 1].label = data.keys[name][postPointer];
             }
           }
           breadcrumbProps.push({
@@ -342,6 +363,7 @@ export default () => {
             onPathChange: handlePathChange,
           });
         };  
+
         if (data.idxs.length > 1) {
           // console.log('idxs', data.idxs);
           const keys = {};
@@ -358,10 +380,10 @@ export default () => {
           });
         }
 
-        let minLegendVal = Number.MAX_VALUE; // Math.min(indicatorPropsInstance.interpolatedHue.getValMin(), indicatorPropsInstance.interpolatedEle.getValMin());
-        let maxLegendVal = Number.MIN_VALUE; // Math.max(indicatorPropsInstance.interpolatedHue.getValMax(), indicatorPropsInstance.interpolatedEle.getValMax());
+        let minLegendVal = Number.MAX_VALUE;
+        let maxLegendVal = Number.MIN_VALUE;
         if (selected) { 
-          labelProps[names.length].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
+          labelProps[names.length + 1].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
           const dailyDataset = data.data[data.date];
           const keys = Object.keys(dailyDataset);
           // console.log('areaPointer', prefPointer, postPointer);
@@ -397,7 +419,11 @@ export default () => {
             fold: state.fold,
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand,
-            getColor
+            chartProps: {
+              ...indicatorPropsInstance.chartProps,
+              path: dataPointer,
+              fold: state.fold
+            }
           });
         } else {
           indicatorProps.push({
