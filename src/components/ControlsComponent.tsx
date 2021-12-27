@@ -26,10 +26,10 @@ export default (props: IControlsProps) => {
 
         controls.current.enableDamping = false;
         controls.current.dampingFactor = 0.05;
-        controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
-        controls.current.maxPolarAngle = Math.PI / 2.05;
-        controls.current.minAzimuthAngle = -Math.PI / 4,
-            controls.current.maxAzimuthAngle = Math.PI / 8;
+        // controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+        // controls.current.maxPolarAngle = Math.PI / 2.05;
+        // controls.current.minAzimuthAngle = -Math.PI / 4,
+        // controls.current.maxAzimuthAngle = Math.PI / 8;
 
         camera.position.set(-198, 450, 577);
         controls.current.target.set(0, 0, 0);

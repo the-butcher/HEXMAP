@@ -38,9 +38,9 @@ export default (props: IInstantProps) => {
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        console.log('firing slider instant change');
+        // console.log('firing slider instant change');
         // requestAnimationFrame(() => {
-            onInstantChange(value as number);
+        onInstantChange(value as number);
         // });
     }
 
@@ -51,11 +51,11 @@ export default (props: IInstantProps) => {
      * @returns 
      */
     const formatLabel = ((value: number, index: number) => {
-        return <div>{ TimeUtil.formatCategoryDateFull(value) }</div>;
+        return <div>{TimeUtil.formatCategoryDateFull(value)}</div>;
     });
 
     return (
-        <Slider key={ key } marks={ marks } onChange={ handleInstantChange } valueLabelFormat={ formatLabel } size="small"  value={ props.instantCur } min={ props.instantMin } max={ props.instantMax } step={ TimeUtil.MILLISECONDS_PER____DAY } aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }}/>
+        <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instantCur} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }} />
     );
 
 }

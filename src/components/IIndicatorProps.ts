@@ -48,4 +48,6 @@ export interface IIndicatorProps {
      
     interpolatedEle: InterpolatedValue;
 
+    style?: React.CSSProperties;
+
 }

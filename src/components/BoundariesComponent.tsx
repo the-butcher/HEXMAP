@@ -18,8 +18,8 @@ const BoundariesComponent = () => {
   /**
    * vertical part of the boundary - standard material, so the hexagon boundary has structure
    */
-  const meshWall = useRef<three.Mesh>();
-  const geomWall = useRef<three.BufferGeometry>();
+  // const meshWall = useRef<three.Mesh>();
+  // const geomWall = useRef<three.BufferGeometry>();
 
   /**
    * flat part of the boundary - basic material so it blends into page background
@@ -46,8 +46,8 @@ const BoundariesComponent = () => {
         const hoodVertices: number[] = [];
         const hoodNormals: number[] = [];
 
-        const wallVertices: number[] = [];
-        const wallNormals: number[] = [];
+        // const wallVertices: number[] = [];
+        // const wallNormals: number[] = [];
 
         pbfBoundaries.getBoundaries().forEach(pbfBoundary => {
 
@@ -111,19 +111,19 @@ const BoundariesComponent = () => {
             }
             for (let i = firstWallIndex + 1; i < coords2d.length; i++) {
 
-              wallVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              wallVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
-              wallVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
+              hoodVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
+              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
 
-              wallVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              wallVertices.push(coords2d[i - 1].x, boundaryMinZ, coords2d[i - 1].y);
-              wallVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              wallNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
+              hoodVertices.push(coords2d[i - 1].x, boundaryMinZ, coords2d[i - 1].y);
+              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
 
             }
 
@@ -131,15 +131,15 @@ const BoundariesComponent = () => {
 
         const hoodVertices32 = new Float32Array(hoodVertices);
         const hoodNormals32 = new Float32Array(hoodNormals);
-        const wallVertices32 = new Float32Array(wallVertices);
-        const wallNormals32 = new Float32Array(wallNormals);
+        // const wallVertices32 = new Float32Array(wallVertices);
+        // const wallNormals32 = new Float32Array(wallNormals);
 
-        if (geomHood.current && geomWall.current) {
+        if (geomHood.current) {
 
           geomHood.current.setAttribute('position', new three.BufferAttribute(hoodVertices32, 3));
           geomHood.current.setAttribute('normal', new three.BufferAttribute(hoodNormals32, 3));
-          geomWall.current.setAttribute('position', new three.BufferAttribute(wallVertices32, 3));
-          geomWall.current.setAttribute('normal', new three.BufferAttribute(wallNormals32, 3));
+          // geomWall.current.setAttribute('position', new three.BufferAttribute(wallVertices32, 3));
+          // geomWall.current.setAttribute('normal', new three.BufferAttribute(wallNormals32, 3));
 
           // const reflectorOptions: ReflectorOptions = {
           //   clipBias: 0.000003,
@@ -177,16 +177,10 @@ const BoundariesComponent = () => {
 
 
   return (
-    <group>
-      <mesh ref={ meshHood } frustumCulled={ false } receiveShadow  onPointerUp={ handlePointerUp }> 
-        <bufferGeometry ref={ geomHood } />
-        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
-      </mesh>
-      <mesh ref={ meshWall } frustumCulled={ false } castShadow> 
-        <bufferGeometry ref={ geomWall } />
-        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
-      </mesh>
-    </group>
+    <mesh ref={ meshHood } frustumCulled={ false } receiveShadow  onPointerUp={ handlePointerUp }> 
+      <bufferGeometry ref={ geomHood } />
+      <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
+    </mesh>
   );
   
 };

@@ -1,8 +1,6 @@
-import { useHelper } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as three from 'three';
-import { Camera, CameraHelper, PerspectiveCamera, PointLightHelper } from 'three';
 import { ILightProps } from './ILightProps';
 
 /**
@@ -15,10 +13,10 @@ export default (props: ILightProps) => {
 
     const pointLight = useRef<three.DirectionalLight>();
     const { scene } = useThree();
- 
+
     useEffect(() => {
 
-        pointLight.current!.position.set(props.position.x, props.position.y, props.position.z); 
+        pointLight.current!.position.set(props.position.x, props.position.y, props.position.z);
         pointLight.current!.lookAt(0, 0, 0);
         pointLight.current!.castShadow = true;
         pointLight.current!.shadow.autoUpdate = false;
@@ -37,19 +35,19 @@ export default (props: ILightProps) => {
         // const helper = new three.CameraHelper( pointLight.current!.shadow.camera );
         // scene.add( helper );
 
-    }, []);    
-    
+    }, []);
+
     useEffect(() => {
-        console.log('updating light');
+        console.log('updating light', pointLight.current.position);
         pointLight.current!.shadow.needsUpdate = true;
-    }, [props.stamp]);      
+    }, [props.stamp]);
 
     useFrame((state) => {
         // console.log('state', state);
     });
 
     return (
-        <directionalLight intensity={ 1.25 } ref={ pointLight } castShadow />
+        <directionalLight intensity={1.25} ref={pointLight} castShadow />
     );
 
 };

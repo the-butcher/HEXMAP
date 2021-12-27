@@ -15,6 +15,8 @@ export interface IHexagonsProps {
 
     onPathChange: (source: string, name: string, path: string) => void;
 
+    onHexagonsLoaded: () => void;
+
     getHeight: (values: IHexagon) => number;
 
     getColor: (values: IHexagon) => IColor;

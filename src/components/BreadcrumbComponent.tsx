@@ -1,4 +1,4 @@
-import { ListSubheader, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 
 export default (props: IBreadcrumbProps) => {
@@ -21,7 +21,7 @@ export default (props: IBreadcrumbProps) => {
         key = keys[keyIndex];
         val = props.keys[key];
         pad = (hasCategories && key.indexOf('#') === -1) ? '30px' : '6px';
-        items.push(<MenuItem key={ `${key}_${keyIndex}` } value={ key } style={{ paddingLeft: pad}}>{ val }</MenuItem>);
+        items.push(<MenuItem key={`${key}_${keyIndex}`} value={key} style={{ paddingLeft: pad }}>{val}</MenuItem>);
     }
 
     return (

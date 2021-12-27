@@ -14,9 +14,9 @@ export default (props: ILabelProps) => {
 
   const { size, position } = props;
 
-  const geomRef = useRef<three.ShapeGeometry>();
-  const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
-  const meshRef = useRef<three.Mesh>();
+  const geomTextRef = useRef<three.ShapeGeometry>();
+  const mtrlTextRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
+  const meshTextRef = useRef<three.Mesh>();
 
   const [font, setFont] = useState<three.Font>();
 
@@ -36,23 +36,22 @@ export default (props: ILabelProps) => {
       // console.log('props.label', props.label, font);
       
       const shapes = font!.generateShapes( props.label, size );
-      geomRef.current = new three.ShapeGeometry( shapes );
-      geomRef.current.computeBoundingBox();      
-  
-      geomRef.current.rotateX(-Math.PI / 2);
-      geomRef.current.translate(position.x, position.y, position.z);
-      geomRef.current.rotateY(props.rotationY);
+      geomTextRef.current = new three.ShapeGeometry( shapes );
+      geomTextRef.current.computeBoundingBox();      
 
-      meshRef.current!.geometry = geomRef.current;
+      geomTextRef.current.rotateX(-Math.PI / 2);
+      geomTextRef.current.translate(position.x, position.y, position.z);
+      geomTextRef.current.rotateY(props.rotationY);
+      meshTextRef.current!.geometry = geomTextRef.current;
 
     }
     
   }, [props.label, font]);      
 
   return (
-    <mesh ref={ meshRef } onClick={ e => window.open('http://stackoverflow.com') }> 
-      <textGeometry ref={ geomRef } />
-      <meshStandardMaterial ref={ mtrlRef } color={ [0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2] } />
+    <mesh ref={ meshTextRef }> 
+      <textGeometry ref={ geomTextRef } />
+      <meshStandardMaterial ref={ mtrlTextRef } color={ [0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2] } />
     </mesh>
   );
   

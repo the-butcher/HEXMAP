@@ -20,10 +20,12 @@ export interface IChartProps {
      */
     fold: INDICATOR_PROPS_FOLD;
 
-    path: string;  
+    path: string;
 
     // interpolatedHue: InterpolatedValue;
-     
+
     // interpolatedEle: InterpolatedValue;
+
+    onInstantChange: (instant: number) => void;
 
 }

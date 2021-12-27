@@ -1,10 +1,8 @@
-import { invalidate } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
 import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
-import { ILightProps } from './components/ILightProps';
 import { IMapProps } from './components/IMapProps';
 import { IUserInterfaceProps } from './components/IUserInterfaceProps';
 import MapComponent from './components/MapComponent';
@@ -18,7 +16,6 @@ import { ColorUtil } from './util/ColorUtil';
 import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
-import { SpatialUtil } from './util/SpatialUtil';
 import { TimeUtil } from './util/TimeUtil';
 
 export default () => {
@@ -32,31 +29,41 @@ export default () => {
    * @param instant 
    */
   const handleInstantChange = (instant1: number) => {
-
-    setState({
-      ...state,
-      instant: DataRepository.getInstance().clampInstant(state.source, instant1),
+    setAppState({
+      ...appState,
+      instant: DataRepository.getInstance().clampInstant(appState.source, instant1),
       action: {
         updateScene: true,
         updateLight: true,
         updateDelay: 250
       }
     });
+  }
 
+  const handleHexagonsLoaded = () => {
+    console.log('handling hexagons loaded');
+    setAppState({
+      ...appState,
+      action: {
+        updateScene: true,
+        updateLight: true,
+        updateDelay: 1
+      }
+    });
   }
 
   const handleIndicatorExpand = (source1: string) => {
 
-    const isSourceChange = source1 !== state.source;
-    let fold: INDICATOR_PROPS_FOLD = state.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
+    const isSourceChange = source1 !== appState.source;
+    let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
       fold = 'open-horizontal';
     }
 
-    setState({
-      ...state,
+    setAppState({
+      ...appState,
       source: source1,
-      instant:  DataRepository.getInstance().clampInstant(source1, state.instant),
+      instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
       action: {
         updateScene: isSourceChange,
         updateLight: isSourceChange,
@@ -71,15 +78,15 @@ export default () => {
 
     DataRepository.getInstance().getOrLoad(source).then(data => {
       data.indx = parseInt(path);
-      setState({
-        ...state,
+      setAppState({
+        ...appState,
         source,
         action: {
           updateScene: true,
           updateLight: true,
           updateDelay: 1
         },
-      });        
+      });
     });
 
   }
@@ -88,15 +95,15 @@ export default () => {
 
     DataRepository.getInstance().getOrLoad(source).then(data => {
       data.path[name] = path;
-      setState({
-        ...state,
+      setAppState({
+        ...appState,
         source,
         action: {
           updateScene: true,
           updateLight: true,
           updateDelay: 1
         },
-      });        
+      });
     });
 
   };
@@ -125,7 +132,8 @@ export default () => {
           source: './hexmap-data-bundesland-alter.json',
           path: '',
           valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-          fold: 'open-horizontal'
+          fold: 'open-horizontal',
+          onInstantChange: handleInstantChange
         }
       },
       {
@@ -148,7 +156,8 @@ export default () => {
           path: '',
           valueFormatter: FormattingDefinition.FORMATTER____FIXED,
           fold: 'closed',
-        }        
+          onInstantChange: handleInstantChange
+        }
       },
       {
         date: '',
@@ -170,10 +179,11 @@ export default () => {
           path: '',
           valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
           fold: 'closed',
-        }        
-      }  
+          onInstantChange: handleInstantChange
+        }
+      }
     ],
-    navigationBotProps: {  
+    navigationBotProps: {
       instantProps: {
         instantCur: instant,
         instantMin: new Date('2020-03-01').getTime(),
@@ -189,7 +199,7 @@ export default () => {
     lightProps: [
       {
         id: ObjectUtil.createId(),
-        stamp: ObjectUtil.createId(), 
+        stamp: ObjectUtil.createId(),
         position: {
           x: 300,
           y: 200,
@@ -204,22 +214,23 @@ export default () => {
           y: 200,
           z: -150
         }
-      }      
+      }
     ],
     controlsProps: {
       stamp: ObjectUtil.createId(),
     },
     hexagonProps: {
-        // onHover: setHovered,
-        source: '',
-        name: '',
-        keys: [],
-        path: '',
-        stamp: ObjectUtil.createId(),
-        onPathChange: handlePathChange,
-        getColor: (values) => ColorUtil.getCorineColor(values.luc),
-        getHeight: (values) => values.ele,
-        getPath: (values) => values.gkz
+      // onHover: setHovered,
+      source: '',
+      name: '',
+      keys: [],
+      path: '',
+      stamp: ObjectUtil.createId(),
+      onPathChange: handlePathChange,
+      getColor: (values) => ColorUtil.getCorineColor(values.luc),
+      getHeight: (values) => values.ele,
+      getPath: (values) => values.gkz,
+      onHexagonsLoaded: handleHexagonsLoaded
     },
     labelProps: [
       {
@@ -228,7 +239,7 @@ export default () => {
         size: 6.5,
         position: {
           x: -202,
-          y: 0.2,
+          y: 0.3,
           z: -60
         },
         rotationY: 0
@@ -239,7 +250,7 @@ export default () => {
         size: 5,
         position: {
           x: -202,
-          y: 0.2,
+          y: 0.3,
           z: -50
         },
         rotationY: 0
@@ -250,7 +261,7 @@ export default () => {
         size: 5,
         position: {
           x: -202,
-          y: 0.2,
+          y: 0.3,
           z: -40
         },
         rotationY: 0
@@ -261,7 +272,7 @@ export default () => {
         size: 5,
         position: {
           x: -202,
-          y: 0.2,
+          y: 0.3,
           z: -30
         },
         rotationY: 0
@@ -274,7 +285,7 @@ export default () => {
         size: 6,
         position: {
           x: -247,
-          y: 0.2,
+          y: 0.3,
           z: -88
         },
         rotationY: 0
@@ -285,16 +296,42 @@ export default () => {
         size: 6,
         position: {
           x: -80,
-          y: 0.2,
+          y: 0.3,
           z: -88
         },
         rotationY: 0
-      }       
+      }
     ]
   });
 
+  const [updateDimensionsTo, setUpdateDimensionsTo] = useState<number>(-1);
+  const [dimensions, setDimensions] = useState({
+    height: window.innerHeight,
+    width: window.innerWidth
+  });
+  const handleResize = () => {
+    window.clearTimeout(updateDimensionsTo);
+    setUpdateDimensionsTo(window.setTimeout(() => {
+      setDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth
+      });
+    }, 250));
+  }
+
+  useEffect(() => {
+    setAppState({
+      ...appState,
+      action: {
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 1
+      },
+    });
+  }, [dimensions]);
+
   const indicatorProps = userInterfaceProps.indicatorProps[0];
-  const [state, setState] = useState<IAppState>({
+  const [appState, setAppState] = useState<IAppState>({
     source: indicatorProps.source,
     instant,
     action: {
@@ -307,7 +344,7 @@ export default () => {
 
   useEffect(() => {
 
-    console.log('updating app', '90111'.startsWith(''));
+    console.log('updating app');
 
     const refEle = 0;
 
@@ -322,12 +359,12 @@ export default () => {
       const legendLabelProps = mapProps.legendLabelProps;
       let hexagonProps: IHexagonsProps;
 
-      for (let i=0; i<allData.length; i++) {
+      for (let i = 0; i < allData.length; i++) {
 
         const data = allData[i];
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
-        const selected = indicatorPropsInstance.source === state.source;
-        const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, state.instant);
+        const selected = indicatorPropsInstance.source === appState.source;
+        const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, appState.instant);
         const clampedInstantM7 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 7);
 
         data.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
@@ -336,16 +373,16 @@ export default () => {
          * set up breadcrumbs to show options of current indicator
          */
         const breadcrumbProps: IBreadcrumbProps[] = [];
-  
+
         const names = Object.keys(data.keys);
         if (selected) {
           labelProps[0].label = indicatorPropsInstance.name;
           labelProps[1].label = indicatorPropsInstance.desc;
         }
-  
+
         let prefPointer: string = '';
         let postPointer: string = '';
-        for (let i=0; i<names.length; i++) {
+        for (let i = 0; i < names.length; i++) {
           const name = names[i];
           if (i === 0) {
             prefPointer = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
@@ -356,13 +393,13 @@ export default () => {
             }
           }
           breadcrumbProps.push({
-            source: state.source, 
+            source: appState.source,
             name,
             keys: data.keys[name],
             path: data.path[name],
             onPathChange: handlePathChange,
           });
-        };  
+        };
 
         if (data.idxs.length > 1) {
           // console.log('idxs', data.idxs);
@@ -372,7 +409,7 @@ export default () => {
           }
           const path = data.indx.toString();
           breadcrumbProps.push({
-            source: state.source, 
+            source: appState.source,
             name: 'index',
             keys,
             path,
@@ -382,7 +419,7 @@ export default () => {
 
         let minLegendVal = Number.MAX_VALUE;
         let maxLegendVal = Number.MIN_VALUE;
-        if (selected) { 
+        if (selected) {
           labelProps[names.length + 1].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
           const dailyDataset = data.data[data.date];
           const keys = Object.keys(dailyDataset);
@@ -402,7 +439,7 @@ export default () => {
           // const s = interpolatedS.getOut(value);
           // const v = interpolatedV.getOut(value);
           return new Color(h, 1, 0.4);
-        } 
+        }
 
         // console.log('data', data, );
         const dataPointer = prefPointer + postPointer;
@@ -416,13 +453,14 @@ export default () => {
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             breadcrumbProps: breadcrumbProps,
             path: dataPointer,
-            fold: state.fold,
+            fold: appState.fold,
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand,
             chartProps: {
               ...indicatorPropsInstance.chartProps,
               path: dataPointer,
-              fold: state.fold
+              fold: appState.fold,
+              onInstantChange: handleInstantChange
             }
           });
         } else {
@@ -432,21 +470,21 @@ export default () => {
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
-            onExpand: handleIndicatorExpand 
+            onExpand: handleIndicatorExpand
           });
-  
+
         }
 
         if (selected) {
 
           hexagonProps = {
             // onHover: setHovered,
-            source: state.source,
+            source: appState.source,
             name: names[0],
             keys: Object.keys(data.keys[names[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
             path: prefPointer,
             onPathChange: handlePathChange,
-            stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
+            stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getPath: (values) => {
               return values.gkz.substring(0, prefPointer.length);
             },
@@ -454,7 +492,7 @@ export default () => {
               const _prefPointer = values.gkz.substring(0, prefPointer.length)
               const dataPointer = _prefPointer + postPointer;
               const dailyDataset = data.data[data.date];
-              const dailyValues = dailyDataset[dataPointer];              
+              const dailyValues = dailyDataset[dataPointer];
               let val = 0;
               if (dailyValues) {
                 val = dailyValues[data.indx]; // last value
@@ -481,9 +519,10 @@ export default () => {
                 // missing data
               }
               return ele;
-            }
-          }      
-        }  
+            },
+            onHexagonsLoaded: handleHexagonsLoaded
+          }
+        }
 
       };
 
@@ -496,10 +535,10 @@ export default () => {
        */
       const instantProps: IInstantProps = {
         ...userInterfaceProps.navigationBotProps.instantProps,
-        instantCur: state.instant,
+        instantCur: appState.instant,
         onInstantChange: handleInstantChange
       }
- 
+
       /**
        * actual update of user interface props
        */
@@ -511,26 +550,26 @@ export default () => {
           instantProps
         },
         onDataPicked: handleIndicatorExpand,
-      });    
- 
+      });
+
       /**
       * update instant on control props
       */
       const controlsProps = {
         ...mapProps.controlsProps,
-        stamp: state.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp
+        stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp
       }
- 
+
       /**
       * update stamps on all lights (triggering a shadow update)
       */
       const lightProps = mapProps.lightProps.map(props => {
         return {
           ...props,
-          stamp: state.action.updateLight ? ObjectUtil.createId() : props.stamp
+          stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp
         }
-      });  
- 
+      });
+
       // console.log('selectedE', selected1);
       /**
       * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
@@ -542,32 +581,22 @@ export default () => {
           legendLabelProps: [...legendLabelProps],
           lightProps,
           controlsProps,
-          hexagonProps: hexagonProps! 
-        });      
-      }, state.action.updateDelay));
+          hexagonProps: hexagonProps!
+        });
+      }, appState.action.updateDelay));
 
     });
 
 
 
-  }, [state.instant, state.source, state.action]);  
-  
-  
+  }, [appState.instant, appState.source, appState.action]);
 
   useEffect(() => {
-    
-    window.setTimeout(() => {
-      setState({
-        ...state,
-        action: {
-          updateScene: true,
-          updateLight: true,
-          updateDelay: 1
-        }
-      });
-    }, 100);
 
-  }, []);      
+    console.log('building app');
+    window.addEventListener('resize', handleResize);
+
+  }, []);
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
@@ -575,6 +604,6 @@ export default () => {
       <UserInterfaceComponent {...userInterfaceProps} />
     </div>
   );
-  
+
 };
 

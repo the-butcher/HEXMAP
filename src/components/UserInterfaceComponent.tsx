@@ -1,10 +1,10 @@
-import { createTheme, Paper, ThemeProvider } from "@mui/material";
+import { Button, ButtonGroup, createTheme, Paper, ThemeProvider } from "@mui/material";
 import "./../styles.css";
 import DatePickerComponent from "./DatePickerComponent";
 import DateSliderComponent from "./DateSliderComponent";
 import IndicatorComponent from "./IndicatorComponent";
 import { IUserInterfaceProps } from "./IUserInterfaceProps";
-import MuiPickersDay from '@mui/lab/PickersDay';
+
 
 export default (props: IUserInterfaceProps) => {
 
@@ -19,6 +19,31 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             // backgroundColor: 'red'
+          }
+        }
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            backgroundColor,
+            color: 'var(--color-text)',      
+            fontSize: '10px',
+            '&:hover': {
+              border: '1px solid #2b2b27',
+              backgroundColor: 'rgba(77, 77, 68, 1)'
+            }
+          }
+        }
+      },
+      MuiButtonGroup: {
+        styleOverrides: {
+          grouped: {
+            minWidth: 'unset',
+            boxShadow: 'inherit',
+            border: '1px solid #2b2b27',
+            '&:not(:last-of-type):hover': {
+              borderRightColor: 'transparent'
+            }
           }
         }
       },
@@ -167,7 +192,10 @@ export default (props: IUserInterfaceProps) => {
             color: 'var(--color-text)',            
             height: '1px',
             padding: '10px 0px',
-            marginRight: '12px'
+            marginRight: '12px',
+            '@media (pointer: coarse)': {
+              padding: '10px 0px'
+            }
           },
           markLabel: {
             fontFamily,
@@ -185,26 +213,43 @@ export default (props: IUserInterfaceProps) => {
     },
   });
 
+  const mobileView = window.innerWidth <= 900;
+  const handleExpand = (index: number) => {
+    indicatorProps[index].onExpand(indicatorProps[index].source);
+  }  
+
+  const buttons: JSX.Element[] = [];
+  let activeIndicatorSource: string;
+  for (let i = 0; i < indicatorProps.length; i++) {
+    const marginL = i === 0 ? '12px' : '0px';
+    const marginR = i === indicatorProps.length - 1 ? '12px' : '0px';
+    if (indicatorProps[i].fold !== 'closed') {
+      activeIndicatorSource = indicatorProps[i].source;
+    }
+    buttons.push(<Button key={ indicatorProps[i].source } style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={ () => handleExpand(i) }>{ indicatorProps[i].desc }</Button>);
+  }
+
+  // console.log('active source', indicatorProps[activeIndicatorIndex]);
+
+
   return (
-    <ThemeProvider theme={theme}>
-      <div style={{ width: '100%', position: 'absolute', display: 'flex', flexDirection: 'column' }}>
-        {/* <NavigationTopComponent {...navigationTopProps} /> */}
-        <div style={{ width: 'calc(100%-24px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '12px' }}>
-          { indicatorProps.map(props => <IndicatorComponent key={ props.source } {...props} />) }
+    <ThemeProvider theme={ theme }>
+      { mobileView ?
+      <ButtonGroup size="small" variant="outlined" style={{ paddingTop: '6px', width: '100%', display: 'flex'}}>
+        { buttons }
+      </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div> }
+      <div style={{ width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
+          { indicatorProps.map(props => <IndicatorComponent key={ props.source } {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />) }
         </div>
-       </div>
-       <Paper elevation={4} style={{ overflow: 'unset', width: 'calc(100%-24px)', display: 'flex', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '40px', padding: '0px', margin: '0px' }} >
-          <DateSliderComponent {...props.navigationBotProps.instantProps} />
-          <DatePickerComponent {...props.navigationBotProps.instantProps} />
-        </Paper>
-
-       {/* <div style={{ width: 'calc(100%-24px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '12px', position: 'absolute', top: 'auto', bottom: '0px', left: '0px', height: '48px', backgroundColor: 'rgba(255, 255, 255, 0.75)' }}>
-
-       </div> */}
-       {/* <NavigationBotComponent {...navigationBotProps} /> */}
+      </div>
+      <Paper elevation={4} style={{ overflow: 'unset', width: 'calc(100%-24px)', display: 'flex', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '40px', padding: '0px', margin: '0px' }} >
+        <DateSliderComponent {...props.navigationBotProps.instantProps} />
+        <DatePickerComponent {...props.navigationBotProps.instantProps} />
+      </Paper>
     </ThemeProvider>
   );
 
 }
 
-// , backgroundColor: 'rgba(255, 255, 255, 0.75)'
+// 

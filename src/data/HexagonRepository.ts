@@ -1,4 +1,3 @@
-import { IHierarchyEvents } from "@amcharts/amcharts5/.internal/charts/hierarchy/Hierarchy";
 import { IHexagon } from "../components/IHexagon";
 import { IHexagonBorders } from "../components/IHexagonBorders";
 import { IHexagonsProps } from "../components/IHexagonsProps";
@@ -25,10 +24,12 @@ export class HexagonRepository {
 
     private readonly hexagons: IHexagon[];
     private readonly borderHexagons: { [K in string]: IHexagon[] };
+    private readonly pathLengthHistory: number[];
 
     constructor() {
         this.hexagons = [];
         this.borderHexagons = {};
+        this.pathLengthHistory = [];
     }
 
     getHexagons(): IHexagon[] {
@@ -112,75 +113,79 @@ export class HexagonRepository {
 
             }
 
-        }        
+        }
 
     }
 
-    getBorder(path: string, props: IHexagonsProps): IHexagon[] {
+    async getBorder(path: string, props: IHexagonsProps): Promise<IHexagon[]> {
 
-        if (!this.borderHexagons[path]) {
-            this.calculateBorders(props);
-            if (!this.borderHexagons[path]) {
-                this.borderHexagons[path] = [];
-            }
+        // console.log('get borders', path);
+
+        if (this.hexagons.length === 0) {
+            return [];
         }
-        return this.borderHexagons[path];
+
+        if (this.pathLengthHistory.indexOf(path.length) < 0) {
+            this.calculateBorders(props);
+            this.pathLengthHistory.push(path.length);
+        }
+        return this.borderHexagons[path] ? this.borderHexagons[path] : [];
 
     }
 
     getLegendFraction(values: IHexagon): number {
         // 164 - 180
-        const fraction = ((values.x -  SpatialUtil.HEXAGON_ORIGIN_X) / SpatialUtil.HEXAGON_SPACING_Y - 179) / 150;
+        const fraction = ((values.x - SpatialUtil.HEXAGON_ORIGIN_X) / SpatialUtil.HEXAGON_SPACING_Y - 179) / 150;
         return fraction;
     }
 
     async load(): Promise<void> {
 
         let hexagonValue: IHexagon;
-        new PbfHexagonsLoader().load('./hexagons.pbf').then(pbfHexagons => {
+        const pbfHexagons = await new PbfHexagonsLoader().load('./hexagons.pbf');
 
-            // console.log('loading hexagons');
+        console.log('pbfHexagons', pbfHexagons);
 
-            let values: number[];
-            let yOffset: number;
-            let color: number[];
+        let values: number[];
+        let yOffset: number;
+        let color: number[];
 
-            pbfHexagons.getHexagons().forEach(pbfHexagon => {
+        pbfHexagons.getHexagons().forEach(pbfHexagon => {
 
-                // color = ColorUtil.getCorineColor(values[valueIndexCode]);
-                values = pbfHexagon.getValues();
-                yOffset = values[HexagonRepository.VALUE_INDEX___X] % 2 === 0 ? 0 : SpatialUtil.HEXAGON_SPACING_X / 2;
+            // color = ColorUtil.getCorineColor(values[valueIndexCode]);
+            values = pbfHexagon.getValues();
+            yOffset = values[HexagonRepository.VALUE_INDEX___X] % 2 === 0 ? 0 : SpatialUtil.HEXAGON_SPACING_X / 2;
 
-                /**
-                 * intial values
-                 */
-                hexagonValue = {
-                    i: -1,
-                    x: values[HexagonRepository.VALUE_INDEX___X] * SpatialUtil.HEXAGON_SPACING_Y + SpatialUtil.HEXAGON_ORIGIN_X,
-                    y: 0,
-                    z: values[HexagonRepository.VALUE_INDEX___Y] * SpatialUtil.HEXAGON_SPACING_X - yOffset - SpatialUtil.HEXAGON_ORIGIN_Y,
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    col: values[HexagonRepository.VALUE_INDEX___X],
-                    row: values[HexagonRepository.VALUE_INDEX___Y],
-                    gkz: values[HexagonRepository.VALUE_INDEX_GKZ] >= 0 ? values[HexagonRepository.VALUE_INDEX_GKZ].toString() : undefined,
-                    luc: values[HexagonRepository.VALUE_INDEX_LUC],
-                    ele: SpatialUtil.toZ(values[HexagonRepository.VALUE_INDEX___Z] / SpatialUtil.SCALE_PRECISION)
-                };
-                this.hexagons.push(hexagonValue);
-                hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
-
-            });
-
-            this.hexagons.sort((a, b) => b.z - a.z);
-
-            let counter = 0;
-            this.hexagons.forEach(hexagonValue => {
-                hexagonValue.i = counter++;
-            });
+            /**
+             * intial values
+             */
+            hexagonValue = {
+                i: -1,
+                x: values[HexagonRepository.VALUE_INDEX___X] * SpatialUtil.HEXAGON_SPACING_Y + SpatialUtil.HEXAGON_ORIGIN_X,
+                y: 0,
+                z: values[HexagonRepository.VALUE_INDEX___Y] * SpatialUtil.HEXAGON_SPACING_X - yOffset - SpatialUtil.HEXAGON_ORIGIN_Y,
+                r: 0,
+                g: 0,
+                b: 0,
+                col: values[HexagonRepository.VALUE_INDEX___X],
+                row: values[HexagonRepository.VALUE_INDEX___Y],
+                gkz: values[HexagonRepository.VALUE_INDEX_GKZ] >= 0 ? values[HexagonRepository.VALUE_INDEX_GKZ].toString() : undefined,
+                luc: values[HexagonRepository.VALUE_INDEX_LUC],
+                ele: SpatialUtil.toZ(values[HexagonRepository.VALUE_INDEX___Z] / SpatialUtil.SCALE_PRECISION)
+            };
+            this.hexagons.push(hexagonValue);
+            hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
 
         });
+
+        this.hexagons.sort((a, b) => b.z - a.z);
+
+        let counter = 0;
+        this.hexagons.forEach(hexagonValue => {
+            hexagonValue.i = counter++;
+        });
+
+        return;
 
     }
 

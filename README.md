@@ -1,16 +1,25 @@
 # Issues in Hexmap
 - map is completely broken in mobile
   - either the softshadow or the size of the shadow map, because basicshadow with a smaller app works
-- mobile layout
-  - ~~in portrait the map is too small >> viewport copied from old map~~
-  - ~~breadcrumb component should not fold internally (or only after it has wrapped away from the title separately)~~
-  - implement an indicator switcher for mobile
-- add a twitter button linked to @FleischerHannes
-- unfolded chart height for different layouts
+- add shape to scene that the current diagram can be textured on  
+- try to make the date tooltip in the date slider more similar to the chart tooltip
+
+# later
 - logarithmic option in chart
 - tabular view
+- export options for chart, map, data
 
 # solved
+- ~~mobile layout~~
+  - ~~in portrait the map is too small >> viewport copied from old map~~
+  - ~~breadcrumb component should not fold internally (or only after it has wrapped away from the title separately)~~
+  - ~~add functionality to button group~~
+  - ~~unfolded chart height for mobile~~
+  - ~~when switching between large and small indicators need to update all indicators to allow other to show~~
+- ~~change date when clicking in arbitrary chart~~
+- ~~unfolded chart height for different layouts~~
+- ~~add a twitter button linked to @FleischerHannes~~
+- ~~legend hexagons are off by a half hexwidth~~
 - ~~sorting/grouping in path dropdown~~
 - ~~y axis label is visible when collapsed but should not~~
 - ~~date in chart x-axis should show year~~
