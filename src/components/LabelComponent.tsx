@@ -12,7 +12,7 @@ import { ILabelProps } from './ILabelProps';
  */
 export default (props: ILabelProps) => { 
 
-  const { size, position } = props;
+  const { size, position, label } = props;
 
   const geomTextRef = useRef<three.ShapeGeometry>();
   const mtrlTextRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
@@ -21,6 +21,8 @@ export default (props: ILabelProps) => {
   const [font, setFont] = useState<three.Font>();
 
   useEffect(() => {
+
+    console.log('✨ building label component', props);
 
     const loader = new FontLoader();
     loader.load( './droid_sans_mono_regular.typeface.json', (response:Font) => {
@@ -31,11 +33,13 @@ export default (props: ILabelProps) => {
   
   useEffect(() => {
 
+    console.log('🔧 updating label component', props);
+
     if (font) {
 
-      // console.log('props.label', props.label, font);
+      // console.log('props.label', props.label);
       
-      const shapes = font!.generateShapes( props.label, size );
+      const shapes = font!.generateShapes( label, size );
       geomTextRef.current = new three.ShapeGeometry( shapes );
       geomTextRef.current.computeBoundingBox();      
 

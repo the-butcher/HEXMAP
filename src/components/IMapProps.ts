@@ -1,7 +1,9 @@
 import { IControlsProps } from "./IControlsProps";
+import { IChart3DProps } from "./IChart3DProps";
 import { IHexagonsProps } from "./IHexagonsProps";
 import { ILabelProps } from "./ILabelProps";
 import { ILightProps } from "./ILightProps";
+import { ILegendProps } from "./ILegendProps";
 
 /**
  * definition of properties for the MapComponent
@@ -21,6 +23,8 @@ export interface IMapProps {
 
     labelProps: ILabelProps[];
 
-    legendLabelProps: ILabelProps[];
+    legendLabelProps: ILegendProps,
+
+    chart3DProps: IChart3DProps[];
 
 }

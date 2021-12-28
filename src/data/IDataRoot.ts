@@ -11,5 +11,9 @@ export interface IDataRoot {
     path: { [K in string]: string }; 
 
     date: string;
+
+    minY: number;
+
+    maxY: number;
     
 }

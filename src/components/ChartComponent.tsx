@@ -32,7 +32,8 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('building chart', source, path);
+    console.log('✨ building chart component', props);
+
 
     DataRepository.getInstance().getOrLoad(source).then(data => {
 
@@ -204,7 +205,7 @@ export default (props: IChartProps) => {
           name: `seriesVal_${valueIndex}`,
           xAxis: _xAxisVal,
           yAxis: _yAxisVal,
-          valueYField: `valueVal_${valueIndex}`,
+          valueYField: `value_${valueIndex}`,
           valueXField: 'date',
           interpolationDuration: 0,
           sequencedInterpolation: false,
@@ -245,87 +246,6 @@ export default (props: IChartProps) => {
 
       }
 
-      // chart.rightAxesContainer.set("layout", root.verticalLayout);
-
-      // const scrollbar = chart.set("scrollbarX", am5xy.XYChartScrollbar.new(root, {
-      //   orientation: 'horizontal',
-      //   height: 73,
-      //   paddingTop: 0
-      // }));
-      // scrollbar.get('background')!.setAll({
-      //   fill: am5.color(0x42423a),
-      // });
-      // scrollbar.chart.set('paddingTop', 0);
-
-      // const gStI = scrollbar.startGrip.get('icon');
-      // const gStB = scrollbar.startGrip.get('background')
-      // // console.log(gStI, gStB);
-
-      // /**
-      //  * some start grip modification
-      //  */
-      // scrollbar.startGrip.set('scale', 0.7);
-      // scrollbar.startGrip.get('icon')!.set('stroke', am5.color(fontColor));
-      // scrollbar.startGrip.get('background')!.set('stroke', am5.color(fontColor));
-
-      // /**
-      //  * some end grip modification
-      //  */
-      // scrollbar.endGrip.set('scale', 0.7);
-      // scrollbar.endGrip.get('icon')!.set('stroke', am5.color(fontColor));
-      // scrollbar.endGrip.get('background')!.set('stroke', am5.color(fontColor));
-
-
-      // const xRendererPre = am5xy.AxisRendererX.new(root, {});
-      // xRendererPre.labels.template.setAll({
-      //   fontFamily,
-      //   fontSize: 10,
-      //   fill: labelColor
-      // });      
-      // const xAxisPre = scrollbar.chart.xAxes.push(am5xy.DateAxis.new(root, {
-      //   groupData: true,
-      //   groupIntervals: [{
-      //     timeUnit: "week",
-      //     count: 1
-      //   }],
-      //   baseInterval: {
-      //     timeUnit: "day",
-      //     count: 1
-      //   },
-      //   renderer: xRendererPre,
-      //   dateFormats,
-      //   periodChangeDateFormats: dateFormats
-      // }));
-      // // xAxisPre.get("dateFormats")["day"] = "dd.MM.yyyy";
-
-      // const yAxisPre: am5xy.ValueAxis<am5xy.AxisRendererY> = scrollbar.chart.yAxes.push(
-      //   am5xy.ValueAxis.new(root, {
-      //     renderer: am5xy.AxisRendererY.new(root, {}),
-      //     min: 0,
-      //     // logarithmic: true,
-      //     // treatZeroAs: 0.000001,
-      //     // min: 1
-      //   }),
-      // );
-
-      // for (let valueIndex = 0; valueIndex < valueCount; valueIndex ++) {
-
-      //   const seriesPre = scrollbar.chart.series.push(am5xy.LineSeries.new(root, {
-      //     valueYField: `valuePre_${valueIndex}`,
-      //     valueXField: "date",
-      //     xAxis: xAxisPre,
-      //     yAxis: yAxisPre,
-      //     stroke: am5.color(fontColor),
-      //   }));
-      //   seriesPre.fills.template.setAll({
-      //     fillOpacity: 0.0
-      //   });      
-      //   seriesPre.strokes.template.set('strokeWidth', 2);
-
-      //   allSeries.push(seriesPre);
-
-      // }
-
       // write to state
       setChart(_chart);
       setSeries(allSeries);
@@ -344,7 +264,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('updating chart (path)', source, path);
+    console.log('🔧 updating chart component (path)', props);
 
     const handleClick = () => {
       let cursor = chart.get('cursor');
@@ -356,42 +276,12 @@ export default (props: IChartProps) => {
     chart?.events.on('pointerdown', handleClick);
     chart?.get('cursor').events.on('pointerdown', handleClick);
 
-    DataRepository.getInstance().getOrLoad(source).then(data => {
-
-      const names = Object.keys(data.keys);
-      let dataPointer: string = '';
-      for (let i = 0; i < names.length; i++) {
-        dataPointer += data.path[names[i]];
-      }
-      const date = data.date;
-
-      /**
-       * how many series are going to be needed
-       */
-      const valueCount = data.data[date][dataPointer].length;
-
-      const chartData: unknown[] = [];
-      const dates = Object.keys(data.data);
-      let maxValue = Number.MIN_VALUE;
-      dates.forEach(dateRaw => {
-        const dataVals = data.data[dateRaw][dataPointer];
-        const dataItem = {
-          date: TimeUtil.parseCategoryDateFull(dateRaw),
-        };
-        for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
-          if (dataVals[valueIndex] !== 0) {
-            const valueY = dataVals[valueIndex];
-            dataItem[`valueVal_${valueIndex}`] = valueY;
-            maxValue = Math.max(maxValue, valueY);
-          }
-        }
-        chartData.push(dataItem);
-      });
+    DataRepository.getInstance().getOrBuild(source, Number.MIN_VALUE, Number.MAX_VALUE).then(chartData => {
 
       // console.log('chartData', chartData);
       series.forEach(s => {
-        (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', maxValue);
-        s.data.setAll(chartData);
+        (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY);
+        s.data.setAll(chartData.entries);
         s.appear(0);
       });
       chart?.show();
@@ -402,7 +292,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('updating chart (fold)', source, path);
+    console.log('🔧 updating chart component (fold)', source, path);
 
     xAxisLabel?.set('visible', fold === 'open-vertical');
     yAxisLabel?.set('visible', fold === 'open-vertical');

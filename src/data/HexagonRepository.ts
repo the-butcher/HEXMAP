@@ -46,19 +46,19 @@ export class HexagonRepository {
 
     calculateBorders(props: IHexagonsProps): void {
 
-        console.log('calculating borders');
+        console.log('⚙ calculating borders');
 
-        const joinableValues = this.hexagons;
+        const joinableHexagons = this.hexagons;
 
         // sort all hexagons by column and row
         let minCol = Number.MAX_SAFE_INTEGER;
         let maxCol = Number.MIN_SAFE_INTEGER;
-        let joinableValuesByColAndRow: { [K in string]: { [K in string]: IHexagonBorders } } = {};
-        joinableValues.forEach(v => {
-            if (!joinableValuesByColAndRow[v.col]) {
-                joinableValuesByColAndRow[v.col] = {};
+        let joinableHexagonsByColAndRow: { [K in string]: { [K in string]: IHexagonBorders } } = {};
+        joinableHexagons.forEach(v => {
+            if (!joinableHexagonsByColAndRow[v.col]) {
+                joinableHexagonsByColAndRow[v.col] = {};
             }
-            joinableValuesByColAndRow[v.col][v.row] = {
+            joinableHexagonsByColAndRow[v.col][v.row] = {
                 i: v.i,
                 path: props.getPath(v)
             }
@@ -67,7 +67,7 @@ export class HexagonRepository {
         });
 
         // all column keys
-        const cols: string[] = Object.keys(joinableValuesByColAndRow);
+        const cols: string[] = Object.keys(joinableHexagonsByColAndRow);
         let rows: string[];
         let joinableCol: { [K in string]: IHexagonBorders };
         let joinableBorder: IHexagonBorders;
@@ -76,7 +76,7 @@ export class HexagonRepository {
 
         for (let c = 0; c < cols.length; c++) {
 
-            joinableCol = joinableValuesByColAndRow[cols[c]];
+            joinableCol = joinableHexagonsByColAndRow[cols[c]];
 
             rows = Object.keys(joinableCol);
             for (let r = 0; r < rows.length; r++) {
@@ -86,21 +86,21 @@ export class HexagonRepository {
                 joinablePath = joinableBorder.path;
 
                 // south
-                joinableBorder.b090 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]);
+                joinableBorder.b090 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]);
 
                 // north
-                joinableBorder.b270 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]);
+                joinableBorder.b270 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]);
 
                 if (joinableHexagon.col % 2 === 0) {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
                 } else {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableValuesByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]);
                 }
 
                 const isBorderHexagon = [joinableBorder.b030, joinableBorder.b090, joinableBorder.b150, joinableBorder.b210, joinableBorder.b270, joinableBorder.b330].find(v => v);
@@ -129,7 +129,9 @@ export class HexagonRepository {
             this.calculateBorders(props);
             this.pathLengthHistory.push(path.length);
         }
-        return this.borderHexagons[path] ? this.borderHexagons[path] : [];
+        const pathTrimmed = path.replaceAll('#', '');
+
+        return this.borderHexagons[pathTrimmed] ? this.borderHexagons[pathTrimmed] : [];
 
     }
 
@@ -144,7 +146,7 @@ export class HexagonRepository {
         let hexagonValue: IHexagon;
         const pbfHexagons = await new PbfHexagonsLoader().load('./hexagons.pbf');
 
-        console.log('pbfHexagons', pbfHexagons);
+        // console.log('pbfHexagons', pbfHexagons);
 
         let values: number[];
         let yOffset: number;

@@ -41,6 +41,8 @@ const BoundariesComponent = () => {
 
   useEffect(() => {
 
+    console.log('✨ building boundaries component');
+
     new PbfBoundariesLoader().load('./boundaries.pbf').then(pbfBoundaries => {
 
         const hoodVertices: number[] = [];
@@ -166,18 +168,8 @@ const BoundariesComponent = () => {
     e.stopPropagation();
   }
 
-  useFrame(() => {
-
-    
-
-    // do something with hexagons
-
-
-  });
-
-
   return (
-    <mesh ref={ meshHood } frustumCulled={ false } receiveShadow  onPointerUp={ handlePointerUp }> 
+    <mesh ref={ meshHood } frustumCulled={ false } castShadow receiveShadow  onPointerUp={ handlePointerUp }> 
       <bufferGeometry ref={ geomHood } />
       <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={ false } />
     </mesh>

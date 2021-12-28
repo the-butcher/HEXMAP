@@ -14,17 +14,13 @@ export interface IChartProps {
      * points to the data, retrievable from DataRepository
      */
     source: string;
+    
+    path: string;
 
     /**
      * the state that the parent component passes to the indicator
      */
     fold: INDICATOR_PROPS_FOLD;
-
-    path: string;
-
-    // interpolatedHue: InterpolatedValue;
-
-    // interpolatedEle: InterpolatedValue;
 
     onInstantChange: (instant: number) => void;
 

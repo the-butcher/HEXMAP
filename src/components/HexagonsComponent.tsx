@@ -37,7 +37,7 @@ export default (props: IHexagonsProps) => {
   let hexagonValue: IHexagon;
   useEffect(() => {
 
-    console.log('building hexagons');
+    console.log('✨ building hexagons component', props);
 
     if (meshRef.current && geomRef.current) {
 
@@ -108,7 +108,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.log('updating hexagons', HexagonRepository.getInstance().getHexagons().length);
+    console.log('🔧 updating hexagons component', props);
 
     let yDest: number;
     let counter = 0;

@@ -12,6 +12,8 @@ import { IHyperlinkProps } from './IHyperlinkProps';
  */
 export default (props: IHyperlinkProps) => {
 
+  // console.log('entering hyperlink component', props);
+
   const { size, position } = props;
 
   const geomTextRef = useRef<three.ShapeGeometry>();
@@ -27,6 +29,8 @@ export default (props: IHyperlinkProps) => {
 
   useEffect(() => {
 
+    console.log('✨ building hyperlink component', props);
+
     const loader = new FontLoader();
     loader.load('./droid_sans_mono_regular.typeface.json', (response: Font) => {
       setFont(new three.Font(response.data));
@@ -37,6 +41,8 @@ export default (props: IHyperlinkProps) => {
   useEffect(() => {
 
     if (font) {
+
+      console.log('🔧 updating hyperlink component', props);
 
       // console.log('props.label', props.label, font);
 

@@ -26,10 +26,14 @@ export default (props: IControlsProps) => {
 
         controls.current.enableDamping = false;
         controls.current.dampingFactor = 0.05;
-        // controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
-        // controls.current.maxPolarAngle = Math.PI / 2.05;
-        // controls.current.minAzimuthAngle = -Math.PI / 4,
-        // controls.current.maxAzimuthAngle = Math.PI / 8;
+        controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+        controls.current.maxPolarAngle = Math.PI / 2.05;
+        controls.current.minAzimuthAngle = -Math.PI / 4,
+        controls.current.maxAzimuthAngle = Math.PI / 8;
+
+        controls.current.addEventListener('change', e => {
+            console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target);
+        });
 
         camera.position.set(-198, 450, 577);
         controls.current.target.set(0, 0, 0);
@@ -48,8 +52,33 @@ export default (props: IControlsProps) => {
             }
         });
         window.addEventListener('keyup', e => {
+            if (e.key === 'c') {
+
+                controls.current.minAzimuthAngle = 0,
+                controls.current.maxAzimuthAngle = 0;
+                controls.current.minPolarAngle = 0.33; // Math.PI / 4; // how far above ground the map can be tilted
+                controls.current.maxPolarAngle = 0.33;
+                camera.position.set(6.78513577491969, 443.84028283902745, 186.7686468436712);
+                controls.current.target.set(6.78513577491969, 0, 34.74231275973837);
+                controls.current.update();
+
+                // setTimeout(() => {
+
+                //     camera.position.set(4.652865358780201, 380.0929665674144, 172.73177630287918);
+                //     controls.current.update();
+
+                    controls.current.minAzimuthAngle = -Math.PI / 4,
+                    controls.current.maxAzimuthAngle = Math.PI / 8;
+                    controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+                    controls.current.maxPolarAngle = Math.PI / 2.05;
+                    controls.current.update();                    
+
+                // }, 200);
+
+
+
+            }            
             if (e.key === 'k') {
-                console.log('set to true');
                 setSreenshotRequested(true);
                 invalidate();
             }

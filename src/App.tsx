@@ -29,6 +29,9 @@ export default () => {
    * @param instant 
    */
   const handleInstantChange = (instant1: number) => {
+
+    console.log('📞 handling instant change', instant1);
+
     setAppState({
       ...appState,
       instant: DataRepository.getInstance().clampInstant(appState.source, instant1),
@@ -38,10 +41,11 @@ export default () => {
         updateDelay: 250
       }
     });
+    
   }
 
   const handleHexagonsLoaded = () => {
-    console.log('handling hexagons loaded');
+    // console.log('handling hexagons loaded', appState);
     setAppState({
       ...appState,
       action: {
@@ -53,6 +57,8 @@ export default () => {
   }
 
   const handleIndicatorExpand = (source1: string) => {
+
+    console.log('📞 handling indicator fold', source1);
 
     const isSourceChange = source1 !== appState.source;
     let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
@@ -76,6 +82,8 @@ export default () => {
 
   const handleIndxChange = (source: string, name: string, path: string) => {
 
+    console.log('📞 handling index change', source, name, path);
+
     DataRepository.getInstance().getOrLoad(source).then(data => {
       data.indx = parseInt(path);
       setAppState({
@@ -92,6 +100,8 @@ export default () => {
   }
 
   const handlePathChange = (source: string, name: string, path: string) => {
+
+    console.log('📞 handling path change', source, name, path);
 
     DataRepository.getInstance().getOrLoad(source).then(data => {
       data.path[name] = path;
@@ -116,7 +126,7 @@ export default () => {
       {
         date: '',
         name: 'Inzidenz',
-        desc: 'Alter und Bundesland',
+        desc: 'Bundesland und Alter',
         value00: '',
         value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
@@ -125,7 +135,7 @@ export default () => {
         source: './hexmap-data-bundesland-alter.json',
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
+        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
         interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
@@ -148,7 +158,7 @@ export default () => {
         source: './hexmap-data-bundesland-bezirk.json',
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
+        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
         interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
@@ -220,7 +230,6 @@ export default () => {
       stamp: ObjectUtil.createId(),
     },
     hexagonProps: {
-      // onHover: setHovered,
       source: '',
       name: '',
       keys: [],
@@ -240,6 +249,17 @@ export default () => {
         position: {
           x: -202,
           y: 0.3,
+          z: -70
+        },
+        rotationY: 0
+      },
+      {
+        id: ObjectUtil.createId(),
+        label: '',
+        size: 5,
+        position: {
+          x: -202,
+          y: 0.3,
           z: -60
         },
         rotationY: 0
@@ -251,7 +271,7 @@ export default () => {
         position: {
           x: -202,
           y: 0.3,
-          z: -50
+          z: 10
         },
         rotationY: 0
       },
@@ -260,26 +280,15 @@ export default () => {
         label: '',
         size: 5,
         position: {
-          x: -202,
+          x: -127,
           y: 0.3,
-          z: -40
-        },
-        rotationY: 0
-      },
-      {
-        id: ObjectUtil.createId(),
-        label: '',
-        size: 5,
-        position: {
-          x: -202,
-          y: 0.3,
-          z: -30
+          z: 10
         },
         rotationY: 0
       }
     ],
-    legendLabelProps: [
-      {
+    legendLabelProps: {
+      min: {
         id: ObjectUtil.createId(),
         label: '0',
         size: 6,
@@ -290,7 +299,7 @@ export default () => {
         },
         rotationY: 0
       },
-      {
+      max: {
         id: ObjectUtil.createId(),
         label: '0',
         size: 6,
@@ -300,6 +309,26 @@ export default () => {
           z: -88
         },
         rotationY: 0
+      }
+    },
+    chart3DProps: [
+      {
+        id: ObjectUtil.createId(),
+        source: './hexmap-data-bundesland-bezirk.json',
+        path: '',
+        indx: -1,
+        instant: -1,
+        min: {
+          x: -203,
+          y: 55
+        },
+        max: {
+          x: -85,
+          y: 0
+        },
+        rotationY: 0,
+        getColor: () => Color.DARK_GREY,
+        valueFormatter: FormattingDefinition.FORMATTER_____NOOP
       }
     ]
   });
@@ -344,7 +373,7 @@ export default () => {
 
   useEffect(() => {
 
-    console.log('updating app');
+    console.log('🔄 updating app');
 
     const refEle = 0;
 
@@ -352,6 +381,7 @@ export default () => {
     Promise.all(allPromises).then(allData => {
 
       const indicatorProps: IIndicatorProps[] = [];
+      let chart3DPropsMain = { ...mapProps.chart3DProps[0] };
       const labelProps = mapProps.labelProps;
       labelProps.forEach(props => {
         props.label = '';
@@ -362,10 +392,12 @@ export default () => {
       for (let i = 0; i < allData.length; i++) {
 
         const data = allData[i];
+        // console.log('data', userInterfaceProps.indicatorProps[i].source, data.path)
+
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === appState.source;
         const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, appState.instant);
-        const clampedInstantM7 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 7);
+        const clampedInstantM7 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
 
         data.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
@@ -376,9 +408,9 @@ export default () => {
 
         const names = Object.keys(data.keys);
         if (selected) {
-          labelProps[0].label = indicatorPropsInstance.name;
-          labelProps[1].label = indicatorPropsInstance.desc;
+          labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
         }
+        let label1 = '';
 
         let prefPointer: string = '';
         let postPointer: string = '';
@@ -386,10 +418,13 @@ export default () => {
           const name = names[i];
           if (i === 0) {
             prefPointer = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
+            if (selected) {
+              label1 += data.keys[name][prefPointer];
+            }
           } else {
             postPointer += data.path[name];
             if (selected) {
-              labelProps[i + 1].label = data.keys[name][postPointer];
+              label1 += ' / ' + data.keys[name][postPointer];
             }
           }
           breadcrumbProps.push({
@@ -407,6 +442,11 @@ export default () => {
           for (let i = 0; i < data.idxs.length; i++) {
             keys[i] = data.idxs[i];
           }
+
+          if (selected) {
+            label1 += ' / ' + data.idxs[data.indx];
+          }
+
           const path = data.indx.toString();
           breadcrumbProps.push({
             source: appState.source,
@@ -415,12 +455,18 @@ export default () => {
             path,
             onPathChange: handleIndxChange,
           });
+
+        }
+
+        if (selected) {
+          labelProps[1].label = label1;
         }
 
         let minLegendVal = Number.MAX_VALUE;
         let maxLegendVal = Number.MIN_VALUE;
         if (selected) {
-          labelProps[names.length + 1].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
+          labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstantM7);
+          labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
           const dailyDataset = data.data[data.date];
           const keys = Object.keys(dailyDataset);
           // console.log('areaPointer', prefPointer, postPointer);
@@ -430,8 +476,8 @@ export default () => {
               maxLegendVal = Math.max(maxLegendVal, dailyDataset[key][data.indx]);
             }
           });
-          legendLabelProps[0].label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
-          legendLabelProps[1].label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
+          legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
+          legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
         }
 
         const getColor = (value: number) => {
@@ -463,6 +509,16 @@ export default () => {
               onInstantChange: handleInstantChange
             }
           });
+          chart3DPropsMain = {
+            ...chart3DPropsMain,
+            source: indicatorPropsInstance.source,
+            path: dataPointer,
+            instant: clampedInstant00,
+            indx: data.indx,
+            valueFormatter: indicatorPropsInstance.valueFormatter,
+            getColor
+          };
+          // console.log('chart3DPropsMain', chart3DPropsMain);
         } else {
           indicatorProps.push({
             ...indicatorPropsInstance,
@@ -578,7 +634,8 @@ export default () => {
       setUpdateMapTo(window.setTimeout(() => {
         setMapProps({
           labelProps: [...labelProps],
-          legendLabelProps: [...legendLabelProps],
+          legendLabelProps: { ...legendLabelProps },
+          chart3DProps: [chart3DPropsMain],
           lightProps,
           controlsProps,
           hexagonProps: hexagonProps!

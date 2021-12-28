@@ -1,8 +1,8 @@
 # Issues in Hexmap
-- map is completely broken in mobile
-  - either the softshadow or the size of the shadow map, because basicshadow with a smaller app works
 - add shape to scene that the current diagram can be textured on  
-- try to make the date tooltip in the date slider more similar to the chart tooltip
+  - move the date-labels to chart 3d
+- adapt date slider tooltip to match chart tooltip
+- data credits
 
 # later
 - logarithmic option in chart
@@ -10,6 +10,8 @@
 - export options for chart, map, data
 
 # solved
+- ~~map is completely broken in mobile~~
+  - ~~size of the shadow map, works with 512, 2048~~
 - ~~mobile layout~~
   - ~~in portrait the map is too small >> viewport copied from old map~~
   - ~~breadcrumb component should not fold internally (or only after it has wrapped away from the title separately)~~

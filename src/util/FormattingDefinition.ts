@@ -15,6 +15,11 @@ export class FormattingDefinition {
         maximumFractionDigits: 0
     };
 
+    static readonly FORMATTER_____NOOP: IFormattingDefinition = {
+        format: value => `${value.toString()}`,
+        chartFormat: '#'
+    }
+
     static readonly FORMATTER____FIXED: IFormattingDefinition = {
         format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FIXED)}`,
         chartFormat: '#'

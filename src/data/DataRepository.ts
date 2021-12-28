@@ -1,5 +1,7 @@
 import { JsonLoader } from "../util/JsonLoader";
 import { TimeUtil } from "../util/TimeUtil";
+import { IChartData } from "./IChartData";
+import { IChartEntry } from "./IChartEntry";
 import { IDataRoot } from "./IDataRoot";
 
 /**
@@ -23,6 +25,69 @@ export class DataRepository {
 
     private constructor() {
         this.dataset = {};
+    }
+
+    async getOrBuild(source: string, minInstant: number, maxInstant: number): Promise<IChartData> {
+
+        const data = await this.getOrLoad(source);
+
+        const names = Object.keys(data.keys);
+        let dataPointer: string = '';
+        for (let i = 0; i < names.length; i++) {
+          dataPointer += data.path[names[i]];
+        }
+        const date = data.date;
+  
+        /**
+         * how many series are going to be needed
+         */
+        const valueCount = data.data[date][dataPointer].length;
+  
+        const entries: IChartEntry[] = [];
+        const dates = Object.keys(data.data);
+
+        let minX = Number.MAX_VALUE;
+        let maxX = Number.MIN_VALUE;
+
+        let minY = 0;
+        let maxY = Number.MIN_VALUE;
+
+        dates.forEach(dateRaw => {
+
+          const dataVals = data.data[dateRaw][dataPointer];
+
+          const valueX = TimeUtil.parseCategoryDateFull(dateRaw);
+
+          if (valueX >= minInstant && valueX <= maxInstant) {
+
+            minX = Math.min(minX, valueX);
+            maxX = Math.max(maxX, valueX);
+  
+            const entry = {
+              date: TimeUtil.parseCategoryDateFull(dateRaw),
+            };
+            for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
+              if (dataVals[valueIndex] !== 0) {
+                const valueY = dataVals[valueIndex];
+                entry[`value_${valueIndex}`] = valueY;
+                maxY = Math.max(maxY, valueY);
+              }
+            }
+            entries.push(entry);
+  
+          }
+
+        });     
+        
+        return {
+          entries,
+          valueCount,
+          minX,
+          maxX,
+          minY: data.minY,
+          maxY: data.maxY
+        }
+
     }
 
     async getOrLoad(source: string): Promise<IDataRoot> {

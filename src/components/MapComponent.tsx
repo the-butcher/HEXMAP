@@ -1,7 +1,9 @@
+import { ThreeDRotation } from "@mui/icons-material";
 import { Canvas, RootState } from "@react-three/fiber";
-import { PCFSoftShadowMap } from "three";
+import { PCFSoftShadowMap, ReinhardToneMapping } from "three";
 import { ObjectUtil } from "../util/ObjectUtil";
 import BoundariesComponent from "./BoundariesComponent";
+import Chart3DComponent from "./Chart3DComponent";
 import ControlsComponent from "./ControlsComponent";
 import HexagonsComponent from "./HexagonsComponent";
 import HyperlinkComponent from "./HyperlinkComponent";
@@ -30,14 +32,10 @@ import LightCompoment from "./LightCompoment";
  */
 export default (props: IMapProps) => {
 
-    const { lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps } = props; // , selected
-
+    const { lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps, chart3DProps } = props; // , selected
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
-        // state.gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
-        // state.gl.toneMapping = three.ReinhardToneMapping;
-        // state.gl.physicallyCorrectLights = true;
     }
 
     const handlePointerUp = () => {
@@ -59,17 +57,19 @@ export default (props: IMapProps) => {
 
     return (
         <div style={{ position: 'absolute', height: '100%', width: '100%' }} onPointerUp={handlePointerUp}>
-            <Canvas frameloop='demand' shadows={{ type: PCFSoftShadowMap, enabled: true }} onCreated={onCreated} camera={{ position: [0, 300, 0], fov: 40, far: 1000000 }}>
+            <Canvas frameloop='demand' shadows={{ type: PCFSoftShadowMap, enabled: true }} onCreated={onCreated} camera={{ position: [0, 300, 0], fov: 40, far: 10000 }}>
                 <ControlsComponent {...controlsProps} />
                 {/* <Stats /> */}
                 {lightProps.map(props => <LightCompoment key={props.id} {...props} />)}
-                <ambientLight intensity={0.30} />
+                <ambientLight intensity={0.20} />
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']}  /> */}
                 <group name={'root'}>
                     <HexagonsComponent {...hexagonProps} />
                     <BoundariesComponent />
                     {labelProps.map(props => <LabelComponent key={props.id} {...props} />)}
-                    {legendLabelProps.map(props => <LabelComponent key={props.id} {...props} />)}
+                    <LabelComponent key={legendLabelProps.min.id} {...legendLabelProps.min} />
+                    <LabelComponent key={legendLabelProps.max.id} {...legendLabelProps.max} />
+                    {chart3DProps.map(props => <Chart3DComponent key={props.id} {...props} />)}
                     <HyperlinkComponent {...twitterLinkProps} />
                 </group>
             </Canvas>
