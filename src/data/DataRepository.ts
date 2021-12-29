@@ -104,6 +104,7 @@ export class DataRepository {
         const instantMin = TimeUtil.parseCategoryDateFull(dates[0]);
         const instantMax = TimeUtil.parseCategoryDateFull(dates[dates.length - 1]);
     
+        // console.log('min/max', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax));
         instant = Math.max(instant, instantMin);
         instant = Math.min(instant, instantMax);
 

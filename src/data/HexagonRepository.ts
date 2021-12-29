@@ -157,6 +157,7 @@ export class HexagonRepository {
             // color = ColorUtil.getCorineColor(values[valueIndexCode]);
             values = pbfHexagon.getValues();
             yOffset = values[HexagonRepository.VALUE_INDEX___X] % 2 === 0 ? 0 : SpatialUtil.HEXAGON_SPACING_X / 2;
+            yOffset += values[HexagonRepository.VALUE_INDEX_LUC] == 1 ? SpatialUtil.HEXAGON_SPACING_X * 17 : 0;
 
             /**
              * intial values

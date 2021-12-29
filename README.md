@@ -1,8 +1,12 @@
+#Tweet
+🢆🢅🢂
+
 # Issues in Hexmap
-- add shape to scene that the current diagram can be textured on  
-  - move the date-labels to chart 3d
+- find a way to add mortality as datasource
 - adapt date slider tooltip to match chart tooltip
-- data credits
+- boundaries have offsets in many places
+- move base config to file (maybe multiple files)
+- add twitter card to index.html
 
 # later
 - logarithmic option in chart
@@ -10,8 +14,14 @@
 - export options for chart, map, data
 
 # solved
+- ~~add shape to scene that the current diagram can be textured on~~
+  - ~~move the date-labels to chart 3d (NO)~~
+  - ~~deprecate the chart 3D component and properties~~
+- ~~add logic to adapt shadow texture size to device capabilities~~
+- ~~add morning EMS as datasource~~
+- ~~data credits~~
 - ~~map is completely broken in mobile~~
-  - ~~size of the shadow map, works with 512, 2048~~
+  - ~~reason: size of the shadow map, works with 512, 2048~~
 - ~~mobile layout~~
   - ~~in portrait the map is too small >> viewport copied from old map~~
   - ~~breadcrumb component should not fold internally (or only after it has wrapped away from the title separately)~~

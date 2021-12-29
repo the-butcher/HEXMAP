@@ -77,7 +77,7 @@ export default (props: IHyperlinkProps) => {
     <group onClick={e => window.open(props.href)} onPointerOver={() => document.body.style.cursor = 'pointer'} onPointerOut={() => document.body.style.cursor = 'auto'}>
       <mesh ref={meshTextRef}>
         <textGeometry ref={geomTextRef} />
-        <meshStandardMaterial ref={mtrlTextRef} color={[0.02 * 1.7, 0.02 * 1.7, 0.015 * 1.7]} />
+        <meshStandardMaterial ref={mtrlTextRef} color={[0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2]} />
       </mesh>
       <mesh ref={meshRectRef}>
         <textGeometry ref={geomRectRef} />

@@ -12,7 +12,7 @@ import { ILightProps } from './ILightProps';
 export default (props: ILightProps) => {
 
     const pointLight = useRef<three.DirectionalLight>();
-    const { scene } = useThree();
+    const { gl, scene } = useThree();
 
     useEffect(() => {
 
@@ -31,8 +31,10 @@ export default (props: ILightProps) => {
         pointLight.current!.shadow.camera.far = 1000;
         pointLight.current!.shadow.camera.lookAt(0, 0, 0);
 
-        pointLight.current!.shadow.mapSize.width = 2048; // 4096;
-        pointLight.current!.shadow.mapSize.height = 4096; // 2048;
+        const maxTextureSize = gl.capabilities.maxTextureSize;
+
+        pointLight.current!.shadow.mapSize.width = maxTextureSize / 8;
+        pointLight.current!.shadow.mapSize.height = maxTextureSize / 4;
 
         // const helper = new three.CameraHelper( pointLight.current!.shadow.camera );
         // scene.add( helper );

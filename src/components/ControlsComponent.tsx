@@ -26,13 +26,13 @@ export default (props: IControlsProps) => {
 
         controls.current.enableDamping = false;
         controls.current.dampingFactor = 0.05;
-        controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
-        controls.current.maxPolarAngle = Math.PI / 2.05;
-        controls.current.minAzimuthAngle = -Math.PI / 4,
-        controls.current.maxAzimuthAngle = Math.PI / 8;
+        // controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+        // controls.current.maxPolarAngle = Math.PI / 2.05;
+        // controls.current.minAzimuthAngle = -Math.PI / 4,
+        // controls.current.maxAzimuthAngle = Math.PI / 8;
 
         controls.current.addEventListener('change', e => {
-            console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target);
+            console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
         });
 
         camera.position.set(-198, 450, 577);
@@ -56,26 +56,20 @@ export default (props: IControlsProps) => {
 
                 controls.current.minAzimuthAngle = 0,
                 controls.current.maxAzimuthAngle = 0;
-                controls.current.minPolarAngle = 0.33; // Math.PI / 4; // how far above ground the map can be tilted
-                controls.current.maxPolarAngle = 0.33;
-                camera.position.set(6.78513577491969, 443.84028283902745, 186.7686468436712);
-                controls.current.target.set(6.78513577491969, 0, 34.74231275973837);
+                controls.current.minPolarAngle = 0.43; // Math.PI / 4; // how far above ground the map can be tilted
+                controls.current.maxPolarAngle = 0.43;
+                // camera.position.set(6.78513577491969, 443.84028283902745, 186.7686468436712);
+                // controls.current.target.set(6.78513577491969, 0, 34.74231275973837);
+                camera.position.set(-16.907294646056016, 411.01271753556387, 260.12818711663294);
+                controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
                 controls.current.update();
 
-                // setTimeout(() => {
 
-                //     camera.position.set(4.652865358780201, 380.0929665674144, 172.73177630287918);
-                //     controls.current.update();
-
-                    controls.current.minAzimuthAngle = -Math.PI / 4,
-                    controls.current.maxAzimuthAngle = Math.PI / 8;
-                    controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
-                    controls.current.maxPolarAngle = Math.PI / 2.05;
-                    controls.current.update();                    
-
-                // }, 200);
-
-
+                controls.current.minAzimuthAngle = -Math.PI / 4,
+                controls.current.maxAzimuthAngle = Math.PI / 8;
+                controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
+                controls.current.maxPolarAngle = Math.PI / 2.05;
+                controls.current.update();                    
 
             }            
             if (e.key === 'k') {

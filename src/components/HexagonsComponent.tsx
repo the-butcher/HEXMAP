@@ -18,9 +18,12 @@ export default (props: IHexagonsProps) => {
   const { invalidate, gl, scene, camera } = useThree();
   const { onPathChange, onHexagonsLoaded } = props;
 
+  const hexagonCount = 174414;
+
   const geomRef = useRef<three.BufferGeometry>(new three.BufferGeometry());
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
-  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, 171174));
+  const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, hexagonCount));
+
 
   /**
    * helper objects for setting up position and color before applying to indexed instances
@@ -31,8 +34,8 @@ export default (props: IHexagonsProps) => {
   /**
    * helpers for updating color
    */
-  const data = Array.from({ length: 171174 }, () => ({ color: '#FF0000', scale: 1 }))
-  const colorArray = useMemo(() => new Float32Array(171174 * 3), []);
+  const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
+  const colorArray = useMemo(() => new Float32Array(hexagonCount * 3), []);
 
   let hexagonValue: IHexagon;
   useEffect(() => {
@@ -160,7 +163,7 @@ export default (props: IHexagonsProps) => {
     e.stopPropagation();
     if (e.instanceId) {
       const hexagonValue = HexagonRepository.getInstance().getHexagon(e.instanceId);
-      if (hexagonValue.luc > 0) {
+      if (hexagonValue.luc >= 100) {
         const path = props.getPath(hexagonValue);
         if (path !== props.path) {
           // console.log('firing path change event');
@@ -172,7 +175,7 @@ export default (props: IHexagonsProps) => {
   }
 
   return (
-    <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, 171174]} castShadow receiveShadow onPointerUp={handlePointerUp}>
+    <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onPointerUp={handlePointerUp}>
       <bufferGeometry ref={geomRef}>
         <instancedBufferAttribute attachObject={['attributes', 'color']} args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>

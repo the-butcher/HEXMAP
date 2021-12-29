@@ -119,10 +119,33 @@ export default () => {
   };
 
 
-  const instant = Date.now() - TimeUtil.MILLISECONDS_PER____DAY;
+  const instant = Date.now();
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
+      {
+        date: '',
+        name: 'Inzidenz',
+        desc: 'EMS',
+        value00: '',
+        value07: '',
+        valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+        onExpand: handleIndicatorExpand,
+        fold: 'open-horizontal',
+        source: './hexmap-data-ems.json',
+        path: '',
+        breadcrumbProps: [],
+        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
+        chartProps: {
+          title: '7-Tages Inzidenz',
+          source: './hexmap-data-ems.json',
+          path: '',
+          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+          fold: 'open-horizontal',
+          onInstantChange: handleInstantChange
+        }
+      },
       {
         date: '',
         name: 'Inzidenz',
@@ -131,7 +154,7 @@ export default () => {
         value07: '',
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
-        fold: 'open-horizontal',
+        fold: 'closed',
         source: './hexmap-data-bundesland-alter.json',
         path: '',
         breadcrumbProps: [],
@@ -142,7 +165,7 @@ export default () => {
           source: './hexmap-data-bundesland-alter.json',
           path: '',
           valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-          fold: 'open-horizontal',
+          fold: 'closed',
           onInstantChange: handleInstantChange
         }
       },
@@ -245,49 +268,60 @@ export default () => {
       {
         id: ObjectUtil.createId(),
         label: '',
-        size: 6.5,
+        size: 5,
         position: {
           x: -202,
           y: 0.3,
-          z: -70
+          z: -8
         },
         rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
         label: '',
-        size: 5,
+        size: 7,
         position: {
           x: -202,
           y: 0.3,
-          z: -60
+          z: 4
         },
         rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
         label: '',
-        size: 5,
+        size: 4,
         position: {
           x: -202,
           y: 0.3,
-          z: 10
+          z: -25.5
         },
         rotationY: 0
       },
       {
         id: ObjectUtil.createId(),
         label: '',
-        size: 5,
+        size: 4,
         position: {
-          x: -127,
+          x: -118,
           y: 0.3,
-          z: 10
+          z: -25.5
         },
         rotationY: 0
-      }
+      }      
     ],
     legendLabelProps: {
+      title: {
+        id: ObjectUtil.createId(),
+        label: 'Legende',
+        size: 4,
+        position: {
+          x: -202,
+          y: 0.3,
+          z: -100.2
+        },
+        rotationY: 0
+      },      
       min: {
         id: ObjectUtil.createId(),
         label: '0',
@@ -295,7 +329,7 @@ export default () => {
         position: {
           x: -247,
           y: 0.3,
-          z: -88
+          z: -88.2
         },
         rotationY: 0
       },
@@ -306,29 +340,70 @@ export default () => {
         position: {
           x: -80,
           y: 0.3,
-          z: -88
+          z: -88.2
         },
         rotationY: 0
       }
     },
-    chart3DProps: [
+    courseLabelProps: {
+      title: {
+        id: ObjectUtil.createId(),
+        label: 'Verlauf',
+        size: 4,
+        position: {
+          x: -202,
+          y: 0.3,
+          z: -48.5
+        },
+        rotationY: 0
+      },
+      min: {
+        id: ObjectUtil.createId(),
+        label: '0',
+        size: 6,
+        position: {
+          x: -247,
+          y: 0.3,
+          z: -36.5
+        },
+        rotationY: 0
+      },
+      max: {
+        id: ObjectUtil.createId(),
+        label: '0',
+        size: 6,
+        position: {
+          x: -80,
+          y: 0.3,
+          z: -36.5
+        },
+        rotationY: 0
+      }
+    },
+    hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        source: './hexmap-data-bundesland-bezirk.json',
-        path: '',
-        indx: -1,
-        instant: -1,
-        min: {
-          x: -203,
-          y: 55
-        },
-        max: {
-          x: -85,
-          y: 0
+        label: 'https://www.data.gv.at/covid-19/',
+        size: 3,
+        position: {
+          x: -202,
+          y: 0.3,
+          z: 11
         },
         rotationY: 0,
-        getColor: () => Color.DARK_GREY,
-        valueFormatter: FormattingDefinition.FORMATTER_____NOOP
+        href: 'https://www.data.gv.at/covid-19/'
+      },
+      {
+        id: ObjectUtil.createId(),
+        label: '@FleischerHannes',
+        size: 3,
+        position: {
+            x: -202,
+            y: 0.3,
+            z: 17
+        },
+        rotationY: 0,
+        href: 'https://twitter.com/FleischerHannes'
       }
     ]
   });
@@ -381,12 +456,13 @@ export default () => {
     Promise.all(allPromises).then(allData => {
 
       const indicatorProps: IIndicatorProps[] = [];
-      let chart3DPropsMain = { ...mapProps.chart3DProps[0] };
       const labelProps = mapProps.labelProps;
       labelProps.forEach(props => {
         props.label = '';
       });
       const legendLabelProps = mapProps.legendLabelProps;
+      const courseLabelProps = mapProps.courseLabelProps;
+      const hyperlinkProps = mapProps.hyperlinkProps;
       let hexagonProps: IHexagonsProps;
 
       for (let i = 0; i < allData.length; i++) {
@@ -396,8 +472,15 @@ export default () => {
 
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === appState.source;
+
+        // current instant (closest to date slider date - and date slider will be move to that instant upon update)
         const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, appState.instant);
-        const clampedInstantM7 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
+
+        // one week offset (for "vorwoche" value)
+        const clampedInstant07 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
+
+        // ~ 2 month back (for the history hexagon slot)
+        const clampedInstant60 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 60);
 
         data.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
@@ -412,19 +495,19 @@ export default () => {
         }
         let label1 = '';
 
-        let prefPointer: string = '';
-        let postPointer: string = '';
+        let prefPath: string = '';
+        let postPath: string = '';
         for (let i = 0; i < names.length; i++) {
           const name = names[i];
           if (i === 0) {
-            prefPointer = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
+            prefPath = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
             if (selected) {
-              label1 += data.keys[name][prefPointer];
+              label1 += data.keys[name][prefPath];
             }
           } else {
-            postPointer += data.path[name];
+            postPath += data.path[name];
             if (selected) {
-              label1 += ' / ' + data.keys[name][postPointer];
+              label1 += ' / ' + data.keys[name][postPath];
             }
           }
           breadcrumbProps.push({
@@ -465,20 +548,38 @@ export default () => {
         let minLegendVal = Number.MAX_VALUE;
         let maxLegendVal = Number.MIN_VALUE;
         if (selected) {
-          labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstantM7);
+
+          labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
           labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
-          const dailyDataset = data.data[data.date];
-          const keys = Object.keys(dailyDataset);
+
+          const dataset00 = data.data[data.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
+          const keys = Object.keys(dataset00);
+
           // console.log('areaPointer', prefPointer, postPointer);
+          /**
+           * find min and max values referring to the map display date
+           */
           keys.forEach(key => {
-            if (key.endsWith(postPointer)) {
-              minLegendVal = Math.min(minLegendVal, dailyDataset[key][data.indx]);
-              maxLegendVal = Math.max(maxLegendVal, dailyDataset[key][data.indx]);
+            if (key.endsWith(postPath)) {
+              minLegendVal = Math.min(minLegendVal, dataset00[key][data.indx]);
+              maxLegendVal = Math.max(maxLegendVal, dataset00[key][data.indx]);
             }
           });
+
           legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
           legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
+
+          const dataset60 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
+          const minCourseVal = dataset60[prefPath + postPath][data.indx];
+          const maxCourseVal = dataset00[prefPath + postPath][data.indx];
+
+          courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
+          courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
+
         }
+
+        // legend
+        // 
 
         const getColor = (value: number) => {
           const h = indicatorPropsInstance.interpolatedHue.getOut(value);
@@ -488,9 +589,11 @@ export default () => {
         }
 
         // console.log('data', data, );
-        const dataPointer = prefPointer + postPointer;
-        const value00 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant00)][dataPointer][data.indx];
-        const valueM7 = data.data[TimeUtil.formatCategoryDateFull(clampedInstantM7)][dataPointer][data.indx];
+        const dataPointer = prefPath + postPath;
+        const dataset00 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
+        const dataset07 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant07)];
+        const value00 = dataset00[dataPointer][data.indx];
+        const valueM7 = dataset07[dataPointer][data.indx];
         const value07 = (value00 - valueM7) / valueM7;
         if (selected) {
           indicatorProps.push({
@@ -509,16 +612,6 @@ export default () => {
               onInstantChange: handleInstantChange
             }
           });
-          chart3DPropsMain = {
-            ...chart3DPropsMain,
-            source: indicatorPropsInstance.source,
-            path: dataPointer,
-            instant: clampedInstant00,
-            indx: data.indx,
-            valueFormatter: indicatorPropsInstance.valueFormatter,
-            getColor
-          };
-          // console.log('chart3DPropsMain', chart3DPropsMain);
         } else {
           indicatorProps.push({
             ...indicatorPropsInstance,
@@ -538,41 +631,60 @@ export default () => {
             source: appState.source,
             name: names[0],
             keys: Object.keys(data.keys[names[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
-            path: prefPointer,
+            path: prefPath,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getPath: (values) => {
-              return values.gkz.substring(0, prefPointer.length);
+              return values.gkz.substring(0, prefPath.length);
             },
             getColor: (values) => {
-              const _prefPointer = values.gkz.substring(0, prefPointer.length)
-              const dataPointer = _prefPointer + postPointer;
-              const dailyDataset = data.data[data.date];
-              const dailyValues = dailyDataset[dataPointer];
+              const _prefPointer = values.gkz.substring(0, prefPath.length)
+              const dataPointer = _prefPointer + postPath;
+              const dataset00 = data.data[data.date];
+              const dailyValues = dataset00[dataPointer];
               let val = 0;
               if (dailyValues) {
-                val = dailyValues[data.indx]; // last value
-              } else if (_prefPointer === '0') {
+                return getColor(dailyValues[data.indx]); // last value
+              } else if (values.luc === 0) {
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
+                return getColor(minLegendVal + (maxLegendVal - minLegendVal) * legendFraction);
+              } else if (values.luc === 1) {
+                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
+                const historicInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
+                const historicDataset = data.data[TimeUtil.formatCategoryDateFull(historicInstant)];
+                const historicValues = historicDataset[prefPath + postPath];
+                if (historicValues) {
+                  return getColor(historicValues[data.indx]); // last value
+                } else {
+                  console.error('failed to find historic values');
+                }
               }
-              return getColor(val);
+              return ColorUtil.getCorineColor(values.luc);
               // return ColorUtil.getCorineColor(values.luc);
             },
             getHeight: (values) => {
               let ele = values.ele / 2 - 7.5 - refEle; // - 7.5;
-              const _prefPointer = values.gkz.substring(0, prefPointer.length)
-              const dataPointer = _prefPointer + postPointer;
-              const dailyDataset = data.data[data.date];
-              const dailyValues = dailyDataset[dataPointer];
+              const _prefPath = values.gkz.substring(0, prefPath.length)
+              const fullPath = _prefPath + postPath;
+              const dataset00 = data.data[data.date];
+              const dailyValues = dataset00[fullPath];
               if (dailyValues) {
                 ele += indicatorPropsInstance.interpolatedEle.getOut(dailyValues[data.indx]);
-              } else if (_prefPointer === '0') {
+              } else if (values.luc === 0) {
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
                 const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
                 ele += indicatorPropsInstance.interpolatedEle.getOut(val);
-              } else {
-                // missing data
+              } else if (values.luc === 1) {
+                // TODO this could likely be faster since legend and history are handled in columns
+                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
+                const historicInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
+                const historicDataset = data.data[TimeUtil.formatCategoryDateFull(historicInstant)];
+                const historicValues = historicDataset[prefPath + postPath];
+                if (historicValues) {
+                  ele += indicatorPropsInstance.interpolatedEle.getOut(historicValues[data.indx]);
+                } else {
+                  console.error('failed to find historic values');
+                }
               }
               return ele;
             },
@@ -635,7 +747,8 @@ export default () => {
         setMapProps({
           labelProps: [...labelProps],
           legendLabelProps: { ...legendLabelProps },
-          chart3DProps: [chart3DPropsMain],
+          courseLabelProps: { ...courseLabelProps },
+          hyperlinkProps: [ ...hyperlinkProps ],
           lightProps,
           controlsProps,
           hexagonProps: hexagonProps!
@@ -646,7 +759,7 @@ export default () => {
 
 
 
-  }, [appState.instant, appState.source, appState.action]);
+  }, [appState.instant, appState.source, appState.action]); 
 
   useEffect(() => {
 
