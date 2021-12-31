@@ -8,10 +8,10 @@ export interface IAppState {
      */
     source: string;
 
-    /**
-     * refer to the currently display time
-     */
-    instant: number;
+    // /**
+    //  * refer to the currently display time for this data
+    //  */
+    // instant: number;
 
     action: IAppAction;
 

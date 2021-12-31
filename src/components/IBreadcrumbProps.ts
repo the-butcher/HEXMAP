@@ -1,10 +1,12 @@
+import { IKeyset } from "../data/IKeyset";
+
 export interface IBreadcrumbProps {
 
     source: string;
     
     name: string;
 
-    keys: { [K in string]: string };
+    keys: IKeyset;
     
     path: string;
 

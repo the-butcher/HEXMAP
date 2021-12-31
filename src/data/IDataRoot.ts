@@ -1,3 +1,9 @@
+/**
+ * definition of the format that data is supposed to be provided in
+ * 
+ * @author h.fleischer
+ * @since 30.12.2021
+ */
 export interface IDataRoot {
 
     keys: { [K in string]: { [K in string]: string }};
@@ -7,10 +13,6 @@ export interface IDataRoot {
     idxs: string[];
 
     indx: number;
-
-    path: { [K in string]: string }; 
-
-    date: string;
 
     minY: number;
 

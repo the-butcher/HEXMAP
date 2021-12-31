@@ -10,7 +10,7 @@ export default (props: IBreadcrumbProps) => {
     }
 
     const items: JSX.Element[] = [];
-    const keys = Object.keys(props.keys).sort();
+    const keys = props.keys.getKeys().sort();
     const hasCategories = false || keys.find(k => k.indexOf('#') >= 0);
     // keys.sort();
     // console.log('keys', keys);
@@ -19,7 +19,7 @@ export default (props: IBreadcrumbProps) => {
     let pad: string;
     for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
         key = keys[keyIndex];
-        val = props.keys[key];
+        val = props.keys.getValue(key);
         pad = (hasCategories && key.indexOf('#') === -1) ? '30px' : '6px';
         items.push(<MenuItem key={`${key}_${keyIndex}`} value={key} style={{ paddingLeft: pad }}>{val}</MenuItem>);
     }

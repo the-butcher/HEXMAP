@@ -12,10 +12,16 @@ export class TimeUtil {
     static readonly MILLISECONDS_PER___WEEK: number = TimeUtil.MILLISECONDS_PER____DAY * 7;
     static readonly MILLISECONDS_PER___YEAR: number = TimeUtil.MILLISECONDS_PER____DAY * 365;
 
+    static readonly DATE_LOOKUP: { [K in string]: string } = {};
+
     static formatCategoryDateFull(instant: number): string {
-        const date = new Date(instant);
-        // @ts-ignore
-        return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getFullYear()).padStart(2, '0')}`;
+        let categoryDateFull = this.DATE_LOOKUP[instant];
+        if (!categoryDateFull) {
+            const date = new Date(instant);
+            categoryDateFull = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getFullYear()).padStart(2, '0')}`;
+            this.DATE_LOOKUP[instant] = categoryDateFull
+        }
+        return categoryDateFull;
     }
 
     static formatCategoryDateDay(instant: number): string {

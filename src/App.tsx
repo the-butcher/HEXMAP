@@ -10,6 +10,7 @@ import UserInterfaceComponent from './components/UserInterfaceComponent';
 import { DataRepository } from './data/DataRepository';
 import { HexagonRepository } from './data/HexagonRepository';
 import { IDataRoot } from './data/IDataRoot';
+import { IDataSetting } from './data/IDataSetting';
 import { IAppState } from './IAppState';
 import { Color } from './util/Color';
 import { ColorUtil } from './util/ColorUtil';
@@ -28,49 +29,70 @@ export default () => {
    * @param source 
    * @param instant 
    */
-  const handleInstantChange = (instant1: number) => {
+  const handleInstantChange = async (instant: number) => {
 
-    console.log('📞 handling instant change', instant1);
+    console.log('📞 handling instant change', instant);
 
+    const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSettings.setInstant(instant);
+
+    /**
+     * trigger an update
+     */
     setAppState({
       ...appState,
-      instant: DataRepository.getInstance().clampInstant(appState.source, instant1),
       action: {
+        stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
         updateDelay: 250
       }
     });
-    
+
   }
 
   const handleHexagonsLoaded = () => {
-    // console.log('handling hexagons loaded', appState);
+
+    console.log('📞 handling hexagons loaded', instant);
+
     setAppState({
       ...appState,
       action: {
+        stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
         updateDelay: 1
       }
     });
+
   }
 
-  const handleIndicatorExpand = (source1: string) => {
+  const handleIndicatorExpand = async (source: string) => {
 
-    console.log('📞 handling indicator fold', source1);
+    console.log('📞 handling indicator fold', source);
 
-    const isSourceChange = source1 !== appState.source;
+    const isSourceChange = source !== appState.source;
     let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
-      fold = 'open-horizontal';
-    }
 
+      fold = 'open-horizontal';
+
+      // get previous settings
+      const prevSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+      // get the settings that we are about to switch to
+      const nextSettings = await DataRepository.getInstance().getOrLoadDataSetting(source);
+
+      // validate instant and apply
+      nextSettings.setInstant(prevSettings.getInstant());
+
+    }
+    4
     setAppState({
       ...appState,
-      source: source1,
-      instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
+      source,
+      // instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
       action: {
+        stamp: ObjectUtil.createId(),
         updateScene: isSourceChange,
         updateLight: isSourceChange,
         updateDelay: 350
@@ -80,46 +102,46 @@ export default () => {
 
   }
 
-  const handleIndxChange = (source: string, name: string, path: string) => {
+  const handleIndxChange = async (source: string, name: string, indexRaw: string) => {
 
-    console.log('📞 handling index change', source, name, path);
+    console.log('📞 handling index change', source, name, indexRaw);
 
-    DataRepository.getInstance().getOrLoad(source).then(data => {
-      data.indx = parseInt(path);
-      setAppState({
-        ...appState,
-        source,
-        action: {
-          updateScene: true,
-          updateLight: true,
-          updateDelay: 1
-        },
-      });
+    const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSettings.setIndex(parseInt(indexRaw));
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: true,
+        updateLight: true,
+        updateDelay: 1
+      },
     });
 
   }
 
-  const handlePathChange = (source: string, name: string, path: string) => {
+  const handlePathChange = async (source: string, name: string, path: string) => {
 
     console.log('📞 handling path change', source, name, path);
 
-    DataRepository.getInstance().getOrLoad(source).then(data => {
-      data.path[name] = path;
-      setAppState({
-        ...appState,
-        source,
-        action: {
-          updateScene: true,
-          updateLight: true,
-          updateDelay: 1
-        },
-      });
+    const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSettings.setPath(name, path);
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: true,
+        updateLight: true,
+        updateDelay: 1
+      },
     });
 
   };
 
 
-  const instant = Date.now();
+  const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
@@ -219,7 +241,7 @@ export default () => {
     navigationBotProps: {
       instantProps: {
         instantCur: instant,
-        instantMin: new Date('2020-03-01').getTime(),
+        instantMin: TimeUtil.parseCategoryDateFull('01.03.2020'),
         instantMax: instant,
         onInstantChange: handleInstantChange
       }
@@ -308,7 +330,7 @@ export default () => {
           z: -25.5
         },
         rotationY: 0
-      }      
+      }
     ],
     legendLabelProps: {
       title: {
@@ -321,7 +343,7 @@ export default () => {
           z: -100.2
         },
         rotationY: 0
-      },      
+      },
       min: {
         id: ObjectUtil.createId(),
         label: '0',
@@ -398,9 +420,9 @@ export default () => {
         label: '@FleischerHannes',
         size: 3,
         position: {
-            x: -202,
-            y: 0.3,
-            z: 17
+          x: -202,
+          y: 0.3,
+          z: 17
         },
         rotationY: 0,
         href: 'https://twitter.com/FleischerHannes'
@@ -427,6 +449,7 @@ export default () => {
     setAppState({
       ...appState,
       action: {
+        stamp: ObjectUtil.createId(),
         updateScene: false,
         updateLight: false,
         updateDelay: 1
@@ -437,8 +460,8 @@ export default () => {
   const indicatorProps = userInterfaceProps.indicatorProps[0];
   const [appState, setAppState] = useState<IAppState>({
     source: indicatorProps.source,
-    instant,
     action: {
+      stamp: ObjectUtil.createId(),
       updateScene: false,
       updateLight: false,
       updateDelay: 1
@@ -450,10 +473,20 @@ export default () => {
 
     console.log('🔄 updating app');
 
-    const refEle = 0;
+    // const refEle = 0;
 
-    const allPromises: Promise<IDataRoot>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoad(props.source));
-    Promise.all(allPromises).then(allData => {
+    /**
+     * update instant props with current source
+     * this is done so the date-slider and date-picker components can call back with the current source
+     * and could probably also be solved by putting source on state in this component
+     */
+    const instantProps: IInstantProps = {
+      ...userInterfaceProps.navigationBotProps.instantProps,
+      onInstantChange: handleInstantChange
+    }
+
+    const promises: Promise<IDataSetting>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoadDataSetting(props.source));
+    Promise.all(promises).then(allSettings => {
 
       const indicatorProps: IIndicatorProps[] = [];
       const labelProps = mapProps.labelProps;
@@ -465,76 +498,80 @@ export default () => {
       const hyperlinkProps = mapProps.hyperlinkProps;
       let hexagonProps: IHexagonsProps;
 
-      for (let i = 0; i < allData.length; i++) {
+      for (let i = 0; i < allSettings.length; i++) {
+        const dataSetting = allSettings[i];
+        const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
+        const selected = indicatorPropsInstance.source === appState.source;
+        if (selected) {
+          instantProps.instantCur = dataSetting.getInstant();
+        }
+      }
 
-        const data = allData[i];
+      for (let i = 0; i < allSettings.length; i++) {
+
+        const dataSetting = allSettings[i];
         // console.log('data', userInterfaceProps.indicatorProps[i].source, data.path)
 
         const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === appState.source;
-
         // current instant (closest to date slider date - and date slider will be move to that instant upon update)
-        const clampedInstant00 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, appState.instant);
+        const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instantCur);
 
         // one week offset (for "vorwoche" value)
-        const clampedInstant07 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
+        const clampedInstant07 = dataSetting.getDataset().getValidInstant(clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
 
         // ~ 2 month back (for the history hexagon slot)
-        const clampedInstant60 = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 60);
+        const clampedInstant60 = dataSetting.getDataset().getValidInstant(clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 60);
 
-        data.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
+        // dataSetting.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
         /**
          * set up breadcrumbs to show options of current indicator
          */
         const breadcrumbProps: IBreadcrumbProps[] = [];
 
-        const names = Object.keys(data.keys);
+        const keysetKeys = dataSetting.getDataset().getKeysetKeys(); //  Object.keys(dataSetting.keys);
         if (selected) {
           labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
         }
         let label1 = '';
 
-        let prefPath: string = '';
-        let postPath: string = '';
-        for (let i = 0; i < names.length; i++) {
-          const name = names[i];
+        let prefKey: string = '';
+        let postKey: string = '';
+        for (let i = 0; i < keysetKeys.length; i++) {
+          const keysetKey = keysetKeys[i];
           if (i === 0) {
-            prefPath = data.path[name]; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
+            prefKey = dataSetting.getPath(keysetKey); // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
             if (selected) {
-              label1 += data.keys[name][prefPath];
+              label1 += dataSetting.getDataset().getKeyset(keysetKey).getValue(prefKey);
             }
           } else {
-            postPath += data.path[name];
+            postKey += dataSetting.getPath(keysetKey);
             if (selected) {
-              label1 += ' / ' + data.keys[name][postPath];
+              label1 += ' / ' + dataSetting.getDataset().getKeyset(keysetKey).getValue(postKey);
             }
           }
           breadcrumbProps.push({
             source: appState.source,
-            name,
-            keys: data.keys[name],
-            path: data.path[name],
+            name: keysetKey,
+            keys: dataSetting.getDataset().getKeyset(keysetKey),
+            path: dataSetting.getPath(keysetKey),
             onPathChange: handlePathChange,
           });
         };
 
-        if (data.idxs.length > 1) {
-          // console.log('idxs', data.idxs);
-          const keys = {};
-          for (let i = 0; i < data.idxs.length; i++) {
-            keys[i] = data.idxs[i];
-          }
+        const indexKeyset = dataSetting.getDataset().getIndexKeyset();
+        if (indexKeyset.getSize() > 1) {
 
           if (selected) {
-            label1 += ' / ' + data.idxs[data.indx];
+            label1 += ' / ' + indexKeyset.getValue(dataSetting.getIndex().toString());
           }
 
-          const path = data.indx.toString();
+          const path = dataSetting.getIndex().toString();
           breadcrumbProps.push({
             source: appState.source,
             name: 'index',
-            keys,
+            keys: indexKeyset,
             path,
             onPathChange: handleIndxChange,
           });
@@ -552,26 +589,25 @@ export default () => {
           labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
           labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
-          const dataset00 = data.data[data.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
-          const keys = Object.keys(dataset00);
+          const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
 
           // console.log('areaPointer', prefPointer, postPointer);
           /**
            * find min and max values referring to the map display date
            */
-          keys.forEach(key => {
-            if (key.endsWith(postPath)) {
-              minLegendVal = Math.min(minLegendVal, dataset00[key][data.indx]);
-              maxLegendVal = Math.max(maxLegendVal, dataset00[key][data.indx]);
+          entry00.getKeys().forEach(key => {
+            if (key.endsWith(postKey)) {
+              minLegendVal = Math.min(minLegendVal, entry00.getValue(key, dataSetting.getIndex()));
+              maxLegendVal = Math.max(maxLegendVal, entry00.getValue(key, dataSetting.getIndex()));
             }
           });
 
           legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
           legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
 
-          const dataset60 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
-          const minCourseVal = dataset60[prefPath + postPath][data.indx];
-          const maxCourseVal = dataset00[prefPath + postPath][data.indx];
+          const entry60 = dataSetting.getDataset().getEntry(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
+          const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex());
+          const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex());
 
           courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
           courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
@@ -589,11 +625,11 @@ export default () => {
         }
 
         // console.log('data', data, );
-        const dataPointer = prefPath + postPath;
-        const dataset00 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
-        const dataset07 = data.data[TimeUtil.formatCategoryDateFull(clampedInstant07)];
-        const value00 = dataset00[dataPointer][data.indx];
-        const valueM7 = dataset07[dataPointer][data.indx];
+        const valueKey = prefKey + postKey;
+        const entry00 = dataSetting.getDataset().getEntry(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
+        const entry07 = dataSetting.getDataset().getEntry(clampedInstant07);
+        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()); // dataset00[dataPointer][dataSetting.indx];
+        const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
         const value07 = (value00 - valueM7) / valueM7;
         if (selected) {
           indicatorProps.push({
@@ -601,13 +637,13 @@ export default () => {
             value00: indicatorPropsInstance.valueFormatter.format(value00),
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             breadcrumbProps: breadcrumbProps,
-            path: dataPointer,
+            path: valueKey,
             fold: appState.fold,
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand,
             chartProps: {
               ...indicatorPropsInstance.chartProps,
-              path: dataPointer,
+              path: valueKey,
               fold: appState.fold,
               onInstantChange: handleInstantChange
             }
@@ -629,61 +665,56 @@ export default () => {
           hexagonProps = {
             // onHover: setHovered,
             source: appState.source,
-            name: names[0],
-            keys: Object.keys(data.keys[names[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
-            path: prefPath,
+            name: keysetKeys[0],
+            keys: dataSetting.getDataset().getKeyset(keysetKeys[0]).getKeys(), // Object.keys(dataSetting.keys[keysetKeys[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
+            path: prefKey,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getPath: (values) => {
-              return values.gkz.substring(0, prefPath.length);
+              return values.gkz.substring(0, prefKey.length);
             },
             getColor: (values) => {
-              const _prefPointer = values.gkz.substring(0, prefPath.length)
-              const dataPointer = _prefPointer + postPath;
-              const dataset00 = data.data[data.date];
-              const dailyValues = dataset00[dataPointer];
+              const _prefKey = values.gkz.substring(0, prefKey.length)
+              const dataKey = _prefKey + postKey;
+              const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // .data[dataSetting.date];
+              // const dailyValues = dataset00[dataKey];
               let val = 0;
-              if (dailyValues) {
-                return getColor(dailyValues[data.indx]); // last value
+              if (entry00.hasKey(dataKey)) {
+                return getColor(entry00.getValue(dataKey, dataSetting.getIndex())); // dailyValues[dataSetting.indx]); // last value
               } else if (values.luc === 0) {
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
                 return getColor(minLegendVal + (maxLegendVal - minLegendVal) * legendFraction);
               } else if (values.luc === 1) {
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                const historicInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                const historicDataset = data.data[TimeUtil.formatCategoryDateFull(historicInstant)];
-                const historicValues = historicDataset[prefPath + postPath];
-                if (historicValues) {
-                  return getColor(historicValues[data.indx]); // last value
+                const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
+                const historicEntry = dataSetting.getDataset().getEntry(historicInstant);
+                if (historicEntry.hasKey(prefKey + postKey)) {
+                  return getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex())); // last value
                 } else {
-                  console.error('failed to find historic values');
+                  // Math.random();
                 }
               }
               return ColorUtil.getCorineColor(values.luc);
               // return ColorUtil.getCorineColor(values.luc);
             },
             getHeight: (values) => {
-              let ele = values.ele / 2 - 7.5 - refEle; // - 7.5;
-              const _prefPath = values.gkz.substring(0, prefPath.length)
-              const fullPath = _prefPath + postPath;
-              const dataset00 = data.data[data.date];
-              const dailyValues = dataset00[fullPath];
-              if (dailyValues) {
-                ele += indicatorPropsInstance.interpolatedEle.getOut(dailyValues[data.indx]);
+              let ele = values.ele / 2 - 7.5;
+              const _prefKey = values.gkz.substring(0, prefKey.length)
+              const dataKey = _prefKey + postKey;
+              const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // .data[dataSetting.date];
+              // const dailyValues = dataset00[fullPath];
+              if (entry00.hasKey(dataKey)) {
+                ele += indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()));
               } else if (values.luc === 0) {
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
                 const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
                 ele += indicatorPropsInstance.interpolatedEle.getOut(val);
               } else if (values.luc === 1) {
-                // TODO this could likely be faster since legend and history are handled in columns
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                const historicInstant = DataRepository.getInstance().clampInstant(indicatorPropsInstance.source, clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                const historicDataset = data.data[TimeUtil.formatCategoryDateFull(historicInstant)];
-                const historicValues = historicDataset[prefPath + postPath];
-                if (historicValues) {
-                  ele += indicatorPropsInstance.interpolatedEle.getOut(historicValues[data.indx]);
-                } else {
-                  console.error('failed to find historic values');
+                const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
+                const historicEntry = dataSetting.getDataset().getEntry(historicInstant);
+                if (historicEntry.hasKey(prefKey + postKey)) {
+                  ele += indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()));
                 }
               }
               return ele;
@@ -696,16 +727,7 @@ export default () => {
 
 
 
-      /**
-       * update instant props with current source
-       * this is done so the date-slider and date-picker components can call back with the current source
-       * and could probably also be solved by putting source on state in this component
-       */
-      const instantProps: IInstantProps = {
-        ...userInterfaceProps.navigationBotProps.instantProps,
-        instantCur: appState.instant,
-        onInstantChange: handleInstantChange
-      }
+
 
       /**
        * actual update of user interface props
@@ -748,7 +770,7 @@ export default () => {
           labelProps: [...labelProps],
           legendLabelProps: { ...legendLabelProps },
           courseLabelProps: { ...courseLabelProps },
-          hyperlinkProps: [ ...hyperlinkProps ],
+          hyperlinkProps: [...hyperlinkProps],
           lightProps,
           controlsProps,
           hexagonProps: hexagonProps!
@@ -759,7 +781,7 @@ export default () => {
 
 
 
-  }, [appState.instant, appState.source, appState.action]); 
+  }, [appState.source, appState.action]);
 
   useEffect(() => {
 

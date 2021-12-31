@@ -113,6 +113,8 @@ export default (props: IHexagonsProps) => {
 
     console.log('🔧 updating hexagons component', props);
 
+    const tsA = Date.now();
+
     let yDest: number;
     let counter = 0;
     let rgb: number[];
@@ -154,6 +156,8 @@ export default (props: IHexagonsProps) => {
       });
     });
 
+    console.log('🕓 updating hexagons component (done)', Date.now() - tsA);
+
     invalidate();
 
   }, [props.stamp]);
@@ -184,15 +188,3 @@ export default (props: IHexagonsProps) => {
   );
 
 };
-
-/**
- *  transparent={ true } opacity={ 0.8 }
- *  onPointerOver={ handleHover }
- *   
- *   onPointerMove={ handlePointerMove }
- *       <cylinderBufferGeometry args={[440 * SpatialUtil.SCALE_SCENE, 440 * SpatialUtil.SCALE_SCENE, SpatialUtil.HEXAGON_SEMIHEIGHT * 2, 6, 1, false, 0, Math.PI * 2]}>
-        <instancedBufferAttribute attachObject={['attributes', 'color']}  args={[colorArray, 3]}></instancedBufferAttribute>
-      </cylinderBufferGeometry>
-
- */
-

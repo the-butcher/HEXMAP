@@ -1,6 +1,6 @@
 export interface IChartEntry {
 
-    date: number;
+    instant: number;
 
     value_0?: number;
     value_1?: number;
