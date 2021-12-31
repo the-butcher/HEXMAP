@@ -1,12 +1,7 @@
-#Tweet
-🢆🢅🢂
-
 # Issues in Hexmap
 - find a way to add mortality as datasource
 - adapt date slider tooltip to match chart tooltip
-- boundaries have offsets in many places
 - move base config to file (maybe multiple files)
-- add twitter card to index.html
 
 # later
 - logarithmic option in chart
@@ -14,6 +9,8 @@
 - export options for chart, map, data
 
 # solved
+- ~~boundaries have offsets in many places~~
+- ~~add twitter card to index.html~~
 - ~~add shape to scene that the current diagram can be textured on~~
   - ~~move the date-labels to chart 3d (NO)~~
   - ~~deprecate the chart 3D component and properties~~
