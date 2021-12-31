@@ -6,6 +6,7 @@ import { HexagonRepository } from '../data/HexagonRepository';
 import { SpatialUtil } from '../util/SpatialUtil';
 import { IHexagon } from './IHexagon';
 import { IHexagonsProps } from './IHexagonsProps';
+import { IHexagonState } from './IHexagonState';
 
 /**
  * functional react component responsible for drawing the hexagons
@@ -115,24 +116,24 @@ export default (props: IHexagonsProps) => {
 
     const tsA = Date.now();
 
-    let yDest: number;
     let counter = 0;
     let rgb: number[];
+    let state: IHexagonState;
 
     /**
      * reposition each hexagon as if property callbacks for height and color
      */
     HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
-      yDest = props.getHeight(hexagon);
-      tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + yDest, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      state = props.getState(hexagon);
+      tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + state.height, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
       // tempObject.rotateY(Math.PI);
       // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
       tempObject.updateMatrix();
       meshRef.current.setMatrixAt(counter, tempObject.matrix);
       meshRef.current.instanceMatrix.needsUpdate = true
 
-      rgb = props.getColor(hexagon).getRgb();
+      rgb = state.color.getRgb();
       colorArray[counter * 3 + 0] = rgb[0];
       colorArray[counter * 3 + 1] = rgb[1];
       colorArray[counter * 3 + 2] = rgb[2];
@@ -146,7 +147,8 @@ export default (props: IHexagonsProps) => {
     props.keys.forEach(path => {
       HexagonRepository.getInstance().getBorder(path, props).then(borderHexagons => {
         borderHexagons.forEach(borderHexagon => {
-          let color = props.getColor(borderHexagon);
+          state = props.getState(borderHexagon);
+          let color = state.color;
           let rgb = path === props.path ? color.hilight().getRgb() : color.outline().getRgb();
           colorArray[borderHexagon.i * 3 + 0] = rgb[0];
           colorArray[borderHexagon.i * 3 + 1] = rgb[1];

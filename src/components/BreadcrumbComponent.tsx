@@ -10,7 +10,7 @@ export default (props: IBreadcrumbProps) => {
     }
 
     const items: JSX.Element[] = [];
-    const keys = props.keys.getKeys().sort();
+    const keys = props.keys.getKeys();
     const hasCategories = false || keys.find(k => k.indexOf('#') >= 0);
     // keys.sort();
     // console.log('keys', keys);

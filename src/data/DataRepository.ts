@@ -2,8 +2,8 @@ import { JsonLoader } from "../util/JsonLoader";
 import { Dataset } from "./Dataset";
 import { DataSetting } from "./DataSetting";
 import { IChartData } from "./IChartData";
+import { IChartEntry } from "./IChartEntry";
 import { IDataRoot } from "./IDataRoot";
-import { IDataset } from "./IDataset";
 import { IDataSetting } from "./IDataSetting";
 
 /**
@@ -33,64 +33,62 @@ export class DataRepository {
 
     const dataSettings = await this.getOrLoadDataSetting(source);
 
-    // const names = dataSet.getKeysetKeys(); // Object.keys(data.keys);
-    // let dataPointer: string = '';
-    // for (let i = 0; i < names.length; i++) {
-    //   dataPointer += data.path[names[i]];
-    // }
+    const names = dataSettings.getDataset().getKeysetKeys(); // Object.keys(data.keys);
+    let dataPointer: string = '';
+    for (let i = 0; i < names.length; i++) {
+      dataPointer += dataSettings.getPath(names[i]);
+    }
     // const date = data.date;
 
-    // /**
-    //  * how many series are going to be needed
-    //  */
-    // const valueCount = data.data[date][dataPointer].length;
+    /**
+     * how many series are going to be needed
+     */
+    const valueCount = dataSettings.getDataset().getIndexKeyset().getSize(); // data.data[date][dataPointer].length;
 
-    // const entries: IChartEntry[] = [];
-    // const dates = Object.keys(data.data);
+    const entries: IChartEntry[] = [];
+    const dates = dataSettings.getDataset().getEntryKeys(); // Object.keys(data.data);
 
-    // let minX = Number.MAX_VALUE;
-    // let maxX = Number.MIN_VALUE;
+    let minX = Number.MAX_VALUE;
+    let maxX = Number.MIN_VALUE;
 
-    // let minY = 0;
-    // let maxY = Number.MIN_VALUE;
+    let minY = 0;
+    let maxY = Number.MIN_VALUE;
 
-    // dates.forEach(dateRaw => {
+    dates.forEach(date => {
 
-    //   const dataVals = data.data[dateRaw][dataPointer];
+      const dataEntry = dataSettings.getDataset().getEntryByDate(date); // data.data[dateRaw][dataPointer];
 
-    //   const valueX = TimeUtil.parseCategoryDateFull(dateRaw);
+      const valueX = dataEntry.getInstant();
 
-    //   if (valueX >= minInstant && valueX <= maxInstant) {
+      if (valueX >= minInstant && valueX <= maxInstant) {
 
-    //     minX = Math.min(minX, valueX);
-    //     maxX = Math.max(maxX, valueX);
+        minX = Math.min(minX, valueX);
+        maxX = Math.max(maxX, valueX);
 
-    //     const entry: IChartEntry = {
-    //       instant: TimeUtil.parseCategoryDateFull(dateRaw),
-    //     };
-    //     for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
-    //       if (dataVals[valueIndex] !== 0) {
-    //         const valueY = dataVals[valueIndex];
-    //         entry[`value_${valueIndex}`] = valueY;
-    //         maxY = Math.max(maxY, valueY);
-    //       }
-    //     }
-    //     entries.push(entry);
+        const chartEntry: IChartEntry = {
+          instant: dataEntry.getInstant(),
+        };
+        for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
+          if (chartEntry[valueIndex] !== 0) {
+            const valueY = dataEntry.getValue(dataPointer, valueIndex); // chartEntry[valueIndex];
+            chartEntry[`value_${valueIndex}`] = valueY;
+            maxY = Math.max(maxY, valueY);
+          }
+        }
+        entries.push(chartEntry);
 
-    //   }
+      }
 
-    // });
+    });
 
-    // return {
-    //   entries,
-    //   valueCount,
-    //   minX,
-    //   maxX,
-    //   minY: data.minY,
-    //   maxY: data.maxY
-    // }
-
-    return null;
+    return {
+      entries,
+      valueCount,
+      minX,
+      maxX,
+      minY: dataSettings.getDataset().getMinY(),
+      maxY: dataSettings.getDataset().getMaxY()
+    }
 
   }
 

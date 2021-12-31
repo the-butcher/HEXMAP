@@ -3,7 +3,9 @@ import { IKeyset } from "./IKeyset";
 
 export interface IDataset {
 
-    getEntry(instant: number): IDataEntry;
+    getEntryByInstant(instant: number): IDataEntry;
+
+    getEntryByDate(date: string): IDataEntry;
 
     getIndexKeyset(): IKeyset;
 
@@ -13,11 +15,11 @@ export interface IDataset {
      */
     getKeysetKeys(): string[];
 
-    // // /**
-    // //  * get the keys that a single entry in this dataset may have
-    // //  * effectively this list is a multiplication of all possible values resulting from different keysets
-    // //  */
-    // // getEntryKeys(): string[];
+    /**
+     * get the keys that a single entry in this dataset may have
+     * effectively this list is a multiplication of all possible values resulting from different keysets
+     */
+    getEntryKeys(): string[];
 
     /**
      * get the keyset held by a given key
@@ -35,5 +37,9 @@ export interface IDataset {
      * get the last valid instant for this data
      */
     getLastInstant(): number;
+
+    getMinY(): number;
+
+    getMaxY(): number;
 
 }

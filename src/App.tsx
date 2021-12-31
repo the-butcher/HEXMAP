@@ -1,6 +1,9 @@
+import { height } from '@mui/lab/node_modules/@mui/system';
+import { color } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
+import { IHexagonState } from './components/IHexagonState';
 import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { IMapProps } from './components/IMapProps';
@@ -86,7 +89,7 @@ export default () => {
       nextSettings.setInstant(prevSettings.getInstant());
 
     }
-    4
+
     setAppState({
       ...appState,
       source,
@@ -281,8 +284,12 @@ export default () => {
       path: '',
       stamp: ObjectUtil.createId(),
       onPathChange: handlePathChange,
-      getColor: (values) => ColorUtil.getCorineColor(values.luc),
-      getHeight: (values) => values.ele,
+      getState: (values) => {
+        return {
+          color: ColorUtil.getCorineColor(values.luc),
+          height: values.ele
+        }
+      },
       getPath: (values) => values.gkz,
       onHexagonsLoaded: handleHexagonsLoaded
     },
@@ -589,7 +596,7 @@ export default () => {
           labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
           labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
-          const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
+          const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
 
           // console.log('areaPointer', prefPointer, postPointer);
           /**
@@ -605,7 +612,7 @@ export default () => {
           legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
           legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
 
-          const entry60 = dataSetting.getDataset().getEntry(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
+          const entry60 = dataSetting.getDataset().getEntryByInstant(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
           const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex());
           const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex());
 
@@ -626,8 +633,8 @@ export default () => {
 
         // console.log('data', data, );
         const valueKey = prefKey + postKey;
-        const entry00 = dataSetting.getDataset().getEntry(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
-        const entry07 = dataSetting.getDataset().getEntry(clampedInstant07);
+        const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
+        const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
         const value00 = entry00.getValue(valueKey, dataSetting.getIndex()); // dataset00[dataPointer][dataSetting.indx];
         const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
         const value07 = (value00 - valueM7) / valueM7;
@@ -662,6 +669,11 @@ export default () => {
 
         if (selected) {
 
+          // performance
+          const valueLookup: { [K in string]: IHexagonState } = {};
+
+          console.log(TimeUtil.formatCategoryDateFull(clampedInstant60), '-', TimeUtil.formatCategoryDateFull(clampedInstant00))
+
           hexagonProps = {
             // onHover: setHovered,
             source: appState.source,
@@ -673,51 +685,71 @@ export default () => {
             getPath: (values) => {
               return values.gkz.substring(0, prefKey.length);
             },
-            getColor: (values) => {
-              const _prefKey = values.gkz.substring(0, prefKey.length)
-              const dataKey = _prefKey + postKey;
-              const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // .data[dataSetting.date];
-              // const dailyValues = dataset00[dataKey];
-              let val = 0;
-              if (entry00.hasKey(dataKey)) {
-                return getColor(entry00.getValue(dataKey, dataSetting.getIndex())); // dailyValues[dataSetting.indx]); // last value
-              } else if (values.luc === 0) {
-                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                return getColor(minLegendVal + (maxLegendVal - minLegendVal) * legendFraction);
-              } else if (values.luc === 1) {
-                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                const historicEntry = dataSetting.getDataset().getEntry(historicInstant);
-                if (historicEntry.hasKey(prefKey + postKey)) {
-                  return getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex())); // last value
-                } else {
-                  // Math.random();
+            getState: (hexagon) => {
+              let ele = hexagon.ele / 2 - 7.5;
+              if (hexagon.luc === 0) {
+                let lookupState = valueLookup['l' + hexagon.x];
+                if (!lookupState) {
+                  const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
+                  const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
+                  lookupState = {
+                    color: getColor(val),
+                    height: indicatorPropsInstance.interpolatedEle.getOut(val)
+                  }
+                  valueLookup['l' + hexagon.x] = lookupState;
+                }
+                return {
+                  color: lookupState.color,
+                  height: lookupState.height + ele
+                } 
+              } else if (hexagon.luc === 1) { // 3d-chart
+                const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
+                let lookupState = valueLookup['c' + hexagon.x];
+                if (!lookupState) {
+                  const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
+                  console.log('building', 'c' + hexagon.x, legendFraction.toFixed(3), TimeUtil.formatCategoryDateFull(historicInstant));
+                  const historicEntry = dataSetting.getDataset().getEntryByInstant(historicInstant);
+                  if (historicEntry.hasKey(prefKey + postKey)) {
+                    lookupState = {
+                      color: getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex())),
+                      height: indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()))
+                    }
+                  } else {
+                    lookupState = {
+                      color: Color.DARK_GREY,
+                      height: 0
+                    }
+                  }
+                  valueLookup['c' + hexagon.x] = lookupState;
+                } 
+                return {
+                  color: lookupState.color,
+                  height: lookupState.height + ele
+                }                
+              } else {
+                let lookupState = valueLookup[hexagon.gkz];
+                if (!lookupState) {
+                  const _prefKey = hexagon.gkz.substring(0, prefKey.length)
+                  const dataKey = _prefKey + postKey;
+                  const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // .data[dataSetting.date];
+                  if (entry00.hasKey(dataKey)) {
+                    lookupState = {
+                      color: getColor(entry00.getValue(dataKey, dataSetting.getIndex())),
+                      height: indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()))
+                    }
+                  } else {
+                    lookupState = {
+                      color: Color.DARK_GREY,
+                      height: 0
+                    }
+                  }
+                  valueLookup[hexagon.gkz] = lookupState;
+                } 
+                return {
+                  color: lookupState.color,
+                  height: lookupState.height + ele
                 }
               }
-              return ColorUtil.getCorineColor(values.luc);
-              // return ColorUtil.getCorineColor(values.luc);
-            },
-            getHeight: (values) => {
-              let ele = values.ele / 2 - 7.5;
-              const _prefKey = values.gkz.substring(0, prefKey.length)
-              const dataKey = _prefKey + postKey;
-              const entry00 = dataSetting.getDataset().getEntry(dataSetting.getInstant()); // .data[dataSetting.date];
-              // const dailyValues = dataset00[fullPath];
-              if (entry00.hasKey(dataKey)) {
-                ele += indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()));
-              } else if (values.luc === 0) {
-                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
-                ele += indicatorPropsInstance.interpolatedEle.getOut(val);
-              } else if (values.luc === 1) {
-                const legendFraction = HexagonRepository.getInstance().getLegendFraction(values);
-                const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                const historicEntry = dataSetting.getDataset().getEntry(historicInstant);
-                if (historicEntry.hasKey(prefKey + postKey)) {
-                  ele += indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()));
-                }
-              }
-              return ele;
             },
             onHexagonsLoaded: handleHexagonsLoaded
           }

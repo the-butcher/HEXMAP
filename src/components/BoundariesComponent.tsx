@@ -94,7 +94,7 @@ const BoundariesComponent = () => {
               hoodNormals.push(0, 1, 0);
             });
 
-            for (let i=1; i<firstWallIndex; i++) {
+            for (let i=1; i < firstWallIndex; i++) {
 
               hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
               hoodVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
@@ -111,21 +111,24 @@ const BoundariesComponent = () => {
               hoodNormals.push(0, 1, 0);
 
             }
-            for (let i = firstWallIndex + 1; i < coords2d.length; i++) {
+            for (let i = firstWallIndex; i <= coords2d.length; i++) {
 
-              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              hoodVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
-              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              const idxM1 = (i - 1) % coords2d.length;
+              const idxM0 = (i) % coords2d.length;
 
-              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              hoodVertices.push(coords2d[i - 1].x, boundaryMinZ, coords2d[i - 1].y);
-              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
-              hoodNormals.push(normal2d[i].x, 0, normal2d[i].y);
+              hoodVertices.push(coords2d[idxM1].x, boundaryMaxZ, coords2d[idxM1].y);
+              hoodVertices.push(coords2d[idxM0].x, boundaryMaxZ, coords2d[idxM0].y);
+              hoodVertices.push(coords2d[idxM0].x, boundaryMinZ, coords2d[idxM0].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
+
+              hoodVertices.push(coords2d[idxM0].x, boundaryMinZ, coords2d[idxM0].y);
+              hoodVertices.push(coords2d[idxM1].x, boundaryMinZ, coords2d[idxM1].y);
+              hoodVertices.push(coords2d[idxM1].x, boundaryMaxZ, coords2d[idxM1].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
+              hoodNormals.push(normal2d[idxM0].x, 0, normal2d[idxM0].y);
 
             }
 

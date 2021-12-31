@@ -1,5 +1,6 @@
 import { IColor } from "../util/IColor";
 import { IHexagon } from "./IHexagon";
+import { IHexagonState } from "./IHexagonState";
 
 export interface IHexagonsProps {
 
@@ -17,9 +18,11 @@ export interface IHexagonsProps {
 
     onHexagonsLoaded: () => void;
 
-    getHeight: (values: IHexagon) => number;
+    // getHeight: (values: IHexagon) => number;
 
-    getColor: (values: IHexagon) => IColor;
+    // getColor: (values: IHexagon) => IColor;
+
+    getState: (hexagon: IHexagon) => IHexagonState;
 
     /**
      * get the currently used portion of the gkz number 

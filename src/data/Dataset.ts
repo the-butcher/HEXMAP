@@ -24,6 +24,8 @@ export class Dataset implements IDataset {
 
     private readonly instantMin: number;
     private readonly instantMax: number;
+    private readonly minY: number;
+    private readonly maxY: number;
 
     constructor(dataRoot: IDataRoot) {
 
@@ -53,10 +55,28 @@ export class Dataset implements IDataset {
         }        
         this.indexKeyset = new Keyset(dataRoot.indx.toString(), indexKeysetRaw);
 
+        this.minY = dataRoot.minY;
+        this.maxY = dataRoot.maxY;
+
     }
 
-    getEntry(instant: number): IDataEntry {
+    getMinY(): number {
+        return this.minY;
+    }
+    getMaxY(): number {
+        return this.maxY;
+    }
+
+    getEntryByDate(date: string): IDataEntry {
+        return this.entries[date];
+    }
+
+    getEntryByInstant(instant: number): IDataEntry {
         return this.entries[TimeUtil.formatCategoryDateFull(instant)];
+    }
+
+    getEntryKeys(): string[] {
+        return this.entryKeys;
     }
 
     getIndexKeyset(): IKeyset {
@@ -81,14 +101,16 @@ export class Dataset implements IDataset {
             let minInstantDif = Number.MAX_SAFE_INTEGER;
             let entryInstant: number;
             let minInstant: number;
-            this.entryKeys.forEach(entryKey => {
-                entryInstant = this.entries[entryKey].getInstant(); // parseInt(entryKey); // TimeUtil.parseCategoryDateFull(date);
+            for (let i=0; i<this.entryKeys.length; i++) {
+                entryInstant = this.entries[this.entryKeys[i]].getInstant(); // parseInt(entryKey); // TimeUtil.parseCategoryDateFull(date);
                 curInstantDif = Math.abs(entryInstant - instant);
                 if (curInstantDif < minInstantDif) {
                     minInstantDif = curInstantDif;
                     minInstant = entryInstant;
+                } else {
+                    break;
                 }
-            });
+            }
             instant = minInstant;
 
         }

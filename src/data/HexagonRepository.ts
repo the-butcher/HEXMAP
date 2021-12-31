@@ -137,7 +137,7 @@ export class HexagonRepository {
 
     getLegendFraction(values: IHexagon): number {
         // 164 - 180
-        const fraction = ((values.x - SpatialUtil.HEXAGON_ORIGIN_X) / SpatialUtil.HEXAGON_SPACING_Y - 179) / 150;
+        const fraction = ((values.x - SpatialUtil.HEXAGON_ORIGIN_X) / SpatialUtil.HEXAGON_SPACING_Y - 164) / 180;
         return fraction;
     }
 
