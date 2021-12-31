@@ -672,7 +672,7 @@ export default () => {
           // performance
           const valueLookup: { [K in string]: IHexagonState } = {};
 
-          console.log(TimeUtil.formatCategoryDateFull(clampedInstant60), '-', TimeUtil.formatCategoryDateFull(clampedInstant00))
+          // console.log(TimeUtil.formatCategoryDateFull(clampedInstant60), '-', TimeUtil.formatCategoryDateFull(clampedInstant00))
 
           hexagonProps = {
             // onHover: setHovered,
@@ -707,7 +707,7 @@ export default () => {
                 let lookupState = valueLookup['c' + hexagon.x];
                 if (!lookupState) {
                   const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                  console.log('building', 'c' + hexagon.x, legendFraction.toFixed(3), TimeUtil.formatCategoryDateFull(historicInstant));
+                  // console.log('building', 'c' + hexagon.x, legendFraction.toFixed(3), TimeUtil.formatCategoryDateFull(historicInstant));
                   const historicEntry = dataSetting.getDataset().getEntryByInstant(historicInstant);
                   if (historicEntry.hasKey(prefKey + postKey)) {
                     lookupState = {
@@ -817,7 +817,7 @@ export default () => {
 
   useEffect(() => {
 
-    console.log('building app');
+    console.log('✨ building app component');
     window.addEventListener('resize', handleResize);
 
   }, []);

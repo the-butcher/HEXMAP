@@ -32,7 +32,7 @@ export default (props: IControlsProps) => {
         // controls.current.maxAzimuthAngle = Math.PI / 8;
 
         controls.current.addEventListener('change', e => {
-            console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
+            // console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
         });
 
         camera.position.set(-198, 450, 577);

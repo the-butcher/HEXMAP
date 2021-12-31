@@ -24,7 +24,7 @@ export default (props: IMapProps) => {
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
         // @ts-ignore
-        console.log('state.gl.capabilities.maxTextureSize', state.gl.capabilities.maxTextureSize);
+        // console.log('state.gl.capabilities.maxTextureSize', state.gl.capabilities.maxTextureSize);
     }
 
     const handlePointerUp = () => {

@@ -277,7 +277,7 @@ export default (props: IChartProps) => {
 
     DataRepository.getInstance().getOrBuild(source, Number.MIN_VALUE, Number.MAX_VALUE).then(chartData => {
 
-      console.log('chartData', chartData, series);
+      // console.log('chartData', chartData, series);
       series.forEach(s => {
         (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY);
         s.data.setAll(chartData.entries);
