@@ -513,6 +513,7 @@ export default () => {
           instantProps.instantCur = dataSetting.getInstant();
         }
       }
+      let mapKeys: string[] = [];
 
       for (let i = 0; i < allSettings.length; i++) {
 
@@ -537,7 +538,7 @@ export default () => {
          */
         const breadcrumbProps: IBreadcrumbProps[] = [];
 
-        const keysetKeys = dataSetting.getDataset().getKeysetKeys(); //  Object.keys(dataSetting.keys);
+        const keysetKeys = dataSetting.getDataset().getKeysetKeys(); ;
         if (selected) {
           labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
         }
@@ -546,29 +547,76 @@ export default () => {
         let prefKey: string = '';
         let postKey: string = '';
         for (let i = 0; i < keysetKeys.length; i++) {
+
           const keysetKey = keysetKeys[i];
+          const keyset = dataSetting.getDataset().getKeyset(keysetKey);
+          const path = dataSetting.getPath(keysetKey);
+
           if (i === 0) {
-            prefKey = dataSetting.getPath(keysetKey); // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
+            prefKey = path; // i.e. '9' - Vienna as province/Bundesland, '900' - Vienna as district/Bezirk
             if (selected) {
               label1 += dataSetting.getDataset().getKeyset(keysetKey).getValue(prefKey);
             }
           } else {
-            postKey += dataSetting.getPath(keysetKey);
+            postKey += path;
             if (selected) {
               label1 += ' / ' + dataSetting.getDataset().getKeyset(keysetKey).getValue(postKey);
             }
           }
-          breadcrumbProps.push({
-            source: appState.source,
-            name: keysetKey,
-            keys: dataSetting.getDataset().getKeyset(keysetKey),
-            path: dataSetting.getPath(keysetKey),
-            onPathChange: handlePathChange,
-          });
+
+          if (selected) {
+
+            mapKeys = keyset.getKeys();
+            /**
+             * the path refers to subset (if there is subsets)
+             * therefore the top crumbs needs to be adapted
+             */
+            let validPath = path;
+            keyset.getKeys().forEach(key => {
+              if (path.startsWith(key.replaceAll('#', ''))) {
+                validPath = key;
+              }
+            });
+
+            // console.log('crumbs (top)', path, prefKey, validPath, keyset);
+
+            breadcrumbProps.push({
+              source: appState.source,
+              name: keysetKey,
+              keys: keyset,
+              path: validPath,
+              onPathChange: handlePathChange,
+            });
+
+            if (keyset.hasSubset(validPath)) {
+
+              const subset = keyset.getSubset(validPath);
+              let validSubpath = path;
+              if (path.indexOf('#') >= 0) {
+                mapKeys = keyset.getKeys();
+              } else {
+                mapKeys = subset.getKeys();
+              }
+              
+              // console.log('crumbs (sub)', path, prefKey, validSubpath, subset);
+              breadcrumbProps.push({
+                source: appState.source,
+                name: keysetKey,
+                keys: subset,
+                path: validSubpath,
+                onPathChange: handlePathChange,
+              });
+              
+            };
+
+          }
+
+
+
         };
 
         const indexKeyset = dataSetting.getDataset().getIndexKeyset();
-        if (indexKeyset.getSize() > 1) {
+        if (indexKeyset.size() > 1) {
 
           if (selected) {
             label1 += ' / ' + indexKeyset.getValue(dataSetting.getIndex().toString());
@@ -678,7 +726,7 @@ export default () => {
             // onHover: setHovered,
             source: appState.source,
             name: keysetKeys[0],
-            keys: dataSetting.getDataset().getKeyset(keysetKeys[0]).getKeys(), // Object.keys(dataSetting.keys[keysetKeys[0]]), // only the actual keys of the file-wise key structure, i.e. 5,6,7 (for bundesland-kennziffer)
+            keys: mapKeys,
             path: prefKey,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,

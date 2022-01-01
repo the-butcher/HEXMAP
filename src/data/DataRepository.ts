@@ -43,7 +43,7 @@ export class DataRepository {
     /**
      * how many series are going to be needed
      */
-    const valueCount = dataSettings.getDataset().getIndexKeyset().getSize(); // data.data[date][dataPointer].length;
+    const valueCount = dataSettings.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
 
     const entries: IChartEntry[] = [];
     const dates = dataSettings.getDataset().getEntryKeys(); // Object.keys(data.data);

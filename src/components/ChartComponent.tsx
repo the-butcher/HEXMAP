@@ -46,7 +46,7 @@ export default (props: IChartProps) => {
         dataPointer += dataSetting.getPath(names[i]);
       }
       // const date = data.date;
-      const valueCount = dataSetting.getDataset().getIndexKeyset().getSize(); // data.data[date][dataPointer].length;
+      const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
       // console.log('valueCount', valueCount);
 
       const root = am5.Root.new('chartdiv_' + source);

@@ -143,7 +143,7 @@ export default (props: IHexagonsProps) => {
 
     });
 
-    // console.log('props.path', props.path, props.keys);
+    console.log('props.path', props.path, props.keys);
     props.keys.forEach(path => {
       HexagonRepository.getInstance().getBorder(path, props).then(borderHexagons => {
         borderHexagons.forEach(borderHexagon => {

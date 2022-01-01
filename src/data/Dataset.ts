@@ -35,7 +35,7 @@ export class Dataset implements IDataset {
         this.keysets = {};
         this.keysetKeys.forEach(keysetKey => {
             const defaultKey = Object.keys(dataRoot.keys[keysetKey]).sort()[0];
-            this.keysets[keysetKey] = new Keyset(defaultKey, dataRoot.keys[keysetKey]);
+            this.keysets[keysetKey] = new Keyset(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
         });
 
         const dateKeys = Object.keys(dataRoot.data);
@@ -53,7 +53,7 @@ export class Dataset implements IDataset {
         for (let i = 0; i < indexKeys.length; i++) {
             indexKeysetRaw[i] = indexKeys[i];
         }        
-        this.indexKeyset = new Keyset(dataRoot.indx.toString(), indexKeysetRaw);
+        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);
 
         this.minY = dataRoot.minY;
         this.maxY = dataRoot.maxY;
