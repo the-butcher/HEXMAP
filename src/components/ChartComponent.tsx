@@ -45,9 +45,7 @@ export default (props: IChartProps) => {
       for (let i = 0; i < names.length; i++) {
         dataPointer += dataSetting.getPath(names[i]);
       }
-      // const date = data.date;
       const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
-      // console.log('valueCount', valueCount);
 
       const root = am5.Root.new('chartdiv_' + source);
       root.setThemes([
@@ -88,6 +86,8 @@ export default (props: IChartProps) => {
         interpolationDuration: 0,
         stateAnimationDuration: 0,
         min: 0
+        // min: -4000,
+        // strictMinMax: true
         // logarithmic: true,
         // treatZeroAs: 0.000001,            
         // min: 1
@@ -121,7 +121,7 @@ export default (props: IChartProps) => {
       const xRendererVal = am5xy.AxisRendererX.new(root, {
         // pan: 'zoom',
       });
-      xRendererVal.labels.template.setAll({
+      xRendererVal.labels.template.setAll({ 
         fontFamily,
         fontSize: 10,
         fill: labelColor,
@@ -200,7 +200,14 @@ export default (props: IChartProps) => {
 
       for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
 
-        const seriesVal = _chart.series.push(am5xy.LineSeries.new(root, {
+        let seriesClass = am5xy.LineSeries;
+
+        const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
+        if (indexName === DataRepository.FAELLE) {
+          seriesClass = am5xy.StepLineSeries;
+        }
+
+        const seriesVal = _chart.series.push(seriesClass.new(root, {
           name: `seriesVal_${valueIndex}`,
           xAxis: _xAxisVal,
           yAxis: _yAxisVal,
@@ -212,15 +219,21 @@ export default (props: IChartProps) => {
           stroke: am5.color(fontColor),
           fill: am5.color(fontColor),
         }));
-        seriesVal.strokes.template.set('strokeWidth', 2);
-        seriesVal.fills.template.setAll({ fillOpacity: 0.2, visible: true });
+
+        if (indexName === DataRepository.FAELLE) {
+          seriesVal.strokes.template.set('strokeWidth', 1);
+          seriesVal.fills.template.setAll({ fillOpacity: 0.0, visible: true });
+        } else {
+          seriesVal.strokes.template.set('strokeWidth', 2);
+          seriesVal.fills.template.setAll({ fillOpacity: 0.2, visible: true });
+        }
 
         allSeries.push(seriesVal);
 
 
         const tooltip = seriesVal.get('tooltip')!;
         tooltip.setAll({
-          labelText: '{valueY}',
+          labelText: `{label_${valueIndex}}`, // '{valueY}',
           paddingTop: 4,
           paddingRight: 4,
           paddingBottom: 4,
@@ -277,9 +290,9 @@ export default (props: IChartProps) => {
 
     DataRepository.getInstance().getOrBuild(source, Number.MIN_VALUE, Number.MAX_VALUE).then(chartData => {
 
-      // console.log('chartData', chartData, series);
       series.forEach(s => {
         (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY);
+        // (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('min', -4000);
         s.data.setAll(chartData.entries);
         s.appear(0);
       });

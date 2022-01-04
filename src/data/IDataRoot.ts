@@ -8,6 +8,8 @@ export interface IDataRoot {
 
     keys: { [K in string]: { [K in string]: string }};
 
+    pops: { [K in string]: number };
+
     data: { [K in string]: { [K in string]: number[] }};
 
     idxs: string[];

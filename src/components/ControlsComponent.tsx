@@ -1,4 +1,5 @@
 // import { OrbitControls, OrbitControlsProps } from '@react-three/drei';
+import { Key } from '@mui/icons-material';
 import { Camera, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as three from 'three';
@@ -26,6 +27,13 @@ export default (props: IControlsProps) => {
 
         controls.current.enableDamping = false;
         controls.current.dampingFactor = 0.05;
+        controls.current.enableKeys = true;
+        controls.current.keys = {
+            LEFT: 'ArrowLeft', //left arrow
+            UP: 'ArrowUp', // up arrow
+            RIGHT: 'ArrowRight', // right arrow
+            BOTTOM: 'ArrowDown' // down arrow
+        }
         // controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
         // controls.current.maxPolarAngle = Math.PI / 2.05;
         // controls.current.minAzimuthAngle = -Math.PI / 4,
@@ -46,12 +54,16 @@ export default (props: IControlsProps) => {
         });
         window.addEventListener('pointerup', e => {
             if (e.button === 0) {
+
                 isLeftButtonPressed.current = false;
-                
+
                 
             }
         });
         window.addEventListener('keyup', e => {
+            if (e.code === 'ArrowLeft') {
+
+            }
             if (e.key === 'c') {
 
                 controls.current.minAzimuthAngle = 0,
@@ -64,7 +76,6 @@ export default (props: IControlsProps) => {
                 controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
                 controls.current.update();
 
-
                 controls.current.minAzimuthAngle = -Math.PI / 4,
                 controls.current.maxAzimuthAngle = Math.PI / 8;
                 controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
@@ -73,8 +84,14 @@ export default (props: IControlsProps) => {
 
             }            
             if (e.key === 'k') {
+
                 setSreenshotRequested(true);
                 invalidate();
+
+                // controls.current.minAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36,
+                // controls.current.maxAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36;
+                // controls.current.update();
+
             }
         });
 

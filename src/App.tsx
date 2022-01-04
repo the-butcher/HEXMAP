@@ -148,6 +148,29 @@ export default () => {
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
+      // {
+      //   date: '',
+      //   name: 'Inzidenz',
+      //   desc: 'Salzburger Gemeinden',
+      //   value00: '',
+      //   value07: '',
+      //   valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+      //   onExpand: handleIndicatorExpand,
+      //   fold: 'open-horizontal',
+      //   source: './hexmap-data-salzburg-gemeinde.json',
+      //   path: '',
+      //   breadcrumbProps: [],
+      //   interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
+      //   interpolatedEle: new InterpolatedValue(0, 100, 0, 20000, 1),
+      //   chartProps: {
+      //     title: '7-Tages Inzidenz',
+      //     source: './hexmap-data-salzburg-gemeinde.json',
+      //     path: '',
+      //     valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+      //     fold: 'open-horizontal',
+      //     onInstantChange: handleInstantChange
+      //   }
+      // },                 
       {
         date: '',
         name: 'Inzidenz',
@@ -160,8 +183,8 @@ export default () => {
         source: './hexmap-data-ems.json',
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
-        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
+        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.25),
+        interpolatedEle: new InterpolatedValue(0, 100, 0, 10000, 0.75),
         chartProps: {
           title: '7-Tages Inzidenz',
           source: './hexmap-data-ems.json',
@@ -412,7 +435,7 @@ export default () => {
     hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        label: 'https://www.data.gv.at/covid-19/',
+        label: 'https://fitforfire.github.io/covid-sbg/#/', // 'https://www.data.gv.at/covid-19/',
         size: 3,
         position: {
           x: -202,

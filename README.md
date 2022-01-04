@@ -1,4 +1,5 @@
 # Issues in Hexmap
+- think about how a case-stepline could be implemented
 - find a way to add mortality as datasource
 - adapt date slider tooltip to match chart tooltip
 - move base config to file (maybe multiple files)

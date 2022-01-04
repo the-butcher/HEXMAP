@@ -7,6 +7,8 @@ export interface IDataset {
 
     getEntryByDate(date: string): IDataEntry;
 
+    getPopulation(key: string): number;
+
     getIndexKeyset(): IKeyset;
 
     /**

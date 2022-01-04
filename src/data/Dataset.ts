@@ -16,6 +16,7 @@ import { Keyset } from "./Keyset";
 export class Dataset implements IDataset { 
 
     // private readonly dataRoot: IDataRoot;
+    private readonly populations: { [K in string]: number};
     private readonly keysetKeys: string[];
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
@@ -29,7 +30,7 @@ export class Dataset implements IDataset {
 
     constructor(dataRoot: IDataRoot) {
 
-        // this.dataRoot = dataRoot;
+        this.populations = dataRoot.pops;
 
         this.keysetKeys = Object.keys(dataRoot.keys);
         this.keysets = {};
@@ -58,6 +59,10 @@ export class Dataset implements IDataset {
         this.minY = dataRoot.minY;
         this.maxY = dataRoot.maxY;
 
+    }
+
+    getPopulation(key: string): number {
+        return this.populations[key];
     }
 
     getMinY(): number {

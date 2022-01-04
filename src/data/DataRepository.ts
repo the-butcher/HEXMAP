@@ -14,6 +14,8 @@ import { IDataSetting } from "./IDataSetting";
  */
 export class DataRepository {
 
+  static readonly FAELLE = 'Fälle';
+
   static getInstance(): DataRepository {
     if (!this.instance) {
       this.instance = new DataRepository();
@@ -31,22 +33,23 @@ export class DataRepository {
 
   async getOrBuild(source: string, minInstant: number, maxInstant: number): Promise<IChartData> {
 
-    const dataSettings = await this.getOrLoadDataSetting(source);
+    const dataSetting = await this.getOrLoadDataSetting(source);
 
-    const names = dataSettings.getDataset().getKeysetKeys(); // Object.keys(data.keys);
+    const names = dataSetting.getDataset().getKeysetKeys(); // Object.keys(data.keys);
     let dataPointer: string = '';
     for (let i = 0; i < names.length; i++) {
-      dataPointer += dataSettings.getPath(names[i]);
+      dataPointer += dataSetting.getPath(names[i]);
     }
-    // const date = data.date;
+    const population = dataSetting.getDataset().getPopulation(dataPointer);
+    console.log('dataPointer', dataPointer, population);
 
     /**
      * how many series are going to be needed
      */
-    const valueCount = dataSettings.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
+    const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
 
     const entries: IChartEntry[] = [];
-    const dates = dataSettings.getDataset().getEntryKeys(); // Object.keys(data.data);
+    const dates = dataSetting.getDataset().getEntryKeys(); // Object.keys(data.data);
 
     let minX = Number.MAX_VALUE;
     let maxX = Number.MIN_VALUE;
@@ -56,7 +59,7 @@ export class DataRepository {
 
     dates.forEach(date => {
 
-      const dataEntry = dataSettings.getDataset().getEntryByDate(date); // data.data[dateRaw][dataPointer];
+      const dataEntry = dataSetting.getDataset().getEntryByDate(date); // data.data[dateRaw][dataPointer];
 
       const valueX = dataEntry.getInstant();
 
@@ -68,12 +71,24 @@ export class DataRepository {
         const chartEntry: IChartEntry = {
           instant: dataEntry.getInstant(),
         };
+
         for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
+
           if (chartEntry[valueIndex] !== 0) {
-            const valueY = dataEntry.getValue(dataPointer, valueIndex); // chartEntry[valueIndex];
+
+            const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
+
+            let valueY = dataEntry.getValue(dataPointer, valueIndex);
+            chartEntry[`label_${valueIndex}`] = valueY;
+            if (indexName === DataRepository.FAELLE) {
+              valueY = valueY * 700000 / population;
+            }
             chartEntry[`value_${valueIndex}`] = valueY;
+
             maxY = Math.max(maxY, valueY);
+
           }
+
         }
         entries.push(chartEntry);
 
@@ -86,8 +101,8 @@ export class DataRepository {
       valueCount,
       minX,
       maxX,
-      minY: dataSettings.getDataset().getMinY(),
-      maxY: dataSettings.getDataset().getMaxY()
+      minY: dataSetting.getDataset().getMinY(),
+      maxY: dataSetting.getDataset().getMaxY()
     }
 
   }
