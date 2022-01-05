@@ -1,4 +1,6 @@
-export class InterpolatedValue {
+import { IInterpolatedValue } from "./IInterpolatedValue";
+
+export class InterpolatedValue implements IInterpolatedValue {
 
     private readonly outMin: number;
     private readonly outMax: number;
@@ -30,7 +32,7 @@ export class InterpolatedValue {
         return this.valMax;
     }
 
-    getOut(val: number) {
+    getOut(val: number): number {
         if (val <= this.valMin) {
             return this.outMin;
         } else if (val >= this.valMax) {

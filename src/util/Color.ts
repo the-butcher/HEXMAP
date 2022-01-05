@@ -4,7 +4,7 @@ import { ObjectUtil } from './ObjectUtil';
 
 export class Color implements IColor {
 
-    static DARK_GREY = new Color(0, 0, 0.2);
+    static readonly DARK_GREY = new Color(0, 1, 1);
 
     static readonly INDEX_H: number = 0;
     static readonly INDEX_S: number = 1;

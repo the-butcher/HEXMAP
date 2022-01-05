@@ -1,11 +1,14 @@
+import ChartComponent, { SERIES_TYPE } from "../components/ChartComponent";
+import { DataRepository } from "./DataRepository";
 import { IKeyset } from "./IKeyset";
 
 export class Keyset implements IKeyset {
 
-    private readonly keysetKey: string;
     private readonly defaultKey: string;
+    private readonly keysetKey: string;
     private readonly keysetRaw: { [K in string]: string};
     private readonly keys: string[];
+    private readonly raws: string[];
 
     private readonly hasSubsets: boolean;
     private readonly subsets: { [K in string]: IKeyset };
@@ -17,15 +20,23 @@ export class Keyset implements IKeyset {
         this.keysetRaw = keysetRaw;
         this.subsets = {};
 
-        const _keys = Object.keys(keysetRaw).sort();
-        const categoryKeys = _keys.filter(k => k.indexOf('#') >= 0);
+        this.raws = Object.keys(keysetRaw).sort();
+        const categoryKeys = this.raws.filter(k => k.indexOf('#') >= 0);
         this.hasSubsets = categoryKeys.length > 1;
         if (this.hasSubsets) {
             this.keys = categoryKeys;
         } else {
-            this.keys = _keys;
+            this.keys = this.raws;
         }
 
+    }
+
+    getRaws(): string[] {
+        return this.raws;
+    }
+
+    getSeriesType(key: string): SERIES_TYPE {
+        return this.keysetRaw[key] === DataRepository.FAELLE ? 'step' : 'line';
     }
 
     hasSubset(key: string): boolean {

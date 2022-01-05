@@ -8,6 +8,8 @@ import { DataRepository } from '../data/DataRepository';
 import { TimeUtil } from '../util/TimeUtil';
 import { IChartProps } from './IChartProps';
 
+export type SERIES_TYPE = 'line' | 'step';
+
 export default (props: IChartProps) => {
 
   const theme = useTheme();
@@ -37,14 +39,6 @@ export default (props: IChartProps) => {
     DataRepository.getInstance().getOrLoadDataSetting(source).then(dataSetting => {
 
       const labelColor = am5.color(fontColor);
-      let lastCursorInstant: number;
-
-      // current data pointer
-      const names = dataSetting.getDataset().getKeysetKeys();
-      let dataPointer: string = '';
-      for (let i = 0; i < names.length; i++) {
-        dataPointer += dataSetting.getPath(names[i]);
-      }
       const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
 
       const root = am5.Root.new('chartdiv_' + source);
@@ -110,7 +104,6 @@ export default (props: IChartProps) => {
       _yAxisLabel?.set('visible', fold === 'open-vertical');
       _yAxisVal?.set('visible', fold === 'open-vertical');
 
-
       const dateFormats = {
         day: 'dd.MM.yyyy',
         week: 'dd.MM.yyyy',
@@ -156,6 +149,7 @@ export default (props: IChartProps) => {
       });
       _xAxisVal.children.moveValue(_xAxisLabel, 1);
       _xAxisLabel?.set('visible', fold === 'open-vertical');
+      
 
 
       // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -186,11 +180,18 @@ export default (props: IChartProps) => {
         paddingTop: 0,
         paddingRight: 0,
         paddingBottom: 0,
-        paddingLeft: 0,
+        paddingLeft: 2,
       });
-      tooltip.get('background')?.setAll({
+      (tooltip.get('background') as am5.PointedRectangle)?.setAll({
         stroke: am5.color(0x131311),
         fill: am5.color(0x42423a),
+        strokeOpacity: 0,
+        cornerRadius: 0,
+        shadowOffsetX: 3,
+        shadowOffsetY: 3,
+        shadowColor: am5.color(0x000000),
+        shadowBlur: 3,
+        shadowOpacity: 0.3,        
       });
       tooltip.label.adapters.add('fill', (value, target) => {
         return labelColor;
@@ -202,8 +203,9 @@ export default (props: IChartProps) => {
 
         let seriesClass = am5xy.LineSeries;
 
-        const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
-        if (indexName === DataRepository.FAELLE) {
+        const seriesLabel = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex);
+        const seriesType = dataSetting.getDataset().getIndexKeyset().getSeriesType(valueIndex);
+        if (seriesType === 'step') {
           seriesClass = am5xy.StepLineSeries;
         }
 
@@ -220,7 +222,7 @@ export default (props: IChartProps) => {
           fill: am5.color(fontColor),
         }));
 
-        if (indexName === DataRepository.FAELLE) {
+        if (seriesType === 'step') {
           seriesVal.strokes.template.set('strokeWidth', 1);
           seriesVal.fills.template.setAll({ fillOpacity: 0.0, visible: true });
         } else {
@@ -233,11 +235,11 @@ export default (props: IChartProps) => {
 
         const tooltip = seriesVal.get('tooltip')!;
         tooltip.setAll({
-          labelText: `{label_${valueIndex}}`, // '{valueY}',
+          labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${valueIndex}}`, // '{valueY}',
           paddingTop: 4,
           paddingRight: 4,
           paddingBottom: 4,
-          paddingLeft: 4,
+          paddingLeft: 6,
           getFillFromSprite: false,
           getStrokeFromSprite: false,
           getLabelFillFromSprite: false,
@@ -248,15 +250,50 @@ export default (props: IChartProps) => {
           fontSize: 14,
         });
         (tooltip.get('background') as am5.PointedRectangle)!.setAll({
-          stroke: am5.color(0x131311),
+          stroke: am5.color(0xFF0011),
           fill: am5.color(0x42423a),
-          cornerRadius: 0
+          strokeOpacity: 0,
+          cornerRadius: 0,
+          shadowOffsetX: 3,
+          shadowOffsetY: 3,
+          shadowColor: am5.color(0x000000),
+          shadowBlur: 3,
+          shadowOpacity: 0.3,
         });
         tooltip.label.adapters.add('fill', (value, target) => {
           return labelColor;
         });
 
       }
+
+      let end: number;
+      let start: number;
+      const handleStartEndChanged = () => {
+        const minInstant = _xAxisVal.positionToValue(start);
+        const maxInstant = _xAxisVal.positionToValue(end);
+        const daysShown = (maxInstant - minInstant) / TimeUtil.MILLISECONDS_PER____DAY;
+        allSeries.forEach(s => {
+          if (daysShown > 120 && s instanceof am5xy.StepLineSeries) {
+            s.hide();
+          } else {
+            s.show();
+          }
+        });
+      };
+      _xAxisVal.adapters.add('start', (value, target) => {
+        start = Math.max(0, value);
+        requestAnimationFrame(() => {
+          handleStartEndChanged();
+        });
+        return start;
+      });
+      _xAxisVal.adapters.add('end', (value, target) => {
+        end = Math.min(1, value);
+        requestAnimationFrame(() => {
+          handleStartEndChanged();
+        });
+        return end;
+      });      
 
       // write to state
       setChart(_chart);
@@ -291,7 +328,7 @@ export default (props: IChartProps) => {
     DataRepository.getInstance().getOrBuild(source, Number.MIN_VALUE, Number.MAX_VALUE).then(chartData => {
 
       series.forEach(s => {
-        (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY);
+        (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', 5000); // chartData.maxY
         // (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('min', -4000);
         s.data.setAll(chartData.entries);
         s.appear(0);

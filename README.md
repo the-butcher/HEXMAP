@@ -1,8 +1,7 @@
 # Issues in Hexmap
-- think about how a case-stepline could be implemented
 - find a way to add mortality as datasource
-- adapt date slider tooltip to match chart tooltip
 - move base config to file (maybe multiple files)
+- in municipality mode only municipalities of the respective province are shown
 
 # later
 - logarithmic option in chart
@@ -10,6 +9,8 @@
 - export options for chart, map, data
 
 # solved
+- ~~adapt date slider tooltip to match chart tooltip~~
+- ~~think about how a case-stepline could be implemented~~
 - ~~boundaries have offsets in many places~~
 - ~~add twitter card to index.html~~
 - ~~add shape to scene that the current diagram can be textured on~~

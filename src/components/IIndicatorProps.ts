@@ -1,5 +1,6 @@
 import { IColor } from "../util/IColor";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
+import { IInterpolatedValue } from "../util/IInterpolatedValue";
 import { InterpolatedValue } from "../util/InterpolatedValue";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 import { IChartProps } from "./IChartProps";
@@ -44,9 +45,11 @@ export interface IIndicatorProps {
 
     breadcrumbProps: IBreadcrumbProps[];
 
-    interpolatedHue: InterpolatedValue;
+    interpolatedHue: IInterpolatedValue;
+    interpolatedSat: IInterpolatedValue;
+    interpolatedVal: IInterpolatedValue;
      
-    interpolatedEle: InterpolatedValue;
+    interpolatedEle: IInterpolatedValue;
 
     style?: React.CSSProperties;
 

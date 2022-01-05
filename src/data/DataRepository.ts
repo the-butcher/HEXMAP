@@ -35,18 +35,18 @@ export class DataRepository {
 
     const dataSetting = await this.getOrLoadDataSetting(source);
 
-    const names = dataSetting.getDataset().getKeysetKeys(); // Object.keys(data.keys);
+    const keysetKeys = dataSetting.getDataset().getKeysetKeys(); // Object.keys(data.keys);
     let dataPointer: string = '';
-    for (let i = 0; i < names.length; i++) {
-      dataPointer += dataSetting.getPath(names[i]);
+    for (let i = 0; i < keysetKeys.length; i++) {
+      dataPointer += dataSetting.getPath(keysetKeys[i]);
     }
     const population = dataSetting.getDataset().getPopulation(dataPointer);
-    console.log('dataPointer', dataPointer, population);
+    // console.log('dataPointer', dataPointer, population);
 
     /**
      * how many series are going to be needed
      */
-    const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
+    const valueCount = dataSetting.getDataset().getIndexKeyset().size();
 
     const entries: IChartEntry[] = [];
     const dates = dataSetting.getDataset().getEntryKeys(); // Object.keys(data.data);
@@ -79,11 +79,13 @@ export class DataRepository {
             const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
 
             let valueY = dataEntry.getValue(dataPointer, valueIndex);
-            chartEntry[`label_${valueIndex}`] = valueY;
-            if (indexName === DataRepository.FAELLE) {
-              valueY = valueY * 700000 / population;
+            if (valueY > 0) {
+              chartEntry[`label_${valueIndex}`] = valueY;
+              if (indexName === DataRepository.FAELLE) {
+                valueY = valueY * 700000 / population; // scale daily reports to incidence
+              }
+              chartEntry[`value_${valueIndex}`] = valueY;
             }
-            chartEntry[`value_${valueIndex}`] = valueY;
 
             maxY = Math.max(maxY, valueY);
 

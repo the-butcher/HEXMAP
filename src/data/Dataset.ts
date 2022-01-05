@@ -1,5 +1,6 @@
 import { TimeUtil } from "../util/TimeUtil";
 import { DataEntry } from "./DataEntry";
+import { DataRepository } from "./DataRepository";
 import { IDataEntry } from "./IDataEntry";
 import { IDataRoot } from "./IDataRoot";
 import { IDataset } from "./IDataset";
@@ -39,6 +40,13 @@ export class Dataset implements IDataset {
             this.keysets[keysetKey] = new Keyset(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
         });
 
+        const indexKeys = dataRoot.idxs;
+        const indexKeysetRaw: { [K in string]: string} = {};
+        for (let i = 0; i < indexKeys.length; i++) {
+            indexKeysetRaw[i] = indexKeys[i];
+        }        
+        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);        
+
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[0]);
         this.instantMax = TimeUtil.parseCategoryDateFull(dateKeys[dateKeys.length - 1]);
@@ -49,12 +57,6 @@ export class Dataset implements IDataset {
             this.entries[dateKey] = new DataEntry(TimeUtil.parseCategoryDateFull(dateKey), dataRoot.data[dateKey]);
         });
 
-        const indexKeys = dataRoot.idxs;
-        const indexKeysetRaw: { [K in string]: string} = {};
-        for (let i = 0; i < indexKeys.length; i++) {
-            indexKeysetRaw[i] = indexKeys[i];
-        }        
-        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);
 
         this.minY = dataRoot.minY;
         this.maxY = dataRoot.maxY;

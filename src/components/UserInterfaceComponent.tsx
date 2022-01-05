@@ -205,8 +205,10 @@ export default (props: IUserInterfaceProps) => {
           },
           valueLabel: {
             fontFamily,
-            fontSize: '12px',
-            color: 'var(--color-text)',            
+            fontSize: '14px',
+            color: 'var(--color-text)',   
+            backgroundColor: '#42423a',
+            boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)'       
           }
         },
       }   

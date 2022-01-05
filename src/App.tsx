@@ -17,6 +17,7 @@ import { IDataSetting } from './data/IDataSetting';
 import { IAppState } from './IAppState';
 import { Color } from './util/Color';
 import { ColorUtil } from './util/ColorUtil';
+import { FixedValue } from './util/FixedValue';
 import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
@@ -160,8 +161,8 @@ export default () => {
       //   source: './hexmap-data-salzburg-gemeinde.json',
       //   path: '',
       //   breadcrumbProps: [],
-      //   interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 500, 1),
-      //   interpolatedEle: new InterpolatedValue(0, 100, 0, 20000, 1),
+      //   interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.33),
+      //   interpolatedEle: new InterpolatedValue(0, 50, 0, 12000, 1),
       //   chartProps: {
       //     title: '7-Tages Inzidenz',
       //     source: './hexmap-data-salzburg-gemeinde.json',
@@ -183,8 +184,11 @@ export default () => {
         source: './hexmap-data-ems.json',
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.25),
-        interpolatedEle: new InterpolatedValue(0, 100, 0, 10000, 0.75),
+        // interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.33),
+        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedSat: new FixedValue(1.00),
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedEle: new InterpolatedValue(0, 200, 0, 12000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
           source: './hexmap-data-ems.json',
@@ -207,6 +211,8 @@ export default () => {
         path: '',
         breadcrumbProps: [],
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedSat: new FixedValue(1.00),
+        interpolatedVal: new FixedValue(0.40),
         interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
@@ -230,6 +236,8 @@ export default () => {
         path: '',
         breadcrumbProps: [],
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedSat: new FixedValue(1.00),
+        interpolatedVal: new FixedValue(0.40),
         interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
@@ -252,8 +260,10 @@ export default () => {
         source: './hexmap-data-vacc-gemeinde.json',
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
-        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1),
+        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.5, 0.9, 1),
+        interpolatedSat: new FixedValue(1.00),
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedEle: new InterpolatedValue(-10, 20, 0.00, 1.00, 1),
         chartProps: {
           title: 'Impfquote',
           source: './hexmap-data-vacc-gemeinde.json',
@@ -589,14 +599,15 @@ export default () => {
 
           if (selected) {
 
-            mapKeys = keyset.getKeys();
+            mapKeys = keyset.getRaws();
+            
             /**
              * the path refers to subset (if there is subsets)
              * therefore the top crumbs needs to be adapted
              */
             let validPath = path;
             keyset.getKeys().forEach(key => {
-              if (path.startsWith(key.replaceAll('#', ''))) {
+              if (path.startsWith(key.replaceAll('#', ''))) { // includes #####, but will match 
                 validPath = key;
               }
             });
@@ -615,13 +626,14 @@ export default () => {
 
               const subset = keyset.getSubset(validPath);
               let validSubpath = path;
-              if (path.indexOf('#') >= 0) {
-                mapKeys = keyset.getKeys();
-              } else {
-                mapKeys = subset.getKeys();
-              }
+              // if (path.indexOf('#') >= 0) {
+              //   mapKeys = keyset.getKeys();
+              // } else {
+              //   mapKeys = subset.getKeys();
+              // }
+              // console.log('mapKeys', mapKeys);
               
-              // console.log('crumbs (sub)', path, prefKey, validSubpath, subset);
+              // console.log('crumbs (sub)', path, prefKey, validSubpath, subset, mapKeys);
               breadcrumbProps.push({
                 source: appState.source,
                 name: keysetKey,
@@ -639,7 +651,8 @@ export default () => {
         };
 
         const indexKeyset = dataSetting.getDataset().getIndexKeyset();
-        if (indexKeyset.size() > 1) {
+        const indexSizeFiltered = indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
+        if (indexSizeFiltered > 1) {
 
           if (selected) {
             label1 += ' / ' + indexKeyset.getValue(dataSetting.getIndex().toString());
@@ -692,14 +705,11 @@ export default () => {
 
         }
 
-        // legend
-        // 
-
         const getColor = (value: number) => {
           const h = indicatorPropsInstance.interpolatedHue.getOut(value);
-          // const s = interpolatedS.getOut(value);
-          // const v = interpolatedV.getOut(value);
-          return new Color(h, 1, 0.4);
+          const s = indicatorPropsInstance.interpolatedSat.getOut(value);
+          const v = indicatorPropsInstance.interpolatedVal.getOut(value);
+          return new Color(h, s, v);
         }
 
         // console.log('data', data, );
@@ -737,6 +747,11 @@ export default () => {
           });
 
         }
+
+        const defaultState = {
+          color: new Color(0, 0, 0),
+          height: 0
+        };
 
         if (selected) {
 
@@ -809,10 +824,7 @@ export default () => {
                       height: indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()))
                     }
                   } else {
-                    lookupState = {
-                      color: Color.DARK_GREY,
-                      height: 0
-                    }
+                    return defaultState;
                   }
                   valueLookup[hexagon.gkz] = lookupState;
                 } 

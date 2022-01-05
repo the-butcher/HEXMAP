@@ -20,11 +20,11 @@ export class DataEntry implements IDataEntry {
         return this.keys;
     }
 
-    hasKey(key: string): boolean {
+    hasKey(key: string | number): boolean {
         return this.dataRaw[key] !== undefined;
     }
 
-    getValue(key: string, index: number): number {
+    getValue(key: string | number, index: number): number {
         return this.dataRaw[key][index];
     }
 

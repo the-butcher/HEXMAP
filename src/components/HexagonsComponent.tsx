@@ -30,12 +30,12 @@ export default (props: IHexagonsProps) => {
    * helper objects for setting up position and color before applying to indexed instances
    */
   const tempObject = new three.Object3D();
-  const tempColor = new three.Color();
+  // const tempColor = new three.Color();
 
   /**
    * helpers for updating color
    */
-  const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
+  // const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
   const colorArray = useMemo(() => new Float32Array(hexagonCount * 3), []);
 
   let hexagonValue: IHexagon;
