@@ -1,10 +1,9 @@
 // import { OrbitControls, OrbitControlsProps } from '@react-three/drei';
-import { Key } from '@mui/icons-material';
 import { Camera, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
-import * as three from 'three';
 import { Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { TimeUtil } from '../util/TimeUtil';
 import { IControlsProps } from './IControlsProps';
 
 export default (props: IControlsProps) => {
@@ -13,17 +12,28 @@ export default (props: IControlsProps) => {
     const [screenshotRequested, setSreenshotRequested] = useState<boolean>(false);
 
     let controls = useRef<OrbitControls>();
-    let isLeftButtonPressed = useRef<boolean>(false);
+    let cinstant = useRef<number>();
+
+    const { onInstantChange, instant, stamp } = props;
+
+    /**
+     * triggered from keypress, calling the callback specified in props
+     * @param event 
+     * @param value 
+     */
+    const incrementInstant = () => {
+        onInstantChange(cinstant.current + TimeUtil.MILLISECONDS_PER____DAY);
+    }
 
     useEffect(() => {
 
+        console.log('✨ building controls component', props);
 
         controls.current = new OrbitControls(camera, gl.domElement);
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
         // controls.enableZoom = false;
         controls.current.addEventListener('change', invalidate)
         controls.current.rotateSpeed = 0.25;
-
 
         controls.current.enableDamping = false;
         controls.current.dampingFactor = 0.05;
@@ -47,26 +57,13 @@ export default (props: IControlsProps) => {
         controls.current.target.set(0, 0, 0);
         controls.current.update();
 
-        window.addEventListener('pointerdown', e => {
-            if (e.button === 0) {
-                isLeftButtonPressed.current = true;
-            }
-        });
-        window.addEventListener('pointerup', e => {
-            if (e.button === 0) {
-
-                isLeftButtonPressed.current = false;
-
-                
-            }
-        });
         window.addEventListener('keyup', e => {
             if (e.code === 'ArrowLeft') {
 
             }
             if (e.key === 'c') {
 
-                controls.current.minAzimuthAngle = 0,
+                controls.current.minAzimuthAngle = 0;
                 controls.current.maxAzimuthAngle = 0;
                 controls.current.minPolarAngle = 0.43; // Math.PI / 4; // how far above ground the map can be tilted
                 controls.current.maxPolarAngle = 0.43;
@@ -76,23 +73,25 @@ export default (props: IControlsProps) => {
                 controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
                 controls.current.update();
 
-                controls.current.minAzimuthAngle = -Math.PI / 4,
+                controls.current.minAzimuthAngle = -Math.PI / 4;
                 controls.current.maxAzimuthAngle = Math.PI / 8;
                 controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
                 controls.current.maxPolarAngle = Math.PI / 2.05;
-                controls.current.update();                    
+                controls.current.update();
 
-            }            
+            }
             if (e.key === 'k') {
 
                 setSreenshotRequested(true);
                 invalidate();
+                incrementInstant();
 
                 // controls.current.minAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36,
                 // controls.current.maxAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36;
                 // controls.current.update();
 
             }
+
         });
 
         return () => {
@@ -105,6 +104,12 @@ export default (props: IControlsProps) => {
 
     }, []);
 
+    useEffect(() => {
+
+        console.log('🔧 updating controls component', props);
+        cinstant.current = instant;
+
+    }, [stamp]);
 
     function renderToJPG(gl: WebGLRenderer, scene: Scene, camera: Camera) {
 
@@ -116,7 +121,7 @@ export default (props: IControlsProps) => {
                 var a = document.createElement('a');
                 var url = URL.createObjectURL(blob);
                 a.href = url;
-                a.download = 'canvas.jpg';
+                a.download = `canvas_3d_${Date.now()}`;
                 a.click();
             },
             'image/jpg',
@@ -139,9 +144,7 @@ export default (props: IControlsProps) => {
     }, 10);
 
     // useEffect(() => {
-
-        
-
+    //     console.log('🔧 updating controls component', props);   
     // }, [props.stamp]);
 
     return null;

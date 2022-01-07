@@ -246,8 +246,8 @@ export default (props: IUserInterfaceProps) => {
         </div>
       </div>
       <Paper elevation={4} style={{ overflow: 'unset', width: 'calc(100%-24px)', display: 'flex', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '40px', padding: '0px', margin: '0px' }} >
-        <DateSliderComponent {...props.navigationBotProps.instantProps} />
-        <DatePickerComponent {...props.navigationBotProps.instantProps} />
+        <DateSliderComponent {...navigationBotProps.instantProps} />
+        <DatePickerComponent {...navigationBotProps.instantProps} />
       </Paper>
     </ThemeProvider>
   );

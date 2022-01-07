@@ -113,7 +113,6 @@ export default (props: IHexagonsProps) => {
   useEffect(() => {
 
     console.log('🔧 updating hexagons component', props);
-
     const tsA = Date.now();
 
     let counter = 0;

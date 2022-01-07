@@ -2,6 +2,8 @@
 - find a way to add mortality as datasource
 - move base config to file (maybe multiple files)
 - in municipality mode only municipalities of the respective province are shown
+- restore map props rebuild so delayed map props build is possible again
+- first chart shows only after another path is chosen
 
 # later
 - logarithmic option in chart

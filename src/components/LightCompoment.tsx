@@ -11,30 +11,37 @@ import { ILightProps } from './ILightProps';
  */
 export default (props: ILightProps) => {
 
-    const pointLight = useRef<three.DirectionalLight>();
+    const pointLightSlow = useRef<three.DirectionalLight>();
+    const pointLightFast = useRef<three.DirectionalLight>();
     const { gl, scene } = useThree();
 
+    const configureLight = (light: three.DirectionalLight, textureFraction: number) => {
+
+        light.position.set(props.position.x, props.position.y, props.position.z);
+        light.lookAt(0, 0, 0);
+        light.castShadow = true;
+        light.shadow.autoUpdate = false;
+
+        // light.shadow.camera.left = 200;
+        light.shadow.camera.top = 140;
+        light.shadow.camera.bottom = -120;
+        light.shadow.camera.left = -260;
+        light.shadow.camera.right = 260;
+        light.shadow.camera.far = 1000;
+        light.shadow.camera.lookAt(0, 0, 0);      
+        
+        const maxTextureSize = gl.capabilities.maxTextureSize;
+
+        light.shadow.mapSize.width = maxTextureSize / textureFraction;
+        light.shadow.mapSize.height = maxTextureSize / textureFraction / 2;        
+
+    }
     useEffect(() => {
 
         console.log('✨ building light component', props);
 
-        pointLight.current!.position.set(props.position.x, props.position.y, props.position.z);
-        pointLight.current!.lookAt(0, 0, 0);
-        pointLight.current!.castShadow = true;
-        pointLight.current!.shadow.autoUpdate = false;
-
-        // pointLight.current!.shadow.camera.left = 200;
-        pointLight.current!.shadow.camera.top = 140;
-        pointLight.current!.shadow.camera.bottom = -120;
-        pointLight.current!.shadow.camera.left = -260;
-        pointLight.current!.shadow.camera.right = 260;
-        pointLight.current!.shadow.camera.far = 1000;
-        pointLight.current!.shadow.camera.lookAt(0, 0, 0);
-
-        const maxTextureSize = gl.capabilities.maxTextureSize;
-
-        pointLight.current!.shadow.mapSize.width = maxTextureSize / 8;
-        pointLight.current!.shadow.mapSize.height = maxTextureSize / 4;
+        configureLight(pointLightFast.current!, 32);
+        configureLight(pointLightSlow.current!, 8);
 
         // const helper = new three.CameraHelper( pointLight.current!.shadow.camera );
         // scene.add( helper );
@@ -42,8 +49,16 @@ export default (props: ILightProps) => {
     }, []);
 
     useEffect(() => {
+
         console.log('🔧 updating light component', props);
-        pointLight.current!.shadow.needsUpdate = true;
+
+        pointLightSlow.current!.visible = props.shadowEnabled;
+        pointLightFast.current!.visible = !props.shadowEnabled;
+
+        pointLightSlow.current!.shadow.needsUpdate = props.shadowEnabled;
+        pointLightFast.current!.shadow.needsUpdate = !props.shadowEnabled;
+        
+
     }, [props.stamp]);
 
     useFrame((state) => {
@@ -51,7 +66,10 @@ export default (props: ILightProps) => {
     });
 
     return (
-        <directionalLight intensity={1.25} ref={pointLight} castShadow />
+        <>
+            <directionalLight intensity={1.25} ref={pointLightSlow} castShadow />
+            <directionalLight intensity={1.25} ref={pointLightFast} castShadow />
+        </>
     );
 
 };

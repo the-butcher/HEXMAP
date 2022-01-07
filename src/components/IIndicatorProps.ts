@@ -1,7 +1,5 @@
-import { IColor } from "../util/IColor";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { IInterpolatedValue } from "../util/IInterpolatedValue";
-import { InterpolatedValue } from "../util/InterpolatedValue";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 import { IChartProps } from "./IChartProps";
 
@@ -35,6 +33,11 @@ export interface IIndicatorProps {
      * points to the data, retrievable from DataRepository
      */
     source: string;
+
+    /**
+     * flag indicating if the given source has already been loaded
+     */
+    loaded: boolean;
 
     path: string;  
 

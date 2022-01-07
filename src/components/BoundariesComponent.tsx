@@ -96,22 +96,22 @@ const BoundariesComponent = () => {
 
             for (let i=1; i < firstWallIndex; i++) {
 
-              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              hoodVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
-              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              hoodNormals.push(0, 1, 0);
-              hoodNormals.push(0, 1, 0);
-              hoodNormals.push(0, 1, 0);
+              // hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
+              // hoodVertices.push(coords2d[i].x, boundaryMaxZ, coords2d[i].y);
+              // hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
+              // hoodNormals.push(0, 1, 0);
+              // hoodNormals.push(0, 1, 0);
+              // hoodNormals.push(0, 1, 0);
 
-              hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
-              hoodVertices.push(coords2d[i - 1].x, boundaryMinZ, coords2d[i - 1].y);
-              hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
-              hoodNormals.push(0, 1, 0);
-              hoodNormals.push(0, 1, 0);
-              hoodNormals.push(0, 1, 0);
+              // hoodVertices.push(coords2d[i].x, boundaryMinZ, coords2d[i].y);
+              // hoodVertices.push(coords2d[i - 1].x, boundaryMinZ, coords2d[i - 1].y);
+              // hoodVertices.push(coords2d[i - 1].x, boundaryMaxZ, coords2d[i - 1].y);
+              // hoodNormals.push(0, 1, 0);
+              // hoodNormals.push(0, 1, 0);
+              // hoodNormals.push(0, 1, 0);
 
             }
-            for (let i = firstWallIndex; i <= coords2d.length; i++) {
+            for (let i = firstWallIndex + 2; i <= coords2d.length; i++) {
 
               const idxM1 = (i - 1) % coords2d.length;
               const idxM0 = (i) % coords2d.length;
@@ -143,19 +143,6 @@ const BoundariesComponent = () => {
 
           geomHood.current.setAttribute('position', new three.BufferAttribute(hoodVertices32, 3));
           geomHood.current.setAttribute('normal', new three.BufferAttribute(hoodNormals32, 3));
-          // geomWall.current.setAttribute('position', new three.BufferAttribute(wallVertices32, 3));
-          // geomWall.current.setAttribute('normal', new three.BufferAttribute(wallNormals32, 3));
-
-          // const reflectorOptions: ReflectorOptions = {
-          //   clipBias: 0.000003,
-          //   textureWidth: 8192,
-          //   textureHeight: 8192,
-          //   color: 0x777777
-          // }
-          // const reflector: Reflector = new Reflector( geomHood.current, reflectorOptions);
-          // scene.add( reflector );
-          // reflector.position.y = 0;
-          // reflector.position.z = 0;          
 
         }        
     

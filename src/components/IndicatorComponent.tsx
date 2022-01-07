@@ -9,7 +9,7 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
 
   const theme = useTheme();
 
-  const { source, onExpand, breadcrumbProps } = props;
+  const { source, loaded, onExpand, breadcrumbProps } = props;
 
   const openHorizontal = props.fold === 'open-horizontal' || props.fold === 'open-vertical';
   const openVertical = props.fold === 'open-vertical';
@@ -33,9 +33,11 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
           <div style={{ display: 'flex', justifyContent: 'right', flexDirection: 'row', flexWrap: 'wrap', width: 'inherit', minHeight: '21px' }}>
             <div style={{ fontSize: '14px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', paddingTop: '1px', paddingRight: '12px' }}>{props.name} nach {props.desc}</div>
             <div style={{ flexGrow: '1' }}></div>
-            <Breadcrumbs aria-label="breadcrumb" style={{ display: openHorizontal ? 'block' : 'none', paddingRight: '12px' }}>
+            {
+              loaded ? <Breadcrumbs aria-label="breadcrumb" style={{ display: openHorizontal ? 'block' : 'none', paddingRight: '12px' }}>
               {breadcrumbProps.map(props => <BreadcrumbComponent key={props.name} {...props} />)}
-            </Breadcrumbs>
+                </Breadcrumbs> : null
+            }
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', minHeight: indicatorMinHeight }}>
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: '140px', flexGrow: '1' }}>
@@ -50,9 +52,11 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
               </IconButton>
             </CardActions>
             <div style={{ display: openHorizontal ? 'flex' : 'none', flexDirection: 'row', flexGrow: '999' }}>
-              <div style={{ overflow: 'hidden', height: openVertical ? verticalHeight : indicatorMinHeight, transition: 'all 250ms ease-in-out', minWidth: '250px', flexGrow: '99' }}>
+            {
+              loaded ? <div style={{ overflow: 'hidden', height: openVertical ? verticalHeight : indicatorMinHeight, transition: 'all 250ms ease-in-out', minWidth: '250px', flexGrow: '99' }}>
                 <ChartComponent {...props.chartProps} style={{ width: 'inherit', height: 'inherit', overflow: 'hidden', display: openHorizontal ? 'block' : 'none' }} />
-              </div>
+              </div> : null
+            }
             </div>
 
           </div>

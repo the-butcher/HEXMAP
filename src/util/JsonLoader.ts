@@ -8,6 +8,7 @@ export class JsonLoader {
      * @param url
      */
     async load(url: string): Promise<any> {
+        console.log('☁ loading', url);
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url);

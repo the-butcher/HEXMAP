@@ -6,6 +6,7 @@ import { IHexagonsProps } from './components/IHexagonsProps';
 import { IHexagonState } from './components/IHexagonState';
 import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
+import { ILegendProps } from './components/ILegendProps';
 import { IMapProps } from './components/IMapProps';
 import { IUserInterfaceProps } from './components/IUserInterfaceProps';
 import MapComponent from './components/MapComponent';
@@ -40,9 +41,6 @@ export default () => {
     const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     dataSettings.setInstant(instant);
 
-    /**
-     * trigger an update
-     */
     setAppState({
       ...appState,
       action: {
@@ -57,7 +55,7 @@ export default () => {
 
   const handleHexagonsLoaded = () => {
 
-    console.log('📞 handling hexagons loaded', instant);
+    console.log('📞 handling hexagons loaded');
 
     setAppState({
       ...appState,
@@ -65,7 +63,24 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
-        updateDelay: 1
+        updateDelay: 250
+      }
+    });
+
+  }
+
+  const handleDataLoaded = (source: string) => {
+
+    console.log('📞 handling data loaded', source);
+    userInterfaceProps.indicatorProps.find(p => p.source === source).loaded = true;
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 250
       }
     });
 
@@ -119,7 +134,7 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
-        updateDelay: 1
+        updateDelay: 250
       },
     });
 
@@ -138,7 +153,7 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
-        updateDelay: 1
+        updateDelay: 250
       },
     });
 
@@ -159,10 +174,13 @@ export default () => {
       //   onExpand: handleIndicatorExpand,
       //   fold: 'open-horizontal',
       //   source: './hexmap-data-salzburg-gemeinde.json',
+      //   loaded: false,
       //   path: '',
       //   breadcrumbProps: [],
-      //   interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.33),
       //   interpolatedEle: new InterpolatedValue(0, 50, 0, 12000, 1),
+      //   interpolatedHue: new InterpolatedValue(0.25, -0.05, 0, 3000, 0.33),
+      //   interpolatedSat: new FixedValue(1.00),
+      //   interpolatedVal: new FixedValue(0.40),
       //   chartProps: {
       //     title: '7-Tages Inzidenz',
       //     source: './hexmap-data-salzburg-gemeinde.json',
@@ -173,41 +191,43 @@ export default () => {
       //   }
       // },                 
       {
-        date: '',
+        date: '##.##.####',
         name: 'Inzidenz',
         desc: 'EMS',
-        value00: '',
-        value07: '',
+        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         fold: 'open-horizontal',
         source: './hexmap-data-ems.json',
+        loaded: false,
         path: '',
         breadcrumbProps: [],
         // interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.33),
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedHue: new InterpolatedValue(0.25, -0.10, 0, 5000, 0.33),
         interpolatedSat: new FixedValue(1.00),
         interpolatedVal: new FixedValue(0.40),
         interpolatedEle: new InterpolatedValue(0, 200, 0, 12000, 1),
         chartProps: {
           title: '7-Tages Inzidenz',
           source: './hexmap-data-ems.json',
-          path: '',
+          path: '#',
           valueFormatter: FormattingDefinition.FORMATTER____FIXED,
           fold: 'open-horizontal',
           onInstantChange: handleInstantChange
         }
       },
       {
-        date: '',
+        date: '##.##.####',
         name: 'Inzidenz',
         desc: 'Bundesland und Alter',
-        value00: '',
-        value07: '',
+        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         fold: 'closed',
         source: './hexmap-data-bundesland-alter.json',
+        loaded: false,
         path: '',
         breadcrumbProps: [],
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
@@ -224,15 +244,16 @@ export default () => {
         }
       },
       {
-        date: '',
+        date: '##.##.####',
         name: 'Inzidenz',
         desc: 'Bezirk',
-        value00: '',
-        value07: '',
+        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         fold: 'closed',
         source: './hexmap-data-bundesland-bezirk.json',
+        loaded: false,
         path: '',
         breadcrumbProps: [],
         interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
@@ -249,15 +270,16 @@ export default () => {
         }
       },
       {
-        date: '',
+        date: '##.##.####',
         name: 'Impfung',
         desc: 'Gemeinde',
-        value00: '',
-        value07: '',
+        value00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+        value07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
         onExpand: handleIndicatorExpand,
         fold: 'closed',
         source: './hexmap-data-vacc-gemeinde.json',
+        loaded: false,
         path: '',
         breadcrumbProps: [],
         interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.5, 0.9, 1),
@@ -286,7 +308,6 @@ export default () => {
 
   const [updateMapTo, setUpdateMapTo] = useState<number>(-1);
   const [mapProps, setMapProps] = useState<IMapProps>({
-    // selected: selected1,
     lightProps: [
       {
         id: ObjectUtil.createId(),
@@ -295,7 +316,8 @@ export default () => {
           x: 300,
           y: 200,
           z: -300
-        }
+        },
+        shadowEnabled: true
       },
       {
         id: ObjectUtil.createId(),
@@ -304,11 +326,15 @@ export default () => {
           x: -300,
           y: 200,
           z: -150
-        }
+        },
+        shadowEnabled: true
       }
     ],
     controlsProps: {
+      id: ObjectUtil.createId(),
       stamp: ObjectUtil.createId(),
+      instant,
+      onInstantChange: handleInstantChange
     },
     hexagonProps: {
       source: '',
@@ -492,7 +518,7 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: false,
         updateLight: false,
-        updateDelay: 1
+        updateDelay: 250
       },
     });
   }, [dimensions]);
@@ -504,10 +530,11 @@ export default () => {
       stamp: ObjectUtil.createId(),
       updateScene: false,
       updateLight: false,
-      updateDelay: 1
+      updateDelay: 1000
     },
     fold: indicatorProps.fold
   });
+
 
   useEffect(() => {
 
@@ -525,36 +552,50 @@ export default () => {
       onInstantChange: handleInstantChange
     }
 
-    const promises: Promise<IDataSetting>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoadDataSetting(props.source));
-    Promise.all(promises).then(allSettings => {
+    // const promises: Promise<IDataSetting>[] = userInterfaceProps.indicatorProps.map(props => DataRepository.getInstance().getOrLoadDataSetting(props.source));
+    // Promise.all(promises).then(allSettings => {
 
-      const indicatorProps: IIndicatorProps[] = [];
-      const labelProps = mapProps.labelProps;
-      labelProps.forEach(props => {
-        props.label = '';
-      });
-      const legendLabelProps = mapProps.legendLabelProps;
-      const courseLabelProps = mapProps.courseLabelProps;
-      const hyperlinkProps = mapProps.hyperlinkProps;
-      let hexagonProps: IHexagonsProps;
-
-      for (let i = 0; i < allSettings.length; i++) {
-        const dataSetting = allSettings[i];
-        const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
-        const selected = indicatorPropsInstance.source === appState.source;
-        if (selected) {
-          instantProps.instantCur = dataSetting.getInstant();
-        }
+    const _labelProps = mapProps.labelProps.map(props => {
+      return {
+        ...props,
+        label: ''
       }
-      let mapKeys: string[] = [];
+    });
+    const _legendLabelProps: ILegendProps = {
+      ...mapProps.legendLabelProps,
+      min: {...mapProps.legendLabelProps.min},
+      max: {...mapProps.legendLabelProps.max},
+    }
+    const _courseLabelProps: ILegendProps = {
+      ...mapProps.courseLabelProps,
+      min: {...mapProps.courseLabelProps.min},
+      max: {...mapProps.courseLabelProps.max},
+    }
+    let _hexagonProps: IHexagonsProps = {
+      ...mapProps.hexagonProps
+    };
 
-      for (let i = 0; i < allSettings.length; i++) {
+    for (let i = 0; i < userInterfaceProps.indicatorProps.length; i++) {
+      const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
+      const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
+      const selected = indicatorPropsInstance.source === appState.source;
+      if (dataSetting && selected) {
+        instantProps.instantCur = dataSetting.getInstant();
+      }
+    }
+    let mapKeys: string[] = [];
 
-        const dataSetting = allSettings[i];
+    for (let i = 0; i < userInterfaceProps.indicatorProps.length; i++) {
+
+      const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
+      const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
+
+      if (dataSetting) {
+
         // console.log('data', userInterfaceProps.indicatorProps[i].source, data.path)
 
-        const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
         const selected = indicatorPropsInstance.source === appState.source;
+
         // current instant (closest to date slider date - and date slider will be move to that instant upon update)
         const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instantCur);
 
@@ -571,9 +612,9 @@ export default () => {
          */
         const breadcrumbProps: IBreadcrumbProps[] = [];
 
-        const keysetKeys = dataSetting.getDataset().getKeysetKeys(); ;
+        const keysetKeys = dataSetting.getDataset().getKeysetKeys();;
         if (selected) {
-          labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
+          _labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
         }
         let label1 = '';
 
@@ -600,7 +641,7 @@ export default () => {
           if (selected) {
 
             mapKeys = keyset.getRaws();
-            
+
             /**
              * the path refers to subset (if there is subsets)
              * therefore the top crumbs needs to be adapted
@@ -632,7 +673,7 @@ export default () => {
               //   mapKeys = subset.getKeys();
               // }
               // console.log('mapKeys', mapKeys);
-              
+
               // console.log('crumbs (sub)', path, prefKey, validSubpath, subset, mapKeys);
               breadcrumbProps.push({
                 source: appState.source,
@@ -641,12 +682,10 @@ export default () => {
                 path: validSubpath,
                 onPathChange: handlePathChange,
               });
-              
+
             };
 
           }
-
-
 
         };
 
@@ -670,15 +709,15 @@ export default () => {
         }
 
         if (selected) {
-          labelProps[1].label = label1;
+          _labelProps[1].label = label1;
         }
 
         let minLegendVal = Number.MAX_VALUE;
         let maxLegendVal = Number.MIN_VALUE;
         if (selected) {
 
-          labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
-          labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
+          _labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
+          _labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
           const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
 
@@ -693,15 +732,15 @@ export default () => {
             }
           });
 
-          legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
-          legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
+          _legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
+          _legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
 
           const entry60 = dataSetting.getDataset().getEntryByInstant(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
           const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex());
           const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex());
 
-          courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
-          courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
+          _courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
+          _courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
 
         }
 
@@ -720,7 +759,7 @@ export default () => {
         const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
         const value07 = (value00 - valueM7) / valueM7;
         if (selected) {
-          indicatorProps.push({
+          userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             value00: indicatorPropsInstance.valueFormatter.format(value00),
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
@@ -735,16 +774,16 @@ export default () => {
               fold: appState.fold,
               onInstantChange: handleInstantChange
             }
-          });
+          };
         } else {
-          indicatorProps.push({
+          userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             value00: indicatorPropsInstance.valueFormatter.format(value00),
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand
-          });
+          };
 
         }
 
@@ -760,7 +799,7 @@ export default () => {
 
           // console.log(TimeUtil.formatCategoryDateFull(clampedInstant60), '-', TimeUtil.formatCategoryDateFull(clampedInstant00))
 
-          hexagonProps = {
+          _hexagonProps = {
             // onHover: setHovered,
             source: appState.source,
             name: keysetKeys[0],
@@ -787,7 +826,7 @@ export default () => {
                 return {
                   color: lookupState.color,
                   height: lookupState.height + ele
-                } 
+                }
               } else if (hexagon.luc === 1) { // 3d-chart
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
                 let lookupState = valueLookup['c' + hexagon.x];
@@ -807,11 +846,11 @@ export default () => {
                     }
                   }
                   valueLookup['c' + hexagon.x] = lookupState;
-                } 
+                }
                 return {
                   color: lookupState.color,
                   height: lookupState.height + ele
-                }                
+                }
               } else {
                 let lookupState = valueLookup[hexagon.gkz];
                 if (!lookupState) {
@@ -827,81 +866,112 @@ export default () => {
                     return defaultState;
                   }
                   valueLookup[hexagon.gkz] = lookupState;
-                } 
+                }
                 return {
                   color: lookupState.color,
                   height: lookupState.height + ele
                 }
               }
+
             },
             onHexagonsLoaded: handleHexagonsLoaded
           }
+
         }
 
-      };
-
-
-
-
-
-      /**
-       * actual update of user interface props
-       */
-      setUserInterfaceProps({
-        // ...userInterfaceProps,
-        indicatorProps,
-        navigationBotProps: {
-          ...userInterfaceProps.navigationBotProps,
-          instantProps
-        },
-        onDataPicked: handleIndicatorExpand,
-      });
-
-      /**
-      * update instant on control props
-      */
-      const controlsProps = {
-        ...mapProps.controlsProps,
-        stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp
       }
 
-      /**
-      * update stamps on all lights (triggering a shadow update)
-      */
-      const lightProps = mapProps.lightProps.map(props => {
-        return {
-          ...props,
-          stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp
-        }
-      });
+    };
 
-      // console.log('selectedE', selected1);
-      /**
-      * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
-      */
-      window.clearTimeout(updateMapTo);
-      setUpdateMapTo(window.setTimeout(() => {
-        setMapProps({
-          labelProps: [...labelProps],
-          legendLabelProps: { ...legendLabelProps },
-          courseLabelProps: { ...courseLabelProps },
-          hyperlinkProps: [...hyperlinkProps],
-          lightProps,
-          controlsProps,
-          hexagonProps: hexagonProps!
-        });
-      }, appState.action.updateDelay));
-
+    /**
+     * actual update of user interface props
+     */
+    setUserInterfaceProps({
+      ...userInterfaceProps,
+      // userInterfaceProps.indicatorProps,
+      navigationBotProps: {
+        ...userInterfaceProps.navigationBotProps,
+        instantProps
+      },
+      onDataPicked: handleIndicatorExpand,
     });
 
+    /**
+    * update instant on control props
+    */
+    const _controlProps = {
+      ...mapProps.controlsProps,
+      instant: instantProps.instantCur,
+      stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp,
+      onInstantChange: handleInstantChange
+    }
+      
 
+    /**
+    * update stamps on all lights (triggering a shadow update)
+    */
+    const _lightPropsFast = mapProps.lightProps.map(props => {
+      return {
+        ...props,
+        stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
+        shadowEnabled: false
+      }
+    });
+    const _lightPropsSlow = mapProps.lightProps.map(props => {
+      return {
+        ...props,
+        stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
+        shadowEnabled: true
+      }
+    });    
 
-  }, [appState.source, appState.action]);
+    if (appState.action.updateDelay > 0) {
+      setMapProps({
+        ...mapProps,
+        labelProps: _labelProps,
+        legendLabelProps: _legendLabelProps,
+        courseLabelProps: _courseLabelProps,
+        hexagonProps: _hexagonProps,
+        lightProps: _lightPropsFast,
+        controlsProps: _controlProps
+      });    
+    }
+
+    // console.log('selectedE', selected1);
+    /**
+    * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
+    */
+    window.clearTimeout(updateMapTo);
+    setUpdateMapTo(window.setTimeout(() => {
+      setMapProps({
+        ...mapProps,
+        labelProps: _labelProps,
+        legendLabelProps: _legendLabelProps,
+        courseLabelProps: _courseLabelProps,
+        hexagonProps: _hexagonProps,
+        lightProps: _lightPropsSlow,
+        controlsProps: _controlProps
+      });
+    }, appState.action.updateDelay));
+
+    // });
+
+  }, [appState]);
 
   useEffect(() => {
 
     console.log('✨ building app component');
     window.addEventListener('resize', handleResize);
+
+    let delay = 1;
+    userInterfaceProps.indicatorProps.forEach(props => {
+      setTimeout(() => {
+        DataRepository.getInstance().getOrLoadDataSetting(props.source).then(dataSetting => {
+          handleDataLoaded(props.source)
+        });
+      }, delay);
+      delay += 500;
+    });
 
   }, []);
 

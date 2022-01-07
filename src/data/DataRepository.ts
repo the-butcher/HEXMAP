@@ -31,9 +31,9 @@ export class DataRepository {
     this.dataSettings = {};
   }
 
-  async getOrBuild(source: string, minInstant: number, maxInstant: number): Promise<IChartData> {
+  getChartData(source: string, minInstant: number, maxInstant: number): IChartData {
 
-    const dataSetting = await this.getOrLoadDataSetting(source);
+    const dataSetting = this.getDataSetting(source);
 
     const keysetKeys = dataSetting.getDataset().getKeysetKeys(); // Object.keys(data.keys);
     let dataPointer: string = '';
@@ -109,11 +109,20 @@ export class DataRepository {
 
   }
 
+  getDataSetting(source: string): IDataSetting {
+
+    // console.log('get-------------data', source);
+    return this.dataSettings[source];
+  }
+  
   async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
+
+    // console.log('get-or-load (wait)', source);
     if (!this.dataSettings[source]) {
       const dataRoot: IDataRoot = await new JsonLoader().load(source);
       this.dataSettings[source] = new DataSetting(new Dataset(dataRoot));
     }
+    // console.log('get-or-load (done)', source);
     return this.dataSettings[source];
   }
 
