@@ -217,7 +217,7 @@ export default (props: IUserInterfaceProps) => {
 
   const mobileView = window.innerWidth <= 900;
   const handleExpand = (index: number) => {
-    indicatorProps[index].onExpand(indicatorProps[index].source);
+    indicatorProps[index].onExpand(indicatorProps[index].id);
   }  
 
   const buttons: JSX.Element[] = [];
@@ -228,7 +228,7 @@ export default (props: IUserInterfaceProps) => {
     if (indicatorProps[i].fold !== 'closed') {
       activeIndicatorSource = indicatorProps[i].source;
     }
-    buttons.push(<Button key={ indicatorProps[i].source } style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={ () => handleExpand(i) }>{ indicatorProps[i].desc }</Button>);
+    buttons.push(<Button key={ `expandmobile_${indicatorProps[i].id}` } style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={ () => handleExpand(i) }>{ indicatorProps[i].desc }</Button>);
   }
 
   // console.log('active source', indicatorProps[activeIndicatorIndex]);
@@ -242,7 +242,7 @@ export default (props: IUserInterfaceProps) => {
       </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div> }
       <div style={{ width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
         <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
-          { indicatorProps.map(props => <IndicatorComponent key={ props.source } {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />) }
+          { indicatorProps.map(props => <IndicatorComponent key={ `indicator_${props.id}` } {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />) }
         </div>
       </div>
       <Paper elevation={4} style={{ overflow: 'unset', width: 'calc(100%-24px)', display: 'flex', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '40px', padding: '0px', margin: '0px' }} >

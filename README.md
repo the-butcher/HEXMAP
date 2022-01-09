@@ -1,9 +1,7 @@
 # Issues in Hexmap
 - find a way to add mortality as datasource
 - move base config to file (maybe multiple files)
-- in municipality mode only municipalities of the respective province are shown
-- restore map props rebuild so delayed map props build is possible again
-- first chart shows only after another path is chosen
+- in municipality mode only municipalities of the respective province are outlined
 
 # later
 - logarithmic option in chart
@@ -11,6 +9,8 @@
 - export options for chart, map, data
 
 # solved
+- ~~restore map props rebuild so delayed map props build is possible again~~
+- ~~first chart shows only after another path is chosen~~
 - ~~adapt date slider tooltip to match chart tooltip~~
 - ~~think about how a case-stepline could be implemented~~
 - ~~boundaries have offsets in many places~~

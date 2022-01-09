@@ -1,10 +1,10 @@
-import { height } from '@mui/lab/node_modules/@mui/system';
-import { color } from '@mui/system';
 import { useEffect, useState } from 'react';
+import ChartComponent from './components/ChartComponent';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
+import { IChartProps } from './components/IChartProps';
 import { IHexagonsProps } from './components/IHexagonsProps';
 import { IHexagonState } from './components/IHexagonState';
-import { IIndicatorProps, INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
+import { INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { ILegendProps } from './components/ILegendProps';
 import { IMapProps } from './components/IMapProps';
@@ -13,8 +13,6 @@ import MapComponent from './components/MapComponent';
 import UserInterfaceComponent from './components/UserInterfaceComponent';
 import { DataRepository } from './data/DataRepository';
 import { HexagonRepository } from './data/HexagonRepository';
-import { IDataRoot } from './data/IDataRoot';
-import { IDataSetting } from './data/IDataSetting';
 import { IAppState } from './IAppState';
 import { Color } from './util/Color';
 import { ColorUtil } from './util/ColorUtil';
@@ -86,11 +84,12 @@ export default () => {
 
   }
 
-  const handleIndicatorExpand = async (source: string) => {
+  const handleIndicatorExpand = async (id: string) => {
 
-    console.log('📞 handling indicator fold', source);
+    console.log('📞 handling indicator fold', id);
 
-    const isSourceChange = source !== appState.source;
+    const indicatorProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
+    const isSourceChange = indicatorProps.source !== appState.source;
     let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
 
@@ -99,7 +98,7 @@ export default () => {
       // get previous settings
       const prevSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
       // get the settings that we are about to switch to
-      const nextSettings = await DataRepository.getInstance().getOrLoadDataSetting(source);
+      const nextSettings = await DataRepository.getInstance().getOrLoadDataSetting(indicatorProps.source);
 
       // validate instant and apply
       nextSettings.setInstant(prevSettings.getInstant());
@@ -108,7 +107,7 @@ export default () => {
 
     setAppState({
       ...appState,
-      source,
+      source: indicatorProps.source,
       // instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
       action: {
         stamp: ObjectUtil.createId(),
@@ -119,6 +118,35 @@ export default () => {
       fold
     });
 
+  }
+
+  const [exportableChart, setExportableChart] = useState<IChartProps>();
+  const handleIndicatorExport = async (id: string) => {
+
+    console.log('📞 handling indicator export', id);
+
+    const exportableChartProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
+
+    // console.log('exportableChartProps', exportableChartProps);
+
+    // setAppState({
+    //   ...appState,
+    //   source: indicatorProps.source,
+    //   // instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
+    //   action: {
+    //     stamp: ObjectUtil.createId(),
+    //     updateScene: false,
+    //     updateLight: false,
+    //     updateDelay: 0
+    //   }
+    // });
+
+    setExportableChart({
+      ...exportableChartProps,
+      id: ObjectUtil.createId(),
+      doExport: true
+    });
+    
   }
 
   const handleIndxChange = async (source: string, name: string, indexRaw: string) => {
@@ -153,18 +181,25 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
-        updateDelay: 250
+        updateDelay: 0
       },
     });
 
   };
 
+  const interpolatedEle7di5 = new InterpolatedValue(0, 80, 0, 20000, 1.00);
+  const interpolatedEle7di3 = new InterpolatedValue(0, 80, 0, 14000, 1.00);
+  const interpolatedEle7di1 = new InterpolatedValue(0, 80, 0, 8000, 1.00);
+  const interpolatedHue7di5 = new InterpolatedValue(0.25, -0.01, 0, 5000, 0.33);
+  const interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
+  const interpolatedHue7di1 = new InterpolatedValue(0.25, -0.01, 0, 2000, 0.33);
 
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
       // {
+      //   id: 'i_sbg',
       //   date: '',
       //   name: 'Inzidenz',
       //   desc: 'Salzburger Gemeinden',
@@ -172,16 +207,18 @@ export default () => {
       //   value07: '',
       //   valueFormatter: FormattingDefinition.FORMATTER____FIXED,
       //   onExpand: handleIndicatorExpand,
+      //   onExport: handleIndicatorExport,
       //   fold: 'open-horizontal',
       //   source: './hexmap-data-salzburg-gemeinde.json',
       //   loaded: false,
       //   path: '',
       //   breadcrumbProps: [],
-      //   interpolatedEle: new InterpolatedValue(0, 50, 0, 12000, 1),
-      //   interpolatedHue: new InterpolatedValue(0.25, -0.05, 0, 3000, 0.33),
+      //   interpolatedEle: interpolatedEle7di5,
+      //   interpolatedHue: interpolatedHue7di5,
       //   interpolatedSat: new FixedValue(1.00),
       //   interpolatedVal: new FixedValue(0.40),
       //   chartProps: {
+      //     id: 'i_sbg',
       //     title: '7-Tages Inzidenz',
       //     source: './hexmap-data-salzburg-gemeinde.json',
       //     path: '',
@@ -189,8 +226,9 @@ export default () => {
       //     fold: 'open-horizontal',
       //     onInstantChange: handleInstantChange
       //   }
-      // },                 
+      // },
       {
+        id: 'i_ems',
         date: '##.##.####',
         name: 'Inzidenz',
         desc: 'EMS',
@@ -198,26 +236,21 @@ export default () => {
         value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
+        onInstantChange: handleInstantChange,
+        onExport: handleIndicatorExport,
+        doExport: false,
         fold: 'open-horizontal',
         source: './hexmap-data-ems.json',
         loaded: false,
         path: '',
         breadcrumbProps: [],
-        // interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 1000, 0.33),
-        interpolatedHue: new InterpolatedValue(0.25, -0.10, 0, 5000, 0.33),
+        interpolatedEle: interpolatedEle7di1,
+        interpolatedHue: interpolatedHue7di1,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedEle: new InterpolatedValue(0, 200, 0, 12000, 1),
-        chartProps: {
-          title: '7-Tages Inzidenz',
-          source: './hexmap-data-ems.json',
-          path: '#',
-          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-          fold: 'open-horizontal',
-          onInstantChange: handleInstantChange
-        }
+        interpolatedVal: new FixedValue(0.40)
       },
       {
+        id: 'i_paa',
         date: '##.##.####',
         name: 'Inzidenz',
         desc: 'Bundesland und Alter',
@@ -225,25 +258,21 @@ export default () => {
         value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
+        onInstantChange: handleInstantChange,
+        onExport: handleIndicatorExport,
+        doExport: false,
         fold: 'closed',
         source: './hexmap-data-bundesland-alter.json',
         loaded: false,
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedEle: interpolatedEle7di1,
+        interpolatedHue: interpolatedHue7di1,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
-        chartProps: {
-          title: '7-Tages Inzidenz',
-          source: './hexmap-data-bundesland-alter.json',
-          path: '',
-          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-          fold: 'closed',
-          onInstantChange: handleInstantChange
-        }
+        interpolatedVal: new FixedValue(0.40)
       },
       {
+        id: 'i_dst',
         date: '##.##.####',
         name: 'Inzidenz',
         desc: 'Bezirk',
@@ -251,25 +280,21 @@ export default () => {
         value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
+        onInstantChange: handleInstantChange,
+        onExport: handleIndicatorExport,
+        doExport: false,
         fold: 'closed',
         source: './hexmap-data-bundesland-bezirk.json',
         loaded: false,
         path: '',
         breadcrumbProps: [],
-        interpolatedHue: new InterpolatedValue(0.25, 0.00, 0, 400, 1),
+        interpolatedEle: interpolatedEle7di3,
+        interpolatedHue: interpolatedHue7di3,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedEle: new InterpolatedValue(0, 50, 0, 3000, 1),
-        chartProps: {
-          title: '7-Tages Inzidenz',
-          source: './hexmap-data-bundesland-bezirk.json',
-          path: '',
-          valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-          fold: 'closed',
-          onInstantChange: handleInstantChange
-        }
+        interpolatedVal: new FixedValue(0.40)
       },
       {
+        id: 'v_mnc',
         date: '##.##.####',
         name: 'Impfung',
         desc: 'Gemeinde',
@@ -277,23 +302,18 @@ export default () => {
         value07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
         valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
         onExpand: handleIndicatorExpand,
+        onInstantChange: handleInstantChange,
+        onExport: handleIndicatorExport,
+        doExport: false,
         fold: 'closed',
         source: './hexmap-data-vacc-gemeinde.json',
         loaded: false,
         path: '',
         breadcrumbProps: [],
+        interpolatedEle: new InterpolatedValue(-10, 20, 0.00, 1.00, 1),
         interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.5, 0.9, 1),
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedEle: new InterpolatedValue(-10, 20, 0.00, 1.00, 1),
-        chartProps: {
-          title: 'Impfquote',
-          source: './hexmap-data-vacc-gemeinde.json',
-          path: '',
-          valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
-          fold: 'closed',
-          onInstantChange: handleInstantChange
-        }
+        interpolatedVal: new FixedValue(0.40)
       }
     ],
     navigationBotProps: {
@@ -471,7 +491,7 @@ export default () => {
     hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        label: 'https://fitforfire.github.io/covid-sbg/#/', // 'https://www.data.gv.at/covid-19/',
+        label: 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/', // 
         size: 3,
         position: {
           x: -202,
@@ -523,6 +543,7 @@ export default () => {
     });
   }, [dimensions]);
 
+
   const indicatorProps = userInterfaceProps.indicatorProps[0];
   const [appState, setAppState] = useState<IAppState>({
     source: indicatorProps.source,
@@ -563,13 +584,13 @@ export default () => {
     });
     const _legendLabelProps: ILegendProps = {
       ...mapProps.legendLabelProps,
-      min: {...mapProps.legendLabelProps.min},
-      max: {...mapProps.legendLabelProps.max},
+      min: { ...mapProps.legendLabelProps.min },
+      max: { ...mapProps.legendLabelProps.max },
     }
     const _courseLabelProps: ILegendProps = {
       ...mapProps.courseLabelProps,
-      min: {...mapProps.courseLabelProps.min},
-      max: {...mapProps.courseLabelProps.max},
+      min: { ...mapProps.courseLabelProps.min },
+      max: { ...mapProps.courseLabelProps.max },
     }
     let _hexagonProps: IHexagonsProps = {
       ...mapProps.hexagonProps
@@ -768,12 +789,8 @@ export default () => {
             fold: appState.fold,
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
             onExpand: handleIndicatorExpand,
-            chartProps: {
-              ...indicatorPropsInstance.chartProps,
-              path: valueKey,
-              fold: appState.fold,
-              onInstantChange: handleInstantChange
-            }
+            onExport: handleIndicatorExport,
+            onInstantChange: handleInstantChange
           };
         } else {
           userInterfaceProps.indicatorProps[i] = {
@@ -782,7 +799,9 @@ export default () => {
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
             date: TimeUtil.formatCategoryDateFull(clampedInstant00),
-            onExpand: handleIndicatorExpand
+            onExpand: handleIndicatorExpand,
+            onExport: handleIndicatorExport,
+            onInstantChange: handleInstantChange
           };
 
         }
@@ -905,7 +924,7 @@ export default () => {
       stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp,
       onInstantChange: handleInstantChange
     }
-      
+
 
     /**
     * update stamps on all lights (triggering a shadow update)
@@ -923,7 +942,7 @@ export default () => {
         stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
         shadowEnabled: true
       }
-    });    
+    });
 
     if (appState.action.updateDelay > 0) {
       setMapProps({
@@ -934,7 +953,7 @@ export default () => {
         hexagonProps: _hexagonProps,
         lightProps: _lightPropsFast,
         controlsProps: _controlProps
-      });    
+      });
     }
 
     // console.log('selectedE', selected1);
@@ -979,6 +998,9 @@ export default () => {
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
       <MapComponent {...mapProps} />
       <UserInterfaceComponent {...userInterfaceProps} />
+      {
+        exportableChart ? <ChartComponent key={ObjectUtil.createId()} {...exportableChart} style={{ width: '1200px', height: '675px' }} /> : null
+      }
     </div>
   );
 

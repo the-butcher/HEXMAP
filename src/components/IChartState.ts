@@ -1,5 +1,6 @@
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
+import * as am5exporting from "@amcharts/amcharts5/plugins/exporting";
 
 /**
  * definition for state in the chart-component
@@ -8,6 +9,8 @@ import * as am5xy from '@amcharts/amcharts5/xy';
  * @since 06.01.2021
 . */
 export class IChartState {
+
+    root: am5.Root;
 
     /**
      * the chart itself
@@ -23,12 +26,14 @@ export class IChartState {
      * the renderers of the respective axes
      */
     xAxisVal: am5xy.DateAxis<am5xy.AxisRendererX>;
-    yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY>;
+    yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY>; 
 
     /**
      * label of the respective axes
      */
     xAxisLabel: am5.Label;
     yAxisLabel: am5.Label;
+
+    exporting: am5exporting.Exporting; 
 
 }

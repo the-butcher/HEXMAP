@@ -84,7 +84,7 @@ export default (props: IControlsProps) => {
 
                 setSreenshotRequested(true);
                 invalidate();
-                incrementInstant();
+                // incrementInstant();
 
                 // controls.current.minAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36,
                 // controls.current.maxAzimuthAngle = controls.current.getAzimuthalAngle() + Math.PI / 36;
@@ -117,7 +117,7 @@ export default (props: IControlsProps) => {
         gl.render(scene, camera);
 
         gl.domElement.toBlob(
-            function (blob) {
+            blob => {
                 var a = document.createElement('a');
                 var url = URL.createObjectURL(blob);
                 a.href = url;

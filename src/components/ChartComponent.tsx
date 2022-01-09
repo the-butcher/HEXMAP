@@ -1,10 +1,13 @@
 import * as am5 from '@amcharts/amcharts5';
+import { IExportingFormatOptions, IExportingImageOptions } from '@amcharts/amcharts5/.internal/plugins/exporting/Exporting';
 import am5locales_de_DE from '@amcharts/amcharts5/locales/de_DE';
+import * as am5exporting from "@amcharts/amcharts5/plugins/exporting";
 import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
+import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import { IChartProps } from './IChartProps';
 import { IChartState } from './IChartState';
@@ -18,7 +21,7 @@ export default (props: IChartProps) => {
   const fontFamily = 'Courier Prime Sans';
   const fontColor = 0xc1c1aa;
 
-  const { source, path, fold, onInstantChange } = props;
+  const { id, source, path, fold, name, date, doExport, onInstantChange } = props;
 
   const [chartState, setChartState] = useState<IChartState>();
 
@@ -37,22 +40,22 @@ export default (props: IChartProps) => {
     const labelColor = am5.color(fontColor);
     const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
 
-    const root = am5.Root.new('chartdiv_' + source);
-    root.setThemes([
-      am5themes_Dark.new(root)
+    const _root = am5.Root.new(`chartdiv_${id}`);
+    _root.setThemes([
+      am5themes_Dark.new(_root)
     ]);
-    root.numberFormatter.set('numberFormat', props.valueFormatter.chartFormat);
-    root.dateFormatter.set('dateFormat', 'dd.MM.yyyy');
-    root.locale = am5locales_de_DE;
+    _root.numberFormatter.set('numberFormat', props.valueFormatter.chartFormat);
+    _root.dateFormatter.set('dateFormat', 'dd.MM.yyyy');
+    _root.locale = am5locales_de_DE;
 
-    const _chart = root.container.children.push(
-      am5xy.XYChart.new(root, {
+    const _chart = _root.container.children.push(
+      am5xy.XYChart.new(_root, {
         panX: false,
         panY: false,
         // wheelX: 'panX',
         wheelY: 'zoomX',
 
-        layout: root.verticalLayout,
+        layout: _root.verticalLayout,
         stateAnimationDuration: 0,
         paddingTop: 8,
         paddingRight: 5,
@@ -61,14 +64,14 @@ export default (props: IChartProps) => {
       })
     );
 
-    const yRendererVal = am5xy.AxisRendererY.new(root, {});
+    const yRendererVal = am5xy.AxisRendererY.new(_root, {});
     yRendererVal.labels.template.setAll({
       fontFamily,
       fontSize: 10,
       fill: labelColor,
       // text: `{valueY.formatNumber('${props.valueFormatter.chartFormat}')}`          
     });
-    const _yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY> = _chart.yAxes.push(am5xy.ValueAxis.new(root, {
+    const _yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY> = _chart.yAxes.push(am5xy.ValueAxis.new(_root, {
       renderer: yRendererVal,
       interpolationDuration: 0,
       stateAnimationDuration: 0,
@@ -79,8 +82,8 @@ export default (props: IChartProps) => {
       // treatZeroAs: 0.000001,            
       // min: 1
     }));
-    const _yAxisLabel = am5.Label.new(root, {
-      text: props.title,
+    const _yAxisLabel = am5.Label.new(_root, {
+      text: name,
       rotation: -90,
       y: am5.p50,
       centerX: am5.p50,
@@ -94,8 +97,8 @@ export default (props: IChartProps) => {
       paddingLeft: 0
     });
     _yAxisVal.children.moveValue(_yAxisLabel, 0);
-    _yAxisLabel?.set('visible', fold === 'open-vertical');
-    _yAxisVal?.set('visible', fold === 'open-vertical');
+    _yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+    _yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
 
     const dateFormats = {
       day: 'dd.MM.yyyy',
@@ -104,7 +107,7 @@ export default (props: IChartProps) => {
       year: 'dd.MM.yyyy'
     }
 
-    const xRendererVal = am5xy.AxisRendererX.new(root, {
+    const xRendererVal = am5xy.AxisRendererX.new(_root, {
       // pan: 'zoom',
     });
     xRendererVal.labels.template.setAll({
@@ -117,18 +120,19 @@ export default (props: IChartProps) => {
       paddingBottom: 0
       // inside: true
     });
-    const _xAxisVal: am5xy.DateAxis<am5xy.AxisRendererX> = _chart.xAxes.push(am5xy.DateAxis.new(root, {
+    const _xAxisVal: am5xy.DateAxis<am5xy.AxisRendererX> = _chart.xAxes.push(am5xy.DateAxis.new(_root, {
       maxDeviation: 0.2,
       baseInterval: {
         timeUnit: 'day',
         count: 1
       },
       renderer: xRendererVal,
-      tooltip: am5.Tooltip.new(root, {}),
+      tooltip: am5.Tooltip.new(_root, {}),
       dateFormats,
-      periodChangeDateFormats: dateFormats
+      periodChangeDateFormats: dateFormats,
+      exportable: true
     }));
-    const _xAxisLabel = am5.Label.new(root, {
+    const _xAxisLabel = am5.Label.new(_root, {
       text: 'Datum',
       x: am5.p50,
       centerX: am5.p50,
@@ -141,15 +145,31 @@ export default (props: IChartProps) => {
       paddingLeft: 0
     });
     _xAxisVal.children.moveValue(_xAxisLabel, 1);
-    _xAxisLabel?.set('visible', fold === 'open-vertical');
+    _xAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+
+    let _chartTitle = am5.Label.new(_root, {
+      text: `${ObjectUtil.buildIndicatorTitle(props)}, ${ObjectUtil.buildBreadcrumbTitle(props.breadcrumbProps)}`,
+      fontFamily,
+      fill: labelColor,
+      fontSize: 10,
+      x: am5.p50,
+      centerX: am5.p50
+    });
+    _chart.children.moveValue(_chartTitle, 0);
+    _chartTitle?.set('visible', doExport);
+
+    let _exporting = am5exporting.Exporting.new(_root, {});
+
 
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-    var cursor = _chart.set('cursor', am5xy.XYCursor.new(root, {
-      behavior: 'none'
+    let cursor = _chart.set('cursor', am5xy.XYCursor.new(_root, {
+      behavior: 'none',
+      alwaysShow: doExport,
+      exportable: true
     }));
     cursor.lineY.set('visible', false);
 
-    const tooltip = _xAxisVal.get('tooltip')!; // xAxisVal.get('tooltip')!;
+    const tooltip = _xAxisVal.get('tooltip')!;
     tooltip.setAll({
       paddingTop: 1,
       paddingRight: 2,
@@ -157,7 +177,8 @@ export default (props: IChartProps) => {
       paddingLeft: 2,
       getFillFromSprite: false,
       getStrokeFromSprite: false,
-      getLabelFillFromSprite: false
+      getLabelFillFromSprite: false,
+      exportable: true
     });
     tooltip.label.setAll({
       fontFamily,
@@ -195,7 +216,7 @@ export default (props: IChartProps) => {
         seriesClass = am5xy.StepLineSeries;
       }
 
-      const seriesVal = _chart.series.push(seriesClass.new(root, {
+      const seriesVal = _chart.series.push(seriesClass.new(_root, {
         name: `seriesVal_${valueIndex}`,
         xAxis: _xAxisVal,
         yAxis: _yAxisVal,
@@ -203,7 +224,7 @@ export default (props: IChartProps) => {
         valueXField: 'instant',
         interpolationDuration: 0,
         sequencedInterpolation: false,
-        tooltip: am5.Tooltip.new(root, {}),
+        tooltip: am5.Tooltip.new(_root, {}),
         stroke: am5.color(fontColor),
         fill: am5.color(fontColor),
       }));
@@ -229,6 +250,7 @@ export default (props: IChartProps) => {
         getFillFromSprite: false,
         getStrokeFromSprite: false,
         getLabelFillFromSprite: false,
+        exportable: true
       });
       tooltip.label.setAll({
         fill: labelColor,
@@ -283,25 +305,78 @@ export default (props: IChartProps) => {
 
     // write to state
     setChartState({
+      root: _root,
       chart: _chart,
       series: _series,
       xAxisLabel: _xAxisLabel,
       yAxisLabel: _yAxisLabel,
       xAxisVal: _xAxisVal,
-      yAxisVal: _yAxisVal
+      yAxisVal: _yAxisVal,
+      exporting: _exporting
     });
 
     _xAxisVal.data.setAll([]);
+
+    // https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/
+    if (doExport) {
+
+
+      const cursorInstant = TimeUtil.parseCategoryDateFull(date);
+
+      let exportChartTo = -1;
+      const frameendedDisposer = _root.events.on('frameended', () => {
+
+        const positionXDest = _xAxisVal.valueToPosition(cursorInstant);
+        const positionXCurr = cursor.getPrivate('positionX');
+        if (positionXDest != positionXCurr) {
+
+          console.log('positionXDest', positionXDest);
+          cursor.set('positionX', positionXDest);
+
+        } else {
+
+          window.clearTimeout(exportChartTo);
+          exportChartTo = window.setTimeout(() => {
+
+            frameendedDisposer.dispose();
+
+            const formatOption: IExportingImageOptions = {
+              minWidth: 1200,
+              maxWidth: 1200,
+              minHeight: 675,
+              maxHeight: 675
+            }
+            _exporting.export("png", formatOption).then(imgData => {
+
+              // console.log('imgData', imgData);
+              var a = document.createElement('a');
+              var url = imgData;
+              a.href = url;
+              a.download = `chart____${Date.now()}`;
+              a.click();
+
+            });
+
+          }, 500);
+
+        }
+
+      });
+
+    };
+
+
 
     console.log('🕓 updating chart component (done)', Date.now() - tsA);
 
   }, []);
 
+
   const updatePath = (chartState: IChartState) => {
 
     const handleClick = () => {
       let cursor = chartState.chart.get('cursor');
-      const axisPosition = chartState.xAxisVal.toAxisPosition(cursor.getPrivate("positionX"));
+      const axisPosition = chartState.xAxisVal.toAxisPosition(cursor.getPrivate('positionX'));
       const date = chartState.xAxisVal.positionToDate(axisPosition);
       handleInstantChange(date.getTime());
     }
@@ -326,9 +401,9 @@ export default (props: IChartProps) => {
 
   const updateFold = (chartState: IChartState) => {
 
-    chartState.xAxisLabel?.set('visible', fold === 'open-vertical');
-    chartState.yAxisLabel?.set('visible', fold === 'open-vertical');
-    chartState.yAxisVal?.set('visible', fold === 'open-vertical');
+    chartState.xAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+    chartState.yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+    chartState.yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
 
   };
 
@@ -356,14 +431,16 @@ export default (props: IChartProps) => {
 
     console.log('🔧 updating chart component (chartState)', props);
     if (chartState) {
+
       updatePath(chartState);
       updateFold(chartState);
+
     }
 
   }, [chartState]);
 
   return (
-    <div id={'chartdiv_' + source} style={props.style} />
+    <div id={`chartdiv_${id}`} style={props.style} />
   )
 
 }

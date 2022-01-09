@@ -163,10 +163,10 @@ export default (props: IHexagonsProps) => {
 
   }, [props.stamp]);
 
-  let handlePointerUp = (e: ThreeEvent<PointerEvent>) => { // 
+  let handleClick = (e: ThreeEvent<PointerEvent>) => { // 
 
     e.stopPropagation();
-    if (e.instanceId) {
+    if (e.instanceId && e.delta < 5) {
       const hexagonValue = HexagonRepository.getInstance().getHexagon(e.instanceId);
       if (hexagonValue.luc >= 100) {
         const path = props.getPath(hexagonValue);
@@ -180,7 +180,7 @@ export default (props: IHexagonsProps) => {
   }
 
   return (
-    <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onPointerUp={handlePointerUp}>
+    <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onClick={handleClick}>
       <bufferGeometry ref={geomRef}>
         <instancedBufferAttribute attachObject={['attributes', 'color']} args={[colorArray, 3]}></instancedBufferAttribute>
       </bufferGeometry>
