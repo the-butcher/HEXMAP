@@ -34,10 +34,10 @@ export default () => {
    */
   const handleInstantChange = async (instant: number) => {
 
-    console.log('📞 handling instant change', instant);
+    console.log('📞 handling instant change', TimeUtil.formatCategoryDateFull(instant));
 
-    const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    dataSettings.setInstant(instant);
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSetting.setInstant(instant);
 
     setAppState({
       ...appState,
@@ -50,6 +50,35 @@ export default () => {
     });
 
   }
+
+  const handleInstantRangeChange = async (instantMin: number, instantMax: number) => {
+
+    console.log('📞 handling instant range change', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax), appState.source);
+
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    if (instantMin) {
+      // dataSetting.setInstantMin(instantMin);
+      userInterfaceProp.instantMin = instantMin;
+    }
+    if (instantMax) {
+      // dataSetting.setInstantMax(instantMax);
+      userInterfaceProp.instantMax = instantMax;
+    }
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 250
+      }
+    });
+
+
+  }
+
 
   const handleHexagonsLoaded = () => {
 
@@ -86,10 +115,11 @@ export default () => {
 
   const handleIndicatorExpand = async (id: string) => {
 
-    console.log('📞 handling indicator fold', id);
-
     const indicatorProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
     const isSourceChange = indicatorProps.source !== appState.source;
+
+    console.log('📞 handling indicator fold', id, appState.source, ' >> ', indicatorProps.source);
+
     let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
 
@@ -126,27 +156,12 @@ export default () => {
     console.log('📞 handling indicator export', id);
 
     const exportableChartProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
-
-    // console.log('exportableChartProps', exportableChartProps);
-
-    // setAppState({
-    //   ...appState,
-    //   source: indicatorProps.source,
-    //   // instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
-    //   action: {
-    //     stamp: ObjectUtil.createId(),
-    //     updateScene: false,
-    //     updateLight: false,
-    //     updateDelay: 0
-    //   }
-    // });
-
     setExportableChart({
       ...exportableChartProps,
       id: ObjectUtil.createId(),
       doExport: true
     });
-    
+
   }
 
   const handleIndxChange = async (source: string, name: string, indexRaw: string) => {
@@ -200,14 +215,19 @@ export default () => {
     indicatorProps: [
       // {
       //   id: 'i_sbg',
-      //   date: '',
+      //   instant: -1,
+      //   instantMin: -1,
+      //   instantMax: -1,
       //   name: 'Inzidenz',
       //   desc: 'Salzburger Gemeinden',
       //   value00: '',
       //   value07: '',
       //   valueFormatter: FormattingDefinition.FORMATTER____FIXED,
       //   onExpand: handleIndicatorExpand,
+      //   onInstantChange: handleInstantChange,
+      //   onInstantRangeChange: handleInstantRangeChange,
       //   onExport: handleIndicatorExport,
+      //   doExport: false,
       //   fold: 'open-horizontal',
       //   source: './hexmap-data-salzburg-gemeinde.json',
       //   loaded: false,
@@ -217,19 +237,12 @@ export default () => {
       //   interpolatedHue: interpolatedHue7di5,
       //   interpolatedSat: new FixedValue(1.00),
       //   interpolatedVal: new FixedValue(0.40),
-      //   chartProps: {
-      //     id: 'i_sbg',
-      //     title: '7-Tages Inzidenz',
-      //     source: './hexmap-data-salzburg-gemeinde.json',
-      //     path: '',
-      //     valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-      //     fold: 'open-horizontal',
-      //     onInstantChange: handleInstantChange
-      //   }
       // },
       {
         id: 'i_ems',
-        date: '##.##.####',
+        instant: -1,
+        instantMin: -1,
+        instantMax: -1,
         name: 'Inzidenz',
         desc: 'EMS',
         value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -237,6 +250,7 @@ export default () => {
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         onInstantChange: handleInstantChange,
+        onInstantRangeChange: handleInstantRangeChange,
         onExport: handleIndicatorExport,
         doExport: false,
         fold: 'open-horizontal',
@@ -251,7 +265,9 @@ export default () => {
       },
       {
         id: 'i_paa',
-        date: '##.##.####',
+        instant: -1,
+        instantMin: -1,
+        instantMax: -1,
         name: 'Inzidenz',
         desc: 'Bundesland und Alter',
         value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -259,6 +275,7 @@ export default () => {
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         onInstantChange: handleInstantChange,
+        onInstantRangeChange: handleInstantRangeChange,
         onExport: handleIndicatorExport,
         doExport: false,
         fold: 'closed',
@@ -273,7 +290,9 @@ export default () => {
       },
       {
         id: 'i_dst',
-        date: '##.##.####',
+        instant: -1,
+        instantMin: -1,
+        instantMax: -1,
         name: 'Inzidenz',
         desc: 'Bezirk',
         value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -281,6 +300,7 @@ export default () => {
         valueFormatter: FormattingDefinition.FORMATTER____FIXED,
         onExpand: handleIndicatorExpand,
         onInstantChange: handleInstantChange,
+        onInstantRangeChange: handleInstantRangeChange,
         onExport: handleIndicatorExport,
         doExport: false,
         fold: 'closed',
@@ -295,7 +315,9 @@ export default () => {
       },
       {
         id: 'v_mnc',
-        date: '##.##.####',
+        instant: -1,
+        instantMin: -1,
+        instantMax: -1,
         name: 'Impfung',
         desc: 'Gemeinde',
         value00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
@@ -303,6 +325,7 @@ export default () => {
         valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
         onExpand: handleIndicatorExpand,
         onInstantChange: handleInstantChange,
+        onInstantRangeChange: handleInstantRangeChange,
         onExport: handleIndicatorExport,
         doExport: false,
         fold: 'closed',
@@ -311,14 +334,14 @@ export default () => {
         path: '',
         breadcrumbProps: [],
         interpolatedEle: new InterpolatedValue(-10, 20, 0.00, 1.00, 1),
-        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.5, 0.9, 1),
+        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.60, 0.80, 1),
         interpolatedSat: new FixedValue(1.00),
         interpolatedVal: new FixedValue(0.40)
       }
     ],
     navigationBotProps: {
       instantProps: {
-        instantCur: instant,
+        instant: instant,
         instantMin: TimeUtil.parseCategoryDateFull('01.03.2020'),
         instantMax: instant,
         onInstantChange: handleInstantChange
@@ -332,6 +355,7 @@ export default () => {
       {
         id: ObjectUtil.createId(),
         stamp: ObjectUtil.createId(),
+        intensity: 1.25,
         position: {
           x: 300,
           y: 200,
@@ -342,6 +366,7 @@ export default () => {
       {
         id: ObjectUtil.createId(),
         stamp: ObjectUtil.createId(),
+        intensity: 1.25,
         position: {
           x: -300,
           y: 200,
@@ -601,7 +626,7 @@ export default () => {
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
       const selected = indicatorPropsInstance.source === appState.source;
       if (dataSetting && selected) {
-        instantProps.instantCur = dataSetting.getInstant();
+        instantProps.instant = dataSetting.getInstant();
       }
     }
     let mapKeys: string[] = [];
@@ -618,7 +643,7 @@ export default () => {
         const selected = indicatorPropsInstance.source === appState.source;
 
         // current instant (closest to date slider date - and date slider will be move to that instant upon update)
-        const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instantCur);
+        const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instant);
 
         // one week offset (for "vorwoche" value)
         const clampedInstant07 = dataSetting.getDataset().getValidInstant(clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
@@ -787,10 +812,13 @@ export default () => {
             breadcrumbProps: breadcrumbProps,
             path: valueKey,
             fold: appState.fold,
-            date: TimeUtil.formatCategoryDateFull(clampedInstant00),
+            instant: clampedInstant00,
+            // instantMin: dataSetting.getInstantMin(),
+            // instantMax: dataSetting.getInstantMax(),
             onExpand: handleIndicatorExpand,
             onExport: handleIndicatorExport,
-            onInstantChange: handleInstantChange
+            onInstantChange: handleInstantChange,
+            onInstantRangeChange: handleInstantRangeChange
           };
         } else {
           userInterfaceProps.indicatorProps[i] = {
@@ -798,10 +826,13 @@ export default () => {
             value00: indicatorPropsInstance.valueFormatter.format(value00),
             value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
-            date: TimeUtil.formatCategoryDateFull(clampedInstant00),
+            instant: clampedInstant00,
+            // instantMin: dataSetting.getInstantMin(),
+            // instantMax: dataSetting.getInstantMax(),
             onExpand: handleIndicatorExpand,
             onExport: handleIndicatorExport,
-            onInstantChange: handleInstantChange
+            onInstantChange: handleInstantChange,
+            onInstantRangeChange: handleInstantRangeChange
           };
 
         }
@@ -920,11 +951,10 @@ export default () => {
     */
     const _controlProps = {
       ...mapProps.controlsProps,
-      instant: instantProps.instantCur,
+      instant: instantProps.instant,
       stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp,
-      onInstantChange: handleInstantChange
+      onInstantChange: handleInstantChange,
     }
-
 
     /**
     * update stamps on all lights (triggering a shadow update)
@@ -999,10 +1029,11 @@ export default () => {
       <MapComponent {...mapProps} />
       <UserInterfaceComponent {...userInterfaceProps} />
       {
-        exportableChart ? <ChartComponent key={ObjectUtil.createId()} {...exportableChart} style={{ width: '1200px', height: '675px' }} /> : null
+        exportableChart ? <ChartComponent key={exportableChart.id} {...exportableChart} style={{ width: '1200px', height: '675px', position: 'absolute', left: '-2000px', top: '-1000px' }} /> : null
       }
     </div>
   );
 
 };
 
+// 

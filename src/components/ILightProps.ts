@@ -4,7 +4,7 @@
  * @author h.fleischer
  * @since 06.01.2022 
  */
-export interface ILightProps { 
+export interface ILightProps {
     id: string;
     stamp: string;
     position: {
@@ -12,5 +12,6 @@ export interface ILightProps {
         y: number;
         z: number;
     };
+    intensity: number;
     shadowEnabled: boolean;
 }

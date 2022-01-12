@@ -3,10 +3,10 @@ export interface IInstantProps {
     /**
      * the initial instant that the slider shall display
      */
-    instantCur: number;
+    instant: number;
 
     instantMin: number;
-    
+
     instantMax: number;
 
     /**

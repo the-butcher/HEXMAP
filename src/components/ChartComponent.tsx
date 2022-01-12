@@ -1,11 +1,11 @@
 import * as am5 from '@amcharts/amcharts5';
-import { IExportingFormatOptions, IExportingImageOptions } from '@amcharts/amcharts5/.internal/plugins/exporting/Exporting';
+import { IExportingImageOptions } from '@amcharts/amcharts5/.internal/plugins/exporting/Exporting';
 import am5locales_de_DE from '@amcharts/amcharts5/locales/de_DE';
 import * as am5exporting from "@amcharts/amcharts5/plugins/exporting";
 import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { useTheme } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
 import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
@@ -21,14 +21,19 @@ export default (props: IChartProps) => {
   const fontFamily = 'Courier Prime Sans';
   const fontColor = 0xc1c1aa;
 
-  const { id, source, path, fold, name, date, doExport, onInstantChange } = props;
+  let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, onInstantRangeChange } = props;
+
+  const openHorizontal = fold === 'open-horizontal' || fold === 'open-vertical';
+  const openVertical = fold === 'open-vertical';
+  let expandTransform = 'rotate(-90deg)'
+  if (openHorizontal) {
+    expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
+  }
 
   const [chartState, setChartState] = useState<IChartState>();
-
-  const handleInstantChange = (instant: number) => {
-    console.log('firing chart instant change');
-    onInstantChange(instant);
-  };
+  const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin1: number, instantMax1: number) => {
+    // no op initially 
+  });
 
   useEffect(() => {
 
@@ -60,9 +65,19 @@ export default (props: IChartProps) => {
         paddingTop: 8,
         paddingRight: 5,
         paddingLeft: 5,
-        paddingBottom: 4
+        paddingBottom: 4,
+        background: am5.Rectangle.new(_root, {
+          fill: am5.color(0x42423a),
+          fillOpacity: doExport ? 1.0 : 0.0
+        })
       })
     );
+
+    _chart.zoomOutButton.set('scale', 0.7);
+    _chart.zoomOutButton.get('background').setAll({
+      'fill': am5.color(0x42423a),
+      'strokeWidth': 0
+    });
 
     const yRendererVal = am5xy.AxisRendererY.new(_root, {});
     yRendererVal.labels.template.setAll({
@@ -130,7 +145,9 @@ export default (props: IChartProps) => {
       tooltip: am5.Tooltip.new(_root, {}),
       dateFormats,
       periodChangeDateFormats: dateFormats,
-      exportable: true
+      exportable: true,
+      min: instantMin > 0 ? instantMin : undefined,
+      max: instantMax > 0 ? instantMax : undefined
     }));
     const _xAxisLabel = am5.Label.new(_root, {
       text: 'Datum',
@@ -160,14 +177,20 @@ export default (props: IChartProps) => {
 
     let _exporting = am5exporting.Exporting.new(_root, {});
 
+    let positionX: number;
+    if (doExport) {
+      positionX = (instant + TimeUtil.MILLISECONDS_PER___HOUR * 11 - instantMin) / (instantMax - instantMin);
+      // console.log('initial positionX', positionX);
+    }
 
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-    let cursor = _chart.set('cursor', am5xy.XYCursor.new(_root, {
-      behavior: 'none',
-      alwaysShow: doExport,
-      exportable: true
+    let _cursor = _chart.set('cursor', am5xy.XYCursor.new(_root, {
+      behavior: 'zoomX',
+      alwaysShow: true, // doExport,
+      exportable: true,
+      positionX
     }));
-    cursor.lineY.set('visible', false);
+    _cursor.lineY.set('visible', false);
 
     const tooltip = _xAxisVal.get('tooltip')!;
     tooltip.setAll({
@@ -274,98 +297,100 @@ export default (props: IChartProps) => {
 
     }
 
-    let end: number;
-    let start: number;
-    const handleStartEndChanged = () => {
-      const minInstant = _xAxisVal.positionToValue(start);
-      const maxInstant = _xAxisVal.positionToValue(end);
-      const daysShown = (maxInstant - minInstant) / TimeUtil.MILLISECONDS_PER____DAY;
-      _series.forEach(s => {
-        if (daysShown > 120 && s instanceof am5xy.StepLineSeries) {
-          s.hide();
-        } else {
-          s.show();
-        }
-      });
-    };
-    _xAxisVal.adapters.add('start', (value, target) => {
-      start = Math.max(0, value);
-      requestAnimationFrame(() => {
-        handleStartEndChanged();
-      });
-      return start;
-    });
-    _xAxisVal.adapters.add('end', (value, target) => {
-      end = Math.min(1, value);
-      requestAnimationFrame(() => {
-        handleStartEndChanged();
-      });
-      return end;
-    });
-
-    // write to state
-    setChartState({
+    const _chartState: IChartState = {
       root: _root,
       chart: _chart,
+      cursor: _cursor,
       series: _series,
       xAxisLabel: _xAxisLabel,
       yAxisLabel: _yAxisLabel,
       xAxisVal: _xAxisVal,
       yAxisVal: _yAxisVal,
       exporting: _exporting
+    };
+
+    if (!doExport) {
+      _chart.events.on('globalpointermove', e => {
+        if (_chart.inPlot(e.point)) {
+          _cursor.show();
+          _cursor.remove('positionX');
+        }
+      });
+    }
+
+    let instantMinC: number;
+    let instantMaxC: number;
+    const handleStartEndChanged = (chartState1: IChartState) => {
+
+      const daysShown = (instantMaxC - instantMinC) / TimeUtil.MILLISECONDS_PER____DAY;
+      chartState1.xAxisVal.series.forEach(s => {
+        if (daysShown > 120 && s instanceof am5xy.StepLineSeries) {
+          s.hide();
+        } else {
+          s.show();
+        }
+      });
+      handleInstantRangeChange.current(instantMinC, instantMaxC);
+
+    };
+    _chartState.xAxisVal.adapters.add('start', (value, target) => {
+      instantMinC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
+      requestAnimationFrame(() => {
+        handleStartEndChanged(_chartState);
+      });
+      return Math.max(0, _chartState.xAxisVal.valueToPosition(instantMinC));
+    });
+    _chartState.xAxisVal.adapters.add('end', (value, target) => {
+      instantMaxC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
+      requestAnimationFrame(() => {
+        handleStartEndChanged(_chartState);
+      });
+      return Math.min(1, _chartState.xAxisVal.valueToPosition(instantMaxC));
     });
 
+    // write to state
+    setChartState(_chartState);
+
     _xAxisVal.data.setAll([]);
+
+
 
     // https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/
     if (doExport) {
 
-
-      const cursorInstant = TimeUtil.parseCategoryDateFull(date);
+      // updateInstants(_chartState);
 
       let exportChartTo = -1;
       const frameendedDisposer = _root.events.on('frameended', () => {
 
-        const positionXDest = _xAxisVal.valueToPosition(cursorInstant);
-        const positionXCurr = cursor.getPrivate('positionX');
-        if (positionXDest != positionXCurr) {
+        window.clearTimeout(exportChartTo);
+        exportChartTo = window.setTimeout(() => {
 
-          console.log('positionXDest', positionXDest);
-          cursor.set('positionX', positionXDest);
+          frameendedDisposer.dispose();
 
-        } else {
+          const formatOption: IExportingImageOptions = {
+            minWidth: 1200,
+            maxWidth: 1200,
+            minHeight: 675,
+            maxHeight: 675
+          }
+          _exporting.export("png", formatOption).then(imgData => {
 
-          window.clearTimeout(exportChartTo);
-          exportChartTo = window.setTimeout(() => {
+            var a = document.createElement('a');
+            var url = imgData;
+            a.href = url;
+            a.download = `chart____${Date.now()}`;
+            a.click();
 
-            frameendedDisposer.dispose();
+          });
 
-            const formatOption: IExportingImageOptions = {
-              minWidth: 1200,
-              maxWidth: 1200,
-              minHeight: 675,
-              maxHeight: 675
-            }
-            _exporting.export("png", formatOption).then(imgData => {
+        }, 500);
 
-              // console.log('imgData', imgData);
-              var a = document.createElement('a');
-              var url = imgData;
-              a.href = url;
-              a.download = `chart____${Date.now()}`;
-              a.click();
-
-            });
-
-          }, 500);
-
-        }
+        // }
 
       });
 
     };
-
-
 
     console.log('🕓 updating chart component (done)', Date.now() - tsA);
 
@@ -374,20 +399,7 @@ export default (props: IChartProps) => {
 
   const updatePath = (chartState: IChartState) => {
 
-    const handleClick = () => {
-      let cursor = chartState.chart.get('cursor');
-      const axisPosition = chartState.xAxisVal.toAxisPosition(cursor.getPrivate('positionX'));
-      const date = chartState.xAxisVal.positionToDate(axisPosition);
-      handleInstantChange(date.getTime());
-    }
-
-    chartState.chart?.events.on('pointerdown', handleClick);
-    chartState.chart?.get('cursor').events.on('pointerdown', handleClick);
-
     const chartData = DataRepository.getInstance().getChartData(source, Number.MIN_VALUE, Number.MAX_VALUE);
-
-    // console.log('chartData', chartData);
-
     chartState.series.forEach(s => {
       (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
       // (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('min', -4000);
@@ -407,12 +419,57 @@ export default (props: IChartProps) => {
 
   };
 
+  const updateInstants = (chartState: IChartState) => {
+
+    let positionMin = 0;
+    let positionMax = 1;
+
+    if (instantMin > 0 && instantMax > 0) {
+
+      positionMin = chartState.xAxisVal.valueToPosition(instantMin);
+      positionMax = chartState.xAxisVal.valueToPosition(instantMax);
+
+    }
+
+    let positionDst = (chartState.xAxisVal.valueToPosition(instant) - positionMin) / (positionMax - positionMin);
+    if (positionDst < 0 || positionDst > 1) {
+      chartState.cursor.hide();
+    } else {
+      chartState.cursor.show();
+    }
+
+    // console.log('positionDst', instant, positionDst, chartState.xAxisVal.valueToPosition(instant), TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax));
+    if (!Number.isNaN(positionDst)) {
+      chartState.cursor.set('positionX', positionDst);
+    }
+
+  }
+
+  const updateCallbacks = () => {
+
+    handleInstantRangeChange.current = (instantMin1: number, instantMax1: number) => {
+      if (openHorizontal && (instantMin1 > 0 && instantMin1 !== instantMin) || (instantMax1 > 0 && instantMax1 !== instantMax)) {
+        if (!doExport) {
+          // window.clearTimeout(onInstantRangeChangeTo);
+          // onInstantRangeChangeTo = window.setTimeout(() => {
+          // console.log('firing chart range change', TimeUtil.formatCategoryDateFull(instantMin), '/', TimeUtil.formatCategoryDateFull(instantMin1), TimeUtil.formatCategoryDateFull(instantMax), '/', TimeUtil.formatCategoryDateFull(instantMax1), source);
+          onInstantRangeChange(instantMin1, instantMax1);
+          // }, 1000);
+        }
+        instantMin = instantMin1;
+        instantMax = instantMax1;
+      }
+    };
+
+  }
+
   useEffect(() => {
 
     console.log('🔧 updating chart component (path)', props);
 
     if (chartState) {
       updatePath(chartState);
+      updateCallbacks();
     }
 
   }, [path]);
@@ -423,18 +480,28 @@ export default (props: IChartProps) => {
 
     if (chartState) {
       updateFold(chartState);
+      updateCallbacks();
     }
 
   }, [fold]);
 
   useEffect(() => {
 
+    console.log('🔧 updating chart component (instant)', props);
+    if (chartState) {
+      updateInstants(chartState);
+      updateCallbacks();
+    }
+
+  }, [instant, instantMin, instantMax]);
+
+  useEffect(() => {
+
     console.log('🔧 updating chart component (chartState)', props);
     if (chartState) {
-
       updatePath(chartState);
       updateFold(chartState);
-
+      updateCallbacks();
     }
 
   }, [chartState]);

@@ -2,12 +2,11 @@ import React from "react";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 import { INDICATOR_PROPS_FOLD } from "./IIndicatorProps";
+import { IInstantProps } from "./IInstantProps";
 
-export interface IChartProps {
+export interface IChartProps extends IInstantProps {
 
     id: string;
-
-    date: string;
 
     name: string;
 
@@ -19,7 +18,7 @@ export interface IChartProps {
      * points to the data, retrievable from DataRepository
      */
     source: string;
-    
+
     path: string;
 
     breadcrumbProps: IBreadcrumbProps[];
@@ -34,9 +33,15 @@ export interface IChartProps {
      */
     onInstantChange: (instant: number) => void;
 
+    /**
+     * callback to be triggered when an the instant range changes
+     */
+    onInstantRangeChange: (instantMin: number, instantMax: number) => void;
 
+    /**
+     * if set to true the chart shall trigger an export directly after being fully rendered
+     */
     doExport: boolean;
-
 
     style?: React.CSSProperties;
 

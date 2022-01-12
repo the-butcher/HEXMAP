@@ -27,7 +27,7 @@ export interface IDataset {
      * get the keyset held by a given key
      * @param key 
      */
-    getKeyset(key: string): IKeyset; 
+    getKeyset(key: string): IKeyset;
 
     /**
      * get an instant known to exist in this dataset
@@ -36,9 +36,14 @@ export interface IDataset {
     getValidInstant(instant: number): number;
 
     /**
+     * get the first valid instant for this data
+     */
+    getInstantMin(): number;
+
+    /**
      * get the last valid instant for this data
      */
-    getLastInstant(): number;
+    getInstantMax(): number;
 
     getMinY(): number;
 

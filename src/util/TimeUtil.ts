@@ -46,4 +46,8 @@ export class TimeUtil {
         return new Date(dateString).getTime();
     }
 
+    static trimInstant(instant: number): number {
+        return TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(instant))
+    }
+
 }

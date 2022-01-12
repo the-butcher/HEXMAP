@@ -17,6 +17,8 @@ export class IChartState {
      */
     chart: am5xy.XYChart;
 
+    cursor: am5xy.XYCursor;
+
     /**
      * the series in the chart
      */
@@ -26,7 +28,7 @@ export class IChartState {
      * the renderers of the respective axes
      */
     xAxisVal: am5xy.DateAxis<am5xy.AxisRendererX>;
-    yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY>; 
+    yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY>;
 
     /**
      * label of the respective axes
@@ -34,6 +36,6 @@ export class IChartState {
     xAxisLabel: am5.Label;
     yAxisLabel: am5.Label;
 
-    exporting: am5exporting.Exporting; 
+    exporting: am5exporting.Exporting;
 
 }

@@ -14,10 +14,10 @@ import { Keyset } from "./Keyset";
  * @author h.fleischer
  * @since 30.12.2021
  */
-export class Dataset implements IDataset { 
+export class Dataset implements IDataset {
 
     // private readonly dataRoot: IDataRoot;
-    private readonly populations: { [K in string]: number};
+    private readonly populations: { [K in string]: number };
     private readonly keysetKeys: string[];
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
@@ -41,11 +41,11 @@ export class Dataset implements IDataset {
         });
 
         const indexKeys = dataRoot.idxs;
-        const indexKeysetRaw: { [K in string]: string} = {};
+        const indexKeysetRaw: { [K in string]: string } = {};
         for (let i = 0; i < indexKeys.length; i++) {
             indexKeysetRaw[i] = indexKeys[i];
-        }        
-        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);        
+        }
+        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);
 
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[0]);
@@ -95,7 +95,7 @@ export class Dataset implements IDataset {
     }
 
     getValidInstant(instant: number): number {
-        
+
         // console.log('min/max', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax));
         instant = Math.max(instant, this.instantMin);
         instant = Math.min(instant, this.instantMax);
@@ -108,7 +108,7 @@ export class Dataset implements IDataset {
             let minInstantDif = Number.MAX_SAFE_INTEGER;
             let entryInstant: number;
             let minInstant: number;
-            for (let i=0; i<this.entryKeys.length; i++) {
+            for (let i = 0; i < this.entryKeys.length; i++) {
                 entryInstant = this.entries[this.entryKeys[i]].getInstant(); // parseInt(entryKey); // TimeUtil.parseCategoryDateFull(date);
                 curInstantDif = Math.abs(entryInstant - instant);
                 if (curInstantDif < minInstantDif) {
@@ -123,15 +123,19 @@ export class Dataset implements IDataset {
         }
 
         return instant;
-        
+
     }
 
-    getLastInstant(): number {
+    getInstantMin(): number {
+        return this.instantMin;
+    }
+
+    getInstantMax(): number {
         return this.instantMax;
     }
 
     getKeyset(key: string): IKeyset {
         return this.keysets[key];
     }
-    
+
 }

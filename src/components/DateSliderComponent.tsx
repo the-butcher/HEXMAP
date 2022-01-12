@@ -55,7 +55,7 @@ export default (props: IInstantProps) => {
     });
 
     return (
-        <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instantCur} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }} />
+        <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instant} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }} />
     );
 
 }

@@ -26,7 +26,7 @@ export default (props: IInstantProps) => {
     <LocalizationProvider dateAdapter={DateAdapter}>
       <DatePicker
 
-        value={new Date(props.instantCur)}
+        value={new Date(props.instant)}
         minDate={new Date(props.instantMin)}
         maxDate={new Date(props.instantMax)}
         onChange={handleInstantChange}

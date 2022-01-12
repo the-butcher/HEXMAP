@@ -1,4 +1,4 @@
-import { IDataset } from "./IDataset"; 
+import { IDataset } from "./IDataset";
 
 /**
  * definition for types that hold the current user settings for a given dataset
@@ -27,7 +27,7 @@ export interface IDataSetting {
     /**
      * the current data-path
      */
-    getPath(name: string): string; 
+    getPath(name: string): string;
 
     /**
      * set a specific part of this settings path
@@ -41,9 +41,17 @@ export interface IDataSetting {
      */
     getInstant(): number;
 
+    // getInstantMin(): number;
+
+    // getInstantMax(): number;
+
     /**
      * set the instant for this setting
      */
     setInstant(instant: number): void;
+
+    // setInstantMin(instantMin: number): void;
+
+    // setInstantMax(instantMax: number): void;
 
 }

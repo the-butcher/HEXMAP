@@ -35,7 +35,7 @@ export default (props: IMapProps) => {
     return (
         <div style={{ position: 'absolute', height: '100%', width: '100%' }} onPointerUp={handlePointerUp}>
             <Canvas frameloop='demand' shadows={{ type: PCFSoftShadowMap, enabled: true }} onCreated={onCreated} camera={{ position: [0, 300, 0], fov: 40, far: 10000 }}>
-                <ControlsComponent key={ controlsProps.id } {...controlsProps} />
+                <ControlsComponent key={controlsProps.id} {...controlsProps} />
                 {/* <Stats /> */}
                 {lightProps.map(props => <LightCompoment key={props.id} {...props} />)}
                 <ambientLight intensity={0.20} />
@@ -50,7 +50,7 @@ export default (props: IMapProps) => {
                     <LabelComponent key={courseLabelProps.title.id} {...courseLabelProps.title} />
                     <LabelComponent key={courseLabelProps.min.id} {...courseLabelProps.min} />
                     <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} />
-                    {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)} 
+                    {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
                 </group>
             </Canvas>
         </div>
