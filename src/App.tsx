@@ -24,6 +24,22 @@ import { TimeUtil } from './util/TimeUtil';
 
 export default () => {
 
+  const handleScreenshotRequested = () => {
+
+    console.log('📞 handling screenshot requested');
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 0
+      }
+    });
+
+  }
+
   /**
    * handles changes originating from either date-slider or data-picker
    * updates all property instances holding an instant
@@ -209,6 +225,8 @@ export default () => {
   const interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
   const interpolatedHue7di1 = new InterpolatedValue(0.25, -0.01, 0, 2000, 0.33);
 
+  const interpolatedInt7diX = new InterpolatedValue(1.30, 1.20, 0, 2000, 1);
+
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
@@ -237,6 +255,7 @@ export default () => {
       //   interpolatedHue: interpolatedHue7di5,
       //   interpolatedSat: new FixedValue(1.00),
       //   interpolatedVal: new FixedValue(0.40),
+      //   interpolatedInt: interpolatedInt7diX
       // },
       {
         id: 'i_ems',
@@ -261,7 +280,8 @@ export default () => {
         interpolatedEle: interpolatedEle7di1,
         interpolatedHue: interpolatedHue7di1,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40)
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedInt: interpolatedInt7diX
       },
       {
         id: 'i_paa',
@@ -286,7 +306,8 @@ export default () => {
         interpolatedEle: interpolatedEle7di1,
         interpolatedHue: interpolatedHue7di1,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40)
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedInt: interpolatedInt7diX
       },
       {
         id: 'i_dst',
@@ -311,7 +332,8 @@ export default () => {
         interpolatedEle: interpolatedEle7di3,
         interpolatedHue: interpolatedHue7di3,
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40)
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedInt: interpolatedInt7diX
       },
       {
         id: 'v_mnc',
@@ -333,10 +355,11 @@ export default () => {
         loaded: false,
         path: '',
         breadcrumbProps: [],
-        interpolatedEle: new InterpolatedValue(-10, 20, 0.00, 1.00, 1),
-        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.60, 0.80, 1),
+        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1),
+        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
         interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40)
+        interpolatedVal: new FixedValue(0.40),
+        interpolatedInt: new FixedValue(1.25),
       }
     ],
     navigationBotProps: {
@@ -346,6 +369,9 @@ export default () => {
         instantMax: instant,
         onInstantChange: handleInstantChange
       }
+    },
+    exportSceneProps: {
+      onScreenshotRequested: handleScreenshotRequested
     }
   });
 
@@ -620,6 +646,11 @@ export default () => {
     let _hexagonProps: IHexagonsProps = {
       ...mapProps.hexagonProps
     };
+    const _lightProps = mapProps.lightProps.map(props => {
+      return {
+        ...props
+      }
+    });
 
     for (let i = 0; i < userInterfaceProps.indicatorProps.length; i++) {
       const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
@@ -804,7 +835,9 @@ export default () => {
         const value00 = entry00.getValue(valueKey, dataSetting.getIndex()); // dataset00[dataPointer][dataSetting.indx];
         const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
         const value07 = (value00 - valueM7) / valueM7;
+
         if (selected) {
+
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             value00: indicatorPropsInstance.valueFormatter.format(value00),
@@ -820,6 +853,11 @@ export default () => {
             onInstantChange: handleInstantChange,
             onInstantRangeChange: handleInstantRangeChange
           };
+
+          _lightProps.forEach(props => {
+            props.intensity = userInterfaceProps.indicatorProps[i].interpolatedInt.getOut(value00)
+          });
+
         } else {
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
@@ -959,14 +997,14 @@ export default () => {
     /**
     * update stamps on all lights (triggering a shadow update)
     */
-    const _lightPropsFast = mapProps.lightProps.map(props => {
+    const _lightPropsFast = _lightProps.map(props => {
       return {
         ...props,
         stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
         shadowEnabled: false
       }
     });
-    const _lightPropsSlow = mapProps.lightProps.map(props => {
+    const _lightPropsSlow = _lightProps.map(props => {
       return {
         ...props,
         stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,

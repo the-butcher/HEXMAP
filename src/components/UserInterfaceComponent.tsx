@@ -1,14 +1,16 @@
-import { Button, ButtonGroup, createTheme, Paper, ThemeProvider } from "@mui/material";
+import { AddAPhoto, Crop54, Delete, Download, ExpandMore, GifBox, KeyboardArrowLeft, KeyboardArrowRight, PhotoLibrary } from "@mui/icons-material";
+import { Badge, Button, ButtonGroup, createTheme, IconButton, ListItem, Paper, Select, ThemeProvider } from "@mui/material";
 import "./../styles.css";
 import DatePickerComponent from "./DatePickerComponent";
 import DateSliderComponent from "./DateSliderComponent";
+import ExportSceneComponent from "./ExportSceneComponent";
 import IndicatorComponent from "./IndicatorComponent";
 import { IUserInterfaceProps } from "./IUserInterfaceProps";
 
 
 export default (props: IUserInterfaceProps) => {
 
-  const { indicatorProps, navigationBotProps } = props;
+  const { indicatorProps, navigationBotProps, exportSceneProps } = props;
 
   const backgroundColor = 'rgba(77, 77, 68, 0.85)';
   const fontFamily = '"Courier Prime Sans", Consolas, Courier-New, monospace';
@@ -26,7 +28,7 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             backgroundColor,
-            color: 'var(--color-text)',      
+            color: 'var(--color-text)',
             fontSize: '10px',
             '&:hover': {
               border: '1px solid #2b2b27',
@@ -53,20 +55,20 @@ export default (props: IUserInterfaceProps) => {
           root: {
             backgroundColor: '#44443c',
             fontFamily,
-            color: 'var(--color-text)',            
+            color: 'var(--color-text)',
             paddingTop: '3px',
             '&.Mui-selected': {
               backgroundColor: 'var(--color-text)',
-              color: '#44443c',                 
+              color: '#44443c',
             },
             '&.Mui-selected:hover': {
               backgroundColor: 'var(--color-text)',
-              color: '#44443c',                 
-            },         
+              color: '#44443c',
+            },
             '&:focus.Mui-selected': {
               backgroundColor: 'var(--color-text)',
-              color: '#44443c',                 
-            }              
+              color: '#44443c',
+            }
           },
         }
       },
@@ -178,7 +180,7 @@ export default (props: IUserInterfaceProps) => {
           root: {
             fontFamily,
             fontSize: '14px',
-            color: 'var(--color-text)',            
+            color: 'var(--color-text)',
             backgroundColor,
             padding: '2px 6px 2px 6px'
           },
@@ -189,7 +191,7 @@ export default (props: IUserInterfaceProps) => {
           root: {
             fontFamily,
             fontSize: '10px',
-            color: 'var(--color-text)',            
+            color: 'var(--color-text)',
             height: '1px',
             padding: '10px 0px',
             marginRight: '12px',
@@ -200,25 +202,25 @@ export default (props: IUserInterfaceProps) => {
           markLabel: {
             fontFamily,
             fontSize: '10px',
-            color: 'var(--color-text)',       
+            color: 'var(--color-text)',
             top: '16px'
           },
           valueLabel: {
             fontFamily,
             fontSize: '14px',
-            color: 'var(--color-text)',   
+            color: 'var(--color-text)',
             backgroundColor: '#42423a',
-            boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)'       
+            boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)'
           }
         },
-      }   
+      }
     },
   });
 
   const mobileView = window.innerWidth <= 900;
   const handleExpand = (index: number) => {
     indicatorProps[index].onExpand(indicatorProps[index].id);
-  }  
+  }
 
   const buttons: JSX.Element[] = [];
   let activeIndicatorSource: string;
@@ -228,27 +230,31 @@ export default (props: IUserInterfaceProps) => {
     if (indicatorProps[i].fold !== 'closed') {
       activeIndicatorSource = indicatorProps[i].source;
     }
-    buttons.push(<Button key={ `expandmobile_${indicatorProps[i].id}` } style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={ () => handleExpand(i) }>{ indicatorProps[i].desc }</Button>);
+    buttons.push(<Button key={`expandmobile_${indicatorProps[i].id}`} style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={() => handleExpand(i)}>{indicatorProps[i].desc}</Button>);
   }
 
   // console.log('active source', indicatorProps[activeIndicatorIndex]);
 
 
   return (
-    <ThemeProvider theme={ theme }>
-      { mobileView ?
-      <ButtonGroup size="small" variant="outlined" style={{ paddingTop: '6px', width: '100%', display: 'flex'}}>
-        { buttons }
-      </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div> }
+    <ThemeProvider theme={theme}>
+      {mobileView ?
+        <ButtonGroup size="small" variant="outlined" style={{ paddingTop: '6px', width: '100%', display: 'flex' }}>
+          {buttons}
+        </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div>}
       <div style={{ width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
         <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
-          { indicatorProps.map(props => <IndicatorComponent key={ `indicator_${props.id}` } {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />) }
+          {indicatorProps.map(props => <IndicatorComponent key={`indicator_${props.id}`} {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />)}
         </div>
       </div>
-      <Paper elevation={4} style={{ overflow: 'unset', width: 'calc(100%-24px)', display: 'flex', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '40px', padding: '0px', margin: '0px' }} >
-        <DateSliderComponent {...navigationBotProps.instantProps} />
-        <DatePickerComponent {...navigationBotProps.instantProps} />
-      </Paper>
+      <div style={{ width: 'calc(100%-24px)', display: 'flex', pointerEvents: 'none', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '120px', padding: '0px', margin: '0px' }}>
+        <ExportSceneComponent {...exportSceneProps} />
+        <div style={{ minWidth: '6px ' }}></div>
+        <Paper elevation={4} style={{ overflow: 'unset', pointerEvents: 'visible', flexGrow: 100, display: 'flex', flexDirection: 'row', position: 'relative', height: '40px', top: '80px' }} >
+          <DateSliderComponent {...navigationBotProps.instantProps} />
+          <DatePickerComponent {...navigationBotProps.instantProps} />
+        </Paper>
+      </div>
     </ThemeProvider>
   );
 

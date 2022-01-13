@@ -4,31 +4,30 @@ import GIFEncoder from 'gif-encoder-2';
 import { useEffect, useRef, useState } from 'react';
 import { Scene, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { ScreenshotUtil } from '../util/ScreenshotUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import { IControlsProps } from './IControlsProps';
-import { IScreenshotOptions } from './IScreenshotOptions';
-
-
+import { IScreenshotOptions } from '../util/IScreenshotOptions';
 
 export default (props: IControlsProps) => {
 
     const { invalidate, gl, camera } = useThree(); // camera, gl, scene
-    const [screenshotRequested, setSreenshotRequested] = useState<IScreenshotOptions>();
+    // const [screenshotRequested, setSreenshotRequested] = useState<IScreenshotOptions>();
 
     let controls = useRef<OrbitControls>();
-    let cinstant = useRef<number>();
-    let gifEncoder = useRef<GIFEncoder>();
+    // let cinstant = useRef<number>();
+    // let gifEncoder = useRef<GIFEncoder>();
 
-    const { onInstantChange, instant, stamp } = props;
+    const { instant, stamp } = props;
 
-    /**
-     * triggered from keypress, calling the callback specified in props
-     * @param event 
-     * @param value 
-     */
-    const incrementInstant = () => {
-        onInstantChange(cinstant.current + TimeUtil.MILLISECONDS_PER____DAY);
-    }
+    // /**
+    //  * triggered from keypress, calling the callback specified in props
+    //  * @param event 
+    //  * @param value 
+    //  */
+    // const incrementInstant = () => {
+    //     onInstantChange(cinstant.current + TimeUtil.MILLISECONDS_PER____DAY);
+    // }
 
     const resetAngleConstraints = () => {
 
@@ -43,6 +42,8 @@ export default (props: IControlsProps) => {
     useEffect(() => {
 
         console.log('✨ building controls component', props);
+
+        ScreenshotUtil.createInstance(invalidate);
 
         controls.current = new OrbitControls(camera, gl.domElement);
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
@@ -105,38 +106,40 @@ export default (props: IControlsProps) => {
 
                 resetAngleConstraints();
 
-            } else if (e.key === 'p') {
-
-                setSreenshotRequested({
-                    type: 'png_image'
-                });
-                invalidate();
-                // incrementInstant();
-
-            } else if (e.key === 'f') {
-
-                setSreenshotRequested({
-                    type: 'gif_frame',
-                    time: 200
-                });
-                invalidate();
-
-            } else if (e.key === 'F') {
-
-                setSreenshotRequested({
-                    type: 'gif_frame',
-                    time: 1000
-                });
-                invalidate();
-
-            } else if (e.key === 'g') {
-
-                setSreenshotRequested({
-                    type: 'gif_image'
-                });
-                invalidate();
-
             }
+
+            // else if (e.key === 'p') {
+
+            //     setSreenshotRequested({
+            //         type: 'png_image'
+            //     });
+            //     invalidate();
+            //     // incrementInstant();
+
+            // } else if (e.key === 'f') {
+
+            //     setSreenshotRequested({
+            //         type: 'gif_frame',
+            //         time: 200
+            //     });
+            //     invalidate();
+
+            // } else if (e.key === 'F') {
+
+            //     setSreenshotRequested({
+            //         type: 'gif_frame',
+            //         time: 1000
+            //     });
+            //     invalidate();
+
+            // } else if (e.key === 'g') {
+
+            //     setSreenshotRequested({
+            //         type: 'gif_image'
+            //     });
+            //     invalidate();
+
+            // }
 
 
         });
@@ -151,113 +154,115 @@ export default (props: IControlsProps) => {
 
     }, []);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log('🔧 updating controls component', props);
-        cinstant.current = instant;
+    //     console.log('🔧 updating controls component (stamp)', props);
+    //     // cinstant.current = instant;
 
-    }, [stamp]);
+    // }, [stamp]);
 
-    function renderToGIFFrame(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+    // function renderToGIFFrame(gl: WebGLRenderer, scene: Scene, camera: Camera) {
 
 
-        if (!gifEncoder.current) {
+    //     if (!gifEncoder.current) {
 
-            gifEncoder.current = new GIFEncoder(1200, 675, 'neuquant', false);
-            gifEncoder.current.setDelay(200);
-            gifEncoder.current.createReadStream().pipe(concat((buffer: Uint8Array) => {
+    //         gifEncoder.current = new GIFEncoder(1200, 675, 'neuquant', false);
+    //         gifEncoder.current.setDelay(200);
+    //         gifEncoder.current.createReadStream().pipe(concat((buffer: Uint8Array) => {
 
-                const blob = new Blob([buffer], {
-                    type: 'image/gif'
-                });
+    //             const blob = new Blob([buffer], {
+    //                 type: 'image/gif'
+    //             });
 
-                var anchor = document.createElement('a');
-                anchor.href = URL.createObjectURL(blob);
-                anchor.download = `canvas_3d_${Date.now()}.gif`;
-                anchor.click();
+    //             var anchor = document.createElement('a');
+    //             anchor.href = URL.createObjectURL(blob);
+    //             anchor.download = `canvas_3d_${Date.now()}.gif`;
+    //             anchor.click();
 
-                gifEncoder.current = undefined;
-                setSreenshotRequested(undefined);
+    //             gifEncoder.current = undefined;
+    //             setSreenshotRequested(undefined);
 
-            }));
-            gifEncoder.current.start();
+    //         }));
+    //         gifEncoder.current.start();
 
-        }
+    //     }
 
-        let outputCanvas = renderToCanvas(gl, scene, camera);
-        gifEncoder.current.setDelay(screenshotRequested.time);
-        gifEncoder.current.addFrame(outputCanvas.getContext('2d'));
+    //     let outputCanvas = renderToCanvas(gl, scene, camera);
+    //     gifEncoder.current.setDelay(screenshotRequested.time);
+    //     gifEncoder.current.addFrame(outputCanvas.getContext('2d'));
 
-        setSreenshotRequested(undefined);
+    //     setSreenshotRequested(undefined);
 
-    }
+    // }
 
-    function renderToGIFImage() {
+    // function renderToGIFImage() {
 
-        if (gifEncoder.current) {
-            gifEncoder.current.finish();
-        }
-        setSreenshotRequested(undefined);
+    //     if (gifEncoder.current) {
+    //         gifEncoder.current.finish();
+    //     }
+    //     setSreenshotRequested(undefined);
 
-    }
+    // }
 
-    function renderToPngImage(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+    // function renderToPngImage(gl: WebGLRenderer, scene: Scene, camera: Camera) {
 
-        gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
-        gl.render(scene, camera);
+    //     gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
+    //     gl.render(scene, camera);
 
-        let outputCanvas = renderToCanvas(gl, scene, camera);
-        outputCanvas.toBlob(
-            blob => {
-                var a = document.createElement('a');
-                var url = URL.createObjectURL(blob);
-                a.href = url;
-                a.download = `canvas_3d_${Date.now()}`;
-                a.click();
+    //     let outputCanvas = renderToCanvas(gl, scene, camera);
+    //     outputCanvas.toBlob(
+    //         blob => {
+    //             var a = document.createElement('a');
+    //             var url = URL.createObjectURL(blob);
+    //             a.href = url;
+    //             a.download = `canvas_3d_${Date.now()}`;
+    //             a.click();
 
-                console.log('url', blob, url);
+    //             console.log('url', blob, url);
 
-            },
-            'image/png',
-            1.0
-        )
+    //         },
+    //         'image/png',
+    //         1.0
+    //     )
 
-        gl.domElement.getContext('webgl', { preserveDrawingBuffer: false });
-        setSreenshotRequested(undefined);
+    //     gl.domElement.getContext('webgl', { preserveDrawingBuffer: false });
+    //     setSreenshotRequested(undefined);
 
-    }
+    // }
 
-    function renderToCanvas(gl: WebGLRenderer, scene: Scene, camera: Camera): HTMLCanvasElement {
+    // function renderToCanvas(gl: WebGLRenderer, scene: Scene, camera: Camera): HTMLCanvasElement {
 
-        gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
-        gl.render(scene, camera);
+    //     gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
+    //     gl.render(scene, camera);
 
-        const outputCanvas = document.createElement('canvas');
-        outputCanvas.width = 1200;
-        outputCanvas.height = 675;
-        const outputContext = outputCanvas.getContext('2d');
+    //     const outputCanvas = document.createElement('canvas');
+    //     outputCanvas.width = 1200;
+    //     outputCanvas.height = 675;
+    //     const outputContext = outputCanvas.getContext('2d');
 
-        const scaleY = outputCanvas.height / gl.domElement.height;
-        const dimX = gl.domElement.width * scaleY;
-        const dimY = gl.domElement.height * scaleY;
-        const offX = (1200 - dimX) / 2;
-        const offY = (675 - dimY) / 2;
+    //     const scaleY = outputCanvas.height / gl.domElement.height;
+    //     const dimX = gl.domElement.width * scaleY;
+    //     const dimY = gl.domElement.height * scaleY;
+    //     const offX = (1200 - dimX) / 2;
+    //     const offY = (675 - dimY) / 2;
 
-        outputContext.drawImage(gl.domElement, offX, offY, dimX, dimY);
+    //     outputContext.drawImage(gl.domElement, offX, offY, dimX, dimY);
 
-        return outputCanvas;
+    //     return outputCanvas;
 
-    }
+    // }
 
     useFrame(({ gl, scene, camera }) => {
 
-        if (screenshotRequested) {
-            if (screenshotRequested.type === 'png_image') {
-                renderToPngImage(gl, scene, camera)
-            } else if (screenshotRequested.type === 'gif_frame') {
-                renderToGIFFrame(gl, scene, camera)
-            } else if (screenshotRequested.type === 'gif_image') {
-                renderToGIFImage()
+        const screenshotOptions = ScreenshotUtil.getInstance().getScreenshotOptions();
+        if (screenshotOptions) {
+            // TODO move to screenshot options altogether
+            if (screenshotOptions.type === 'png_image') {
+                ScreenshotUtil.getInstance().renderToPngImage(gl, scene, camera)
+            } else if (screenshotOptions.type === 'gif_frame') {
+                ScreenshotUtil.getInstance().renderToGIFFrame(gl, scene, camera)
+            } else if (screenshotOptions.type === 'gif_image') {
+                ScreenshotUtil.getInstance().renderToGIFImage()
             }
         } else {
             gl.render(scene, camera);

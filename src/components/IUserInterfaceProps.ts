@@ -1,3 +1,4 @@
+import { IExportSceneProps } from "./IExportSceneProps";
 import { IIndicatorProps } from "./IIndicatorProps";
 import { IMapProps } from "./IMapProps";
 import { INavigationBotProps } from "./INavigationBotProps";
@@ -24,6 +25,11 @@ export interface IUserInterfaceProps {
     /**
      * properties for the bottom-bar (date-picking)
      */
-    navigationBotProps: INavigationBotProps; 
+    navigationBotProps: INavigationBotProps;
+
+    /**
+     * properties for the export-scene component
+     */
+    exportSceneProps: IExportSceneProps;
 
 }

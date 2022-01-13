@@ -15,6 +15,8 @@ export default (props: ILightProps) => {
     const pointLightFast = useRef<three.DirectionalLight>();
     const { gl, scene } = useThree();
 
+    const { stamp, intensity, shadowEnabled } = props;
+
     const configureLight = (light: three.DirectionalLight, textureFraction: number) => {
 
         light.position.set(props.position.x, props.position.y, props.position.z);
@@ -28,12 +30,12 @@ export default (props: ILightProps) => {
         light.shadow.camera.left = -260;
         light.shadow.camera.right = 260;
         light.shadow.camera.far = 1000;
-        light.shadow.camera.lookAt(0, 0, 0);      
-        
+        light.shadow.camera.lookAt(0, 0, 0);
+
         const maxTextureSize = gl.capabilities.maxTextureSize;
 
         light.shadow.mapSize.width = maxTextureSize / textureFraction;
-        light.shadow.mapSize.height = maxTextureSize / textureFraction / 2;        
+        light.shadow.mapSize.height = maxTextureSize / textureFraction / 2;
 
     }
     useEffect(() => {
@@ -52,14 +54,17 @@ export default (props: ILightProps) => {
 
         console.log('🔧 updating light component', props);
 
-        pointLightSlow.current!.visible = props.shadowEnabled;
-        pointLightFast.current!.visible = !props.shadowEnabled;
+        pointLightSlow.current!.visible = shadowEnabled;
+        pointLightFast.current!.visible = !shadowEnabled;
 
-        pointLightSlow.current!.shadow.needsUpdate = props.shadowEnabled;
-        pointLightFast.current!.shadow.needsUpdate = !props.shadowEnabled;
-        
+        pointLightSlow.current!.shadow.needsUpdate = shadowEnabled;
+        pointLightFast.current!.shadow.needsUpdate = !shadowEnabled;
 
-    }, [props.stamp]);
+        pointLightSlow.current.intensity = intensity;
+        pointLightFast.current.intensity = intensity;
+
+
+    }, [stamp]);
 
     useFrame((state) => {
         // console.log('state', state);
@@ -67,8 +72,8 @@ export default (props: ILightProps) => {
 
     return (
         <>
-            <directionalLight intensity={1.25} ref={pointLightSlow} castShadow />
-            <directionalLight intensity={1.25} ref={pointLightFast} castShadow />
+            <directionalLight intensity={intensity} ref={pointLightSlow} castShadow />
+            <directionalLight intensity={intensity} ref={pointLightFast} castShadow />
         </>
     );
 

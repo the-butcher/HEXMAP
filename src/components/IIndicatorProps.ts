@@ -29,7 +29,12 @@ export interface IIndicatorProps extends IChartProps {
     interpolatedHue: IInterpolatedValue;
     interpolatedSat: IInterpolatedValue;
     interpolatedVal: IInterpolatedValue;
-     
+
     interpolatedEle: IInterpolatedValue;
+
+    /**
+     * light intensity depending on value
+     */
+    interpolatedInt: IInterpolatedValue;
 
 }
