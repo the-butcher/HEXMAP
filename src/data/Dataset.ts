@@ -96,7 +96,6 @@ export class Dataset implements IDataset {
 
     getValidInstant(instant: number): number {
 
-        // console.log('min/max', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax));
         instant = Math.max(instant, this.instantMin);
         instant = Math.min(instant, this.instantMax);
 

@@ -39,7 +39,7 @@ export class ProtocolTypes {
     static TYPE_UID_______BOUNDARY: string = '9a32c90d-6071-4925-aa6c-ce08df6feae0';
     static TYPE_UID_____COORDINATE: string = 'ebb15d79-35d8-4b65-9efb-14eab6b983ba';
 
-    static ALL: { [K in string ]: any } = {};
+    static ALL: { [K in string]: any } = {};
     static init() {
         ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_______VARINT32] = new ProtocolTypeVarint32();
         ProtocolTypes.ALL[ProtocolTypes.TYPE_UID_________SINT64] = new ProtocolTypeSint64();
@@ -63,7 +63,6 @@ export class ProtocolTypes {
             return protocolType;
         } else {
             const message: string = "failed to find protocol type (typeUid: " + typeUid + ")";
-            // console.log(message);
             throw new Error(message);
         }
     }
@@ -91,14 +90,14 @@ export class ProtocolTypes {
         protocolType.defineKey('key_______coordinates', 0x1, ProtocolTypes.TYPE_UID_____COORDINATE, (builder: PbfBoundaryBuilder, coordinate: PbfCoordinate) => builder.addCoordinate(coordinate));
         protocolType.defineKey('key________directions', 0x2, ProtocolTypes.TYPE_UID__VARINT_PACKED, (builder: PbfBoundaryBuilder, directions: number[]) => builder.setDirections(directions));
         return protocolType;
-    }    
+    }
 
     static createPbfTypeCoordinate(): IProtocolTypeDefined<PbfCoordinate, PbfCoordinateBuilder> {
         const protocolType: IProtocolTypeDefined<PbfCoordinate, PbfCoordinateBuilder> = ProtocolTypes.define('boundary', () => new PbfCoordinateBuilder());
         protocolType.defineKey('key_________________x', 0x1, ProtocolTypes.TYPE_UID_______VARINT32, (builder: PbfCoordinateBuilder, x: number) => builder.setX(x));
         protocolType.defineKey('key_________________y', 0x2, ProtocolTypes.TYPE_UID_______VARINT32, (builder: PbfCoordinateBuilder, y: number) => builder.setY(y));
         return protocolType;
-    }    
+    }
 
 }
 ProtocolTypes.init();

@@ -26,7 +26,7 @@ export default () => {
 
   const handleScreenshotRequested = () => {
 
-    console.log('📞 handling screenshot requested');
+    console.debug('📞 handling screenshot requested');
 
     setAppState({
       ...appState,
@@ -50,7 +50,7 @@ export default () => {
    */
   const handleInstantChange = async (instant: number) => {
 
-    console.log('📞 handling instant change', TimeUtil.formatCategoryDateFull(instant));
+    console.debug('📞 handling instant change', TimeUtil.formatCategoryDateFull(instant));
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     dataSetting.setInstant(instant);
@@ -69,7 +69,7 @@ export default () => {
 
   const handleInstantRangeChange = async (instantMin: number, instantMax: number) => {
 
-    console.log('📞 handling instant range change', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax), appState.source);
+    console.debug('📞 handling instant range change', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax), appState.source);
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
@@ -98,7 +98,7 @@ export default () => {
 
   const handleHexagonsLoaded = () => {
 
-    console.log('📞 handling hexagons loaded');
+    console.debug('📞 handling hexagons loaded');
 
     setAppState({
       ...appState,
@@ -114,7 +114,7 @@ export default () => {
 
   const handleDataLoaded = (source: string) => {
 
-    console.log('📞 handling data loaded', source);
+    console.debug('📞 handling data loaded', source);
     userInterfaceProps.indicatorProps.find(p => p.source === source).loaded = true;
 
     setAppState({
@@ -134,7 +134,7 @@ export default () => {
     const indicatorProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
     const isSourceChange = indicatorProps.source !== appState.source;
 
-    console.log('📞 handling indicator fold', id, appState.source, ' >> ', indicatorProps.source);
+    console.debug('📞 handling indicator fold', id, appState.source, ' >> ', indicatorProps.source);
 
     let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
@@ -169,7 +169,7 @@ export default () => {
   const [exportableChart, setExportableChart] = useState<IChartProps>();
   const handleIndicatorExport = async (id: string) => {
 
-    console.log('📞 handling indicator export', id);
+    console.debug('📞 handling indicator export', id);
 
     const exportableChartProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
     setExportableChart({
@@ -182,7 +182,7 @@ export default () => {
 
   const handleIndxChange = async (source: string, name: string, indexRaw: string) => {
 
-    console.log('📞 handling index change', source, name, indexRaw);
+    console.debug('📞 handling index change', source, name, indexRaw);
 
     const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     dataSettings.setIndex(parseInt(indexRaw));
@@ -201,7 +201,7 @@ export default () => {
 
   const handlePathChange = async (source: string, name: string, path: string) => {
 
-    console.log('📞 handling path change', source, name, path);
+    console.debug('📞 handling path change', source, name, path);
 
     const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     dataSettings.setPath(name, path);
@@ -610,7 +610,7 @@ export default () => {
 
   useEffect(() => {
 
-    console.log('🔄 updating app');
+    console.debug('🔄 updating app');
 
     // const refEle = 0;
 
@@ -668,8 +668,6 @@ export default () => {
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
 
       if (dataSetting) {
-
-        // console.log('data', userInterfaceProps.indicatorProps[i].source, data.path)
 
         const selected = indicatorPropsInstance.source === appState.source;
 
@@ -730,8 +728,6 @@ export default () => {
               }
             });
 
-            // console.log('crumbs (top)', path, prefKey, validPath, keyset);
-
             breadcrumbProps.push({
               source: appState.source,
               name: keysetKey,
@@ -749,9 +745,7 @@ export default () => {
               // } else {
               //   mapKeys = subset.getKeys();
               // }
-              // console.log('mapKeys', mapKeys);
 
-              // console.log('crumbs (sub)', path, prefKey, validSubpath, subset, mapKeys);
               breadcrumbProps.push({
                 source: appState.source,
                 name: keysetKey,
@@ -798,7 +792,6 @@ export default () => {
 
           const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
 
-          // console.log('areaPointer', prefPointer, postPointer);
           /**
            * find min and max values referring to the map display date
            */
@@ -828,7 +821,6 @@ export default () => {
           return new Color(h, s, v);
         }
 
-        // console.log('data', data, );
         const valueKey = prefKey + postKey;
         const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
         const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
@@ -885,8 +877,6 @@ export default () => {
           // performance
           const valueLookup: { [K in string]: IHexagonState } = {};
 
-          // console.log(TimeUtil.formatCategoryDateFull(clampedInstant60), '-', TimeUtil.formatCategoryDateFull(clampedInstant00))
-
           _hexagonProps = {
             // onHover: setHovered,
             source: appState.source,
@@ -920,7 +910,6 @@ export default () => {
                 let lookupState = valueLookup['c' + hexagon.x];
                 if (!lookupState) {
                   const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
-                  // console.log('building', 'c' + hexagon.x, legendFraction.toFixed(3), TimeUtil.formatCategoryDateFull(historicInstant));
                   const historicEntry = dataSetting.getDataset().getEntryByInstant(historicInstant);
                   if (historicEntry.hasKey(prefKey + postKey)) {
                     lookupState = {
@@ -1024,7 +1013,6 @@ export default () => {
       });
     }
 
-    // console.log('selectedE', selected1);
     /**
     * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
     */
@@ -1047,7 +1035,7 @@ export default () => {
 
   useEffect(() => {
 
-    console.log('✨ building app component');
+    console.debug('✨ building app component');
     window.addEventListener('resize', handleResize);
 
     let delay = 1;

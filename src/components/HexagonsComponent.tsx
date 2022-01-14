@@ -41,11 +41,9 @@ export default (props: IHexagonsProps) => {
   let hexagonValue: IHexagon;
   useEffect(() => {
 
-    console.log('✨ building hexagons component', props);
+    console.debug('✨ building hexagons component', props);
 
     if (meshRef.current && geomRef.current) {
-
-      // console.log('use effect', meshRef.current.id, geomRef.current.id, meshRef.current.geometry.id);
 
       // const offsetHeight = 20000 * SpatialUtil.SCALE_SCENE;
       const vertices: number[] = [];
@@ -112,7 +110,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.log('🔧 updating hexagons component', props);
+    console.debug('🔧 updating hexagons component', props);
     const tsA = Date.now();
 
     let counter = 0;
@@ -142,7 +140,6 @@ export default (props: IHexagonsProps) => {
 
     });
 
-    // console.log('props.path', props.path, props.keys);
     props.keys.forEach(path => {
       HexagonRepository.getInstance().getBorder(path, props).then(borderHexagons => {
         borderHexagons.forEach(borderHexagon => {
@@ -157,7 +154,7 @@ export default (props: IHexagonsProps) => {
       });
     });
 
-    console.log('🕓 updating hexagons component (done)', Date.now() - tsA);
+    console.debug('🕓 updating hexagons component (done)', Date.now() - tsA);
 
     invalidate();
 
@@ -171,7 +168,6 @@ export default (props: IHexagonsProps) => {
       if (hexagonValue.luc >= 100) {
         const path = props.getPath(hexagonValue);
         if (path !== props.path) {
-          // console.log('firing path change event');
           onPathChange(props.source, props.name, path);
         }
       }

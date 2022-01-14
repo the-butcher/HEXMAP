@@ -40,7 +40,7 @@ export default (props: ILightProps) => {
     }
     useEffect(() => {
 
-        console.log('✨ building light component', props);
+        console.debug('✨ building light component', props);
 
         configureLight(pointLightFast.current!, 32);
         configureLight(pointLightSlow.current!, 8);
@@ -52,7 +52,7 @@ export default (props: ILightProps) => {
 
     useEffect(() => {
 
-        console.log('🔧 updating light component', props);
+        console.debug('🔧 updating light component', props);
 
         pointLightSlow.current!.visible = shadowEnabled;
         pointLightFast.current!.visible = !shadowEnabled;
@@ -65,10 +65,6 @@ export default (props: ILightProps) => {
 
 
     }, [stamp]);
-
-    useFrame((state) => {
-        // console.log('state', state);
-    });
 
     return (
         <>

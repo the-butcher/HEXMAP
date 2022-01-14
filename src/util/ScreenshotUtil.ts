@@ -2,8 +2,14 @@ import { Camera, Scene, WebGLRenderer } from "three";
 import GIFEncoder from 'gif-encoder-2';
 import { IScreenshotOptions } from "./IScreenshotOptions";
 import concat from 'concat-stream';
-import { IGifFrame } from "./IGifFrame";
+import { IScreenshot } from "./IScreenshot";
 
+/**
+ * utility type for taking snapshots of the current scene and exporting it to either PNG or GIF
+ * 
+ * @author h.fleischer
+ * @since 13.01.2021
+ */
 export class ScreenshotUtil {
 
     static createInstance(invalidate: () => void): void {
@@ -19,13 +25,16 @@ export class ScreenshotUtil {
     private static instance: ScreenshotUtil;
 
     private readonly invalidate: () => void;
-    // private gifEncoder: GIFEncoder;
     private screenshotOptions: IScreenshotOptions;
-    private readonly gifFrames: IGifFrame[];
+    private readonly frames: IScreenshot[];
 
     private constructor(invalidate: () => void) {
         this.invalidate = invalidate;
-        this.gifFrames = [];
+        this.frames = [];
+    }
+
+    setDelay(frameIndex: number, delay: number): void {
+        this.frames[frameIndex].delay = delay;
     }
 
     setScreenshotOptions(screenshotOptions: IScreenshotOptions): void {
@@ -38,87 +47,70 @@ export class ScreenshotUtil {
     }
 
     getFrameCount(): number {
-        return this.gifFrames.length;
+        return this.frames.length;
     }
 
-    getFrame(frameIndex: number): IGifFrame {
-        return this.gifFrames[frameIndex];
+    getFrame(frameIndex: number): IScreenshot {
+        return this.frames[frameIndex];
     }
 
-    renderToGIFFrame(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+    removeFrame(frameIndex: number): void {
+        this.frames.splice(frameIndex, 1);
+    }
 
-        console.log('rendering to gif frame')
-        // if (!this.gifEncoder) {
-
-        //     this.gifEncoder = new GIFEncoder(1200, 675, 'neuquant', false);
-        //     this.gifEncoder.setDelay(200);
-        //     this.gifEncoder.createReadStream().pipe(concat((buffer: Uint8Array) => {
-
-        //         const blob = new Blob([buffer], {
-        //             type: 'image/gif'
-        //         });
-
-        //         var anchor = document.createElement('a');
-        //         anchor.href = URL.createObjectURL(blob);
-        //         anchor.download = `canvas_3d_${Date.now()}.gif`;
-        //         anchor.click();
-
-        //         this.gifEncoder = undefined;
-        //         this.screenshotOptions = undefined;
-        //         // setSreenshotRequested(undefined);
-
-        //     }));
-        //     this.gifEncoder.start();
-
-        // }
+    renderToFrame(gl: WebGLRenderer, scene: Scene, camera: Camera) {
 
         let canvas = this.renderToCanvas(gl, scene, camera);
-        canvas.style.width = '120px',
-            canvas.style.height = '67px';
-        this.gifFrames.push({
+        canvas.style.width = '120px';
+        canvas.style.height = '67px';
+        this.frames.push({
             canvas,
-            millis: 200
+            delay: 200
         });
         this.screenshotOptions.done();
-        // this.gifEncoder.setDelay(this.screenshotOptions.time);
-        // this.gifEncoder.addFrame(outputCanvas.getContext('2d'));
-
         this.screenshotOptions = undefined;
 
     }
 
-    renderToGIFImage() {
+    exportToGif() {
 
-        // if (this.gifEncoder) {
-        //     this.gifEncoder.finish();
-        // }
-        this.screenshotOptions = undefined;
+        const gifEncoder = new GIFEncoder(1200, 675, 'neuquant', false);
+        gifEncoder.setDelay(200);
+        gifEncoder.createReadStream().pipe(concat((buffer: Uint8Array) => {
+
+            const blob = new Blob([buffer], {
+                type: 'image/gif'
+            });
+
+            var anchor = document.createElement('a');
+            anchor.href = URL.createObjectURL(blob);
+            anchor.download = `canvas_3d_${Date.now()}.gif`;
+            anchor.click();
+
+        }));
+
+        gifEncoder.start();
+        this.frames.forEach(gifFrame => {
+            gifEncoder.setDelay(gifFrame.delay);
+            gifEncoder.addFrame(gifFrame.canvas.getContext('2d'));
+        });
+        gifEncoder.finish();
 
     }
 
-    renderToPngImage(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+    exportToPng() {
 
-        gl.domElement.getContext('webgl', { preserveDrawingBuffer: true });
-        gl.render(scene, camera);
-
-        let outputCanvas = this.renderToCanvas(gl, scene, camera);
-        outputCanvas.toBlob(
+        this.frames[0].canvas.toBlob(
             blob => {
                 var a = document.createElement('a');
                 var url = URL.createObjectURL(blob);
                 a.href = url;
                 a.download = `canvas_3d_${Date.now()}`;
                 a.click();
-
-                console.log('url', blob, url);
-
             },
             'image/png',
             1.0
         )
-
-        gl.domElement.getContext('webgl', { preserveDrawingBuffer: false });
-        this.screenshotOptions = undefined;
 
     }
 

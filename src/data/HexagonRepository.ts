@@ -46,7 +46,7 @@ export class HexagonRepository {
 
     calculateBorders(props: IHexagonsProps): void {
 
-        console.log('⚙ calculating borders');
+        console.debug('⚙ calculating borders');
 
         const joinableHexagons = this.hexagons;
 
@@ -119,8 +119,6 @@ export class HexagonRepository {
 
     async getBorder(path: string, props: IHexagonsProps): Promise<IHexagon[]> {
 
-        // console.log('get borders', path);
-
         if (this.hexagons.length === 0) {
             return [];
         }
@@ -145,8 +143,6 @@ export class HexagonRepository {
 
         let hexagonValue: IHexagon;
         const pbfHexagons = await new PbfHexagonsLoader().load('./hexagons.pbf');
-
-        // console.log('pbfHexagons', pbfHexagons);
 
         let values: number[];
         let yOffset: number;

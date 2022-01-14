@@ -21,12 +21,10 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
   }
 
   const handleExpand = () => {
-    console.log('handling expand', id);
     onExpand(id);
   }
 
   const handleExport = () => {
-    console.log('handling export', id);
     onExport(id);
   }
 

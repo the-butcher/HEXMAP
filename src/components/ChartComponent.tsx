@@ -37,7 +37,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('✨ building chart component', props);
+    console.debug('✨ building chart component', props);
     const tsA = Date.now();
 
     const dataSetting = DataRepository.getInstance().getDataSetting(source);
@@ -180,7 +180,6 @@ export default (props: IChartProps) => {
     let positionX: number;
     if (doExport) {
       positionX = (instant + TimeUtil.MILLISECONDS_PER___HOUR * 11 - instantMin) / (instantMax - instantMin);
-      // console.log('initial positionX', positionX);
     }
 
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -392,7 +391,7 @@ export default (props: IChartProps) => {
 
     };
 
-    console.log('🕓 updating chart component (done)', Date.now() - tsA);
+    console.debug('🕓 updating chart component (done)', Date.now() - tsA);
 
   }, []);
 
@@ -438,7 +437,6 @@ export default (props: IChartProps) => {
       chartState.cursor.show();
     }
 
-    // console.log('positionDst', instant, positionDst, chartState.xAxisVal.valueToPosition(instant), TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax));
     if (!Number.isNaN(positionDst)) {
       chartState.cursor.set('positionX', positionDst);
     }
@@ -450,11 +448,7 @@ export default (props: IChartProps) => {
     handleInstantRangeChange.current = (instantMin1: number, instantMax1: number) => {
       if (openHorizontal && (instantMin1 > 0 && instantMin1 !== instantMin) || (instantMax1 > 0 && instantMax1 !== instantMax)) {
         if (!doExport) {
-          // window.clearTimeout(onInstantRangeChangeTo);
-          // onInstantRangeChangeTo = window.setTimeout(() => {
-          // console.log('firing chart range change', TimeUtil.formatCategoryDateFull(instantMin), '/', TimeUtil.formatCategoryDateFull(instantMin1), TimeUtil.formatCategoryDateFull(instantMax), '/', TimeUtil.formatCategoryDateFull(instantMax1), source);
           onInstantRangeChange(instantMin1, instantMax1);
-          // }, 1000);
         }
         instantMin = instantMin1;
         instantMax = instantMax1;
@@ -465,7 +459,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('🔧 updating chart component (path)', props);
+    console.debug('🔧 updating chart component (path)', props);
 
     if (chartState) {
       updatePath(chartState);
@@ -476,7 +470,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('🔧 updating chart component (fold)', props);
+    console.debug('🔧 updating chart component (fold)', props);
 
     if (chartState) {
       updateFold(chartState);
@@ -487,7 +481,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('🔧 updating chart component (instant)', props);
+    console.debug('🔧 updating chart component (instant)', props);
     if (chartState) {
       updateInstants(chartState);
       updateCallbacks();
@@ -497,7 +491,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.log('🔧 updating chart component (chartState)', props);
+    console.debug('🔧 updating chart component (chartState)', props);
     if (chartState) {
       updatePath(chartState);
       updateFold(chartState);

@@ -1,5 +1,6 @@
-import { Slider } from "@mui/material";
-import { useState } from "react";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { IconButton, Slider, Tooltip } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { ObjectUtil } from "../util/ObjectUtil";
 import { TimeUtil } from "../util/TimeUtil";
 import { IInstantProps } from "./IInstantProps";
@@ -14,7 +15,15 @@ export default (props: IInstantProps) => {
 
     const [key, setKey] = useState<string>(ObjectUtil.createId())
 
-    const { onInstantChange } = props;
+    const { instant, instantMin, instantMax, onInstantChange } = props;
+
+    const [incrementableInstant, setIncrementableInstant] = useState<number>(instant);
+    const handleInstantDecr = useRef<() => void>(() => {
+        // no op initially 
+    });
+    const handleInstantIncr = useRef<() => void>(() => {
+        // no op initially 
+    });
 
     const minDate = new Date(props.instantMin); // 2020
     const maxDate = new Date(props.instantMax); // 2020
@@ -32,20 +41,47 @@ export default (props: IInstantProps) => {
         }
     }
 
+    useEffect(() => {
+
+        console.debug('✨ building date slider component', props);
+
+        window.addEventListener('keyup', e => {
+
+            if (e.key === 'ArrowLeft') {
+                handleInstantDecr.current();
+            } else if (e.key === 'ArrowRight') {
+                handleInstantIncr.current();
+            }
+
+        });
+
+    }, []);
+
+
+    useEffect(() => {
+
+        console.debug('✨ updating date slider component (instant)', props);
+        handleInstantDecr.current = () => {
+            onInstantChange(instant - TimeUtil.MILLISECONDS_PER____DAY);
+        }
+        handleInstantIncr.current = () => {
+            onInstantChange(instant + TimeUtil.MILLISECONDS_PER____DAY);
+        }
+
+    }, [instant]);
+
     /**
      * triggered from the slider, calling the callback specified in props
      * @param event 
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        // console.log('firing slider instant change');
-        // requestAnimationFrame(() => {
         onInstantChange(value as number);
-        // });
     }
 
+
     /**
-     * have slider values (timestamps) formatted to a readable date
+     * have slider values (timestamps) formatted to a readable date 
      * @param value 
      * @param index 
      * @returns 
@@ -55,7 +91,23 @@ export default (props: IInstantProps) => {
     });
 
     return (
-        <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instant} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 36px' }} />
+        <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '100' }}>
+            <Tooltip title="Vorheriger Tag [<]">
+                <span>
+                    <IconButton onClick={handleInstantDecr.current} style={{ width: '30px', height: '28px', marginTop: '6px' }} disabled={instant <= instantMin} >
+                        <KeyboardArrowLeft style={{ width: '21px', height: '21px', color: 'var(--color-text)' }} />
+                    </IconButton>
+                </span>
+            </Tooltip>
+            <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instant} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 6px' }} />
+            <Tooltip title="Nächster Tag [>]">
+                <span>
+                    <IconButton onClick={handleInstantIncr.current} style={{ width: '30px', height: '28px', marginTop: '6px' }} disabled={instant >= instantMax}>
+                        <KeyboardArrowRight style={{ width: '21px', height: '21px', color: 'var(--color-text)' }} />
+                    </IconButton>
+                </span>
+            </Tooltip>
+        </div>
     );
 
 }

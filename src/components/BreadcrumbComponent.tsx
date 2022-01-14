@@ -17,7 +17,6 @@ export default (props: IBreadcrumbProps) => {
         return key.replaceAll('#', '').length === 0;
     }
 
-    // console.log('keys', keys);
     let key: string;
     let val: string;
     let pad: string;

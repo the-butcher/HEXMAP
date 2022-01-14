@@ -41,7 +41,6 @@ export class DataRepository {
       dataPointer += dataSetting.getPath(keysetKeys[i]);
     }
     const population = dataSetting.getDataset().getPopulation(dataPointer);
-    // console.log('dataPointer', dataPointer, population);
 
     /**
      * how many series are going to be needed
@@ -110,19 +109,14 @@ export class DataRepository {
   }
 
   getDataSetting(source: string): IDataSetting {
-
-    // console.log('get-------------data', source);
     return this.dataSettings[source];
   }
-  
-  async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
 
-    // console.log('get-or-load (wait)', source);
+  async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
     if (!this.dataSettings[source]) {
       const dataRoot: IDataRoot = await new JsonLoader().load(source);
       this.dataSettings[source] = new DataSetting(new Dataset(dataRoot));
     }
-    // console.log('get-or-load (done)', source);
     return this.dataSettings[source];
   }
 

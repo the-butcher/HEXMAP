@@ -24,16 +24,10 @@ export default (props: IMapProps) => {
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
-        // @ts-ignore
-        // console.log('state.gl.capabilities.maxTextureSize', state.gl.capabilities.maxTextureSize);
-    }
-
-    const handlePointerUp = () => {
-        // console.log('pointer up in document');
     }
 
     return (
-        <div style={{ position: 'absolute', height: '100%', width: '100%' }} onPointerUp={handlePointerUp}>
+        <div style={{ position: 'absolute', height: '100%', width: '100%' }}>
             <Canvas frameloop='demand' shadows={{ type: PCFSoftShadowMap, enabled: true }} onCreated={onCreated} camera={{ position: [0, 300, 0], fov: 40, far: 10000 }}>
                 <ControlsComponent key={controlsProps.id} {...controlsProps} />
                 {/* <Stats /> */}

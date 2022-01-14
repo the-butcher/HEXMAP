@@ -10,7 +10,7 @@ import { ILabelProps } from './ILabelProps';
  * @author h.fleischer
  * @since 11.12.2021
  */
-export default (props: ILabelProps) => { 
+export default (props: ILabelProps) => {
 
   const { size, position, label } = props;
 
@@ -22,26 +22,24 @@ export default (props: ILabelProps) => {
 
   useEffect(() => {
 
-    console.log('✨ building label component', props);
+    console.debug('✨ building label component', props);
 
     const loader = new FontLoader();
-    loader.load( './droid_sans_mono_regular.typeface.json', (response:Font) => {
+    loader.load('./droid_sans_mono_regular.typeface.json', (response: Font) => {
       setFont(new three.Font(response.data));
     });
 
-  }, []);      
-  
+  }, []);
+
   useEffect(() => {
 
-    console.log('🔧 updating label component', props);
+    console.debug('🔧 updating label component', props);
 
     if (font) {
 
-      // console.log('props.label', props.label);
-      
-      const shapes = font!.generateShapes( label, size );
-      geomTextRef.current = new three.ShapeGeometry( shapes );
-      geomTextRef.current.computeBoundingBox();      
+      const shapes = font!.generateShapes(label, size);
+      geomTextRef.current = new three.ShapeGeometry(shapes);
+      geomTextRef.current.computeBoundingBox();
 
       geomTextRef.current.rotateX(-Math.PI / 2);
       geomTextRef.current.translate(position.x, position.y, position.z);
@@ -49,16 +47,16 @@ export default (props: ILabelProps) => {
       meshTextRef.current!.geometry = geomTextRef.current;
 
     }
-    
-  }, [props.label, font]);      
+
+  }, [props.label, font]);
 
   return (
-    <mesh ref={ meshTextRef }> 
-      <textGeometry ref={ geomTextRef } />
-      <meshStandardMaterial ref={ mtrlTextRef } color={ [0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2] } />
+    <mesh ref={meshTextRef}>
+      <textGeometry ref={geomTextRef} />
+      <meshStandardMaterial ref={mtrlTextRef} color={[0.076 * 2.2, 0.076 * 2.2, 0.050 * 2.2]} />
     </mesh>
   );
-  
+
 };
 
 

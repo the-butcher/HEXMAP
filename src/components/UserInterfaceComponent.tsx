@@ -233,9 +233,6 @@ export default (props: IUserInterfaceProps) => {
     buttons.push(<Button key={`expandmobile_${indicatorProps[i].id}`} style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={() => handleExpand(i)}>{indicatorProps[i].desc}</Button>);
   }
 
-  // console.log('active source', indicatorProps[activeIndicatorIndex]);
-
-
   return (
     <ThemeProvider theme={theme}>
       {mobileView ?
