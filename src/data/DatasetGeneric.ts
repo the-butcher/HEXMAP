@@ -5,7 +5,9 @@ import { IDataEntry } from "./IDataEntry";
 import { IDataRoot } from "./IDataRoot";
 import { IDataset } from "./IDataset";
 import { IKeyset } from "./IKeyset";
-import { Keyset } from "./Keyset";
+import { IKeysetIndex } from "./IKeysetIndex";
+import { KeysetGeneric } from "./KeysetGeneric";
+import { KeysetIndex } from "./KeysetIndex";
 
 /**
  * implementation of IDataSet
@@ -14,7 +16,7 @@ import { Keyset } from "./Keyset";
  * @author h.fleischer
  * @since 30.12.2021
  */
-export class Dataset implements IDataset {
+export class DatasetGeneric implements IDataset {
 
     // private readonly dataRoot: IDataRoot;
     private readonly populations: { [K in string]: number };
@@ -22,7 +24,7 @@ export class Dataset implements IDataset {
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
     private readonly entries: { [K in string]: IDataEntry };
-    private readonly indexKeyset: IKeyset;
+    private readonly indexKeyset: IKeysetIndex;
 
     private readonly instantMin: number;
     private readonly instantMax: number;
@@ -37,15 +39,15 @@ export class Dataset implements IDataset {
         this.keysets = {};
         this.keysetKeys.forEach(keysetKey => {
             const defaultKey = Object.keys(dataRoot.keys[keysetKey]).sort()[0];
-            this.keysets[keysetKey] = new Keyset(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
+            this.keysets[keysetKey] = new KeysetGeneric(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
         });
 
-        const indexKeys = dataRoot.idxs;
-        const indexKeysetRaw: { [K in string]: string } = {};
-        for (let i = 0; i < indexKeys.length; i++) {
-            indexKeysetRaw[i] = indexKeys[i];
-        }
-        this.indexKeyset = new Keyset('index', dataRoot.indx.toString(), indexKeysetRaw);
+        // const indexKeys = dataRoot.idxs;
+        // const indexKeysetRaw: { [K in string]: string } = {};
+        // for (let i = 0; i < indexKeys.length; i++) {
+        //     indexKeysetRaw[i] = indexKeys[i];
+        // }
+        this.indexKeyset = new KeysetIndex(dataRoot.indx, dataRoot.idxs);
 
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[0]);
@@ -86,7 +88,7 @@ export class Dataset implements IDataset {
         return this.entryKeys;
     }
 
-    getIndexKeyset(): IKeyset {
+    getIndexKeyset(): IKeysetIndex {
         return this.indexKeyset;
     }
 

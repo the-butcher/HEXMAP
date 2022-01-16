@@ -1,5 +1,6 @@
 import { IDataEntry } from "./IDataEntry";
 import { IKeyset } from "./IKeyset";
+import { IKeysetIndex } from "./IKeysetIndex";
 
 export interface IDataset {
 
@@ -9,7 +10,7 @@ export interface IDataset {
 
     getPopulation(key: string): number;
 
-    getIndexKeyset(): IKeyset;
+    getIndexKeyset(): IKeysetIndex;
 
     /**
      * get the keys that this dataset holds, i.e. ['Bundesland', 'Altersgruppe']

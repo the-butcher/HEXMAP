@@ -30,17 +30,6 @@ export interface IKeyset {
      */
     getValue(key: string | number): string;
 
-    // /**
-    //  * get the label for a given key
-    //  * @param key 
-    //  */
-    // getLabel(key: string): string;
-
-    /**
-     * get the type of series suitable to display this index' data
-     */
-    getSeriesType(key: string | number): SERIES_TYPE;
-
     /**
      * get a sub-keyset (if any) for the given key
      * @param key 

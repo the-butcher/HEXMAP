@@ -21,7 +21,12 @@ export class FormattingDefinition {
     }
 
     static readonly FORMATTER____FIXED: IFormattingDefinition = {
-        format: value => `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FIXED)}`,
+        format: value => {
+            if (!value) {
+                Math.random();
+            }
+            return `${value.toLocaleString(undefined, FormattingDefinition.OPTIONS_FIXED)}`;
+        },
         chartFormat: '#'
     }
 

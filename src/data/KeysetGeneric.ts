@@ -2,7 +2,7 @@ import ChartComponent, { SERIES_TYPE } from "../components/ChartComponent";
 import { DataRepository } from "./DataRepository";
 import { IKeyset } from "./IKeyset";
 
-export class Keyset implements IKeyset {
+export class KeysetGeneric implements IKeyset {
 
     private readonly defaultKey: string;
     private readonly keysetKey: string;
@@ -35,10 +35,6 @@ export class Keyset implements IKeyset {
         return this.raws;
     }
 
-    getSeriesType(key: string): SERIES_TYPE {
-        return this.keysetRaw[key] === DataRepository.FAELLE ? 'step' : 'line';
-    }
-
     hasSubset(key: string): boolean {
         return this.hasSubsets && this.getSubset(key) !== undefined;
     }
@@ -59,7 +55,7 @@ export class Keyset implements IKeyset {
                     subsetRaw[subkey] = this.keysetRaw[subkey];
                 });
 
-                this.subsets[key] = new Keyset(this.keysetKey, subkeys[0], subsetRaw);
+                this.subsets[key] = new KeysetGeneric(this.keysetKey, subkeys[0], subsetRaw);
             }
             return this.subsets[key];
         }

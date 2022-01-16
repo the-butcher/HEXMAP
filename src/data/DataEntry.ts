@@ -28,4 +28,8 @@ export class DataEntry implements IDataEntry {
         return this.dataRaw[key][index];
     }
 
+    addValue(key: string, value: number): void {
+        this.dataRaw[key].push(value);
+    }
+
 }

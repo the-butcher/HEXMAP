@@ -16,7 +16,6 @@ import { HexagonRepository } from './data/HexagonRepository';
 import { IAppState } from './IAppState';
 import { Color } from './util/Color';
 import { ColorUtil } from './util/ColorUtil';
-import { FixedValue } from './util/FixedValue';
 import { FormattingDefinition } from './util/FormattingDefinition';
 import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
@@ -218,149 +217,13 @@ export default () => {
 
   };
 
-  const interpolatedEle7di5 = new InterpolatedValue(0, 80, 0, 20000, 1.00);
-  const interpolatedEle7di3 = new InterpolatedValue(0, 80, 0, 14000, 1.00);
-  const interpolatedEle7di1 = new InterpolatedValue(0, 80, 0, 8000, 1.00);
-  const interpolatedHue7di5 = new InterpolatedValue(0.25, -0.01, 0, 5000, 0.33);
-  const interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
-  const interpolatedHue7di1 = new InterpolatedValue(0.25, -0.01, 0, 2000, 0.33);
 
-  const interpolatedInt7diX = new InterpolatedValue(1.30, 1.20, 0, 2000, 1);
 
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
     indicatorProps: [
-      // {
-      //   id: 'i_sbg',
-      //   instant: -1,
-      //   instantMin: -1,
-      //   instantMax: -1,
-      //   name: 'Inzidenz',
-      //   desc: 'Salzburger Gemeinden',
-      //   value00: '',
-      //   value07: '',
-      //   valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-      //   onExpand: handleIndicatorExpand,
-      //   onInstantChange: handleInstantChange,
-      //   onInstantRangeChange: handleInstantRangeChange,
-      //   onExport: handleIndicatorExport,
-      //   doExport: false,
-      //   fold: 'open-horizontal',
-      //   source: './hexmap-data-salzburg-gemeinde.json',
-      //   loaded: false,
-      //   path: '',
-      //   breadcrumbProps: [],
-      //   interpolatedEle: interpolatedEle7di5,
-      //   interpolatedHue: interpolatedHue7di5,
-      //   interpolatedSat: new FixedValue(1.00),
-      //   interpolatedVal: new FixedValue(0.40),
-      //   interpolatedInt: interpolatedInt7diX
-      // },
-      {
-        id: 'i_ems',
-        instant: -1,
-        instantMin: -1,
-        instantMax: -1,
-        name: 'Inzidenz',
-        desc: 'EMS',
-        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-        onExpand: handleIndicatorExpand,
-        onInstantChange: handleInstantChange,
-        onInstantRangeChange: handleInstantRangeChange,
-        onExport: handleIndicatorExport,
-        doExport: false,
-        fold: 'open-horizontal',
-        source: './hexmap-data-ems.json',
-        loaded: false,
-        path: '',
-        breadcrumbProps: [],
-        interpolatedEle: interpolatedEle7di1,
-        interpolatedHue: interpolatedHue7di1,
-        interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedInt: interpolatedInt7diX
-      },
-      {
-        id: 'i_paa',
-        instant: -1,
-        instantMin: -1,
-        instantMax: -1,
-        name: 'Inzidenz',
-        desc: 'Bundesland und Alter',
-        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-        onExpand: handleIndicatorExpand,
-        onInstantChange: handleInstantChange,
-        onInstantRangeChange: handleInstantRangeChange,
-        onExport: handleIndicatorExport,
-        doExport: false,
-        fold: 'closed',
-        source: './hexmap-data-bundesland-alter.json',
-        loaded: false,
-        path: '',
-        breadcrumbProps: [],
-        interpolatedEle: interpolatedEle7di1,
-        interpolatedHue: interpolatedHue7di1,
-        interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedInt: interpolatedInt7diX
-      },
-      {
-        id: 'i_dst',
-        instant: -1,
-        instantMin: -1,
-        instantMax: -1,
-        name: 'Inzidenz',
-        desc: 'Bezirk',
-        value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        value07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-        valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-        onExpand: handleIndicatorExpand,
-        onInstantChange: handleInstantChange,
-        onInstantRangeChange: handleInstantRangeChange,
-        onExport: handleIndicatorExport,
-        doExport: false,
-        fold: 'closed',
-        source: './hexmap-data-bundesland-bezirk.json',
-        loaded: false,
-        path: '',
-        breadcrumbProps: [],
-        interpolatedEle: interpolatedEle7di3,
-        interpolatedHue: interpolatedHue7di3,
-        interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedInt: interpolatedInt7diX
-      },
-      {
-        id: 'v_mnc',
-        instant: -1,
-        instantMin: -1,
-        instantMax: -1,
-        name: 'Impfung',
-        desc: 'Gemeinde',
-        value00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
-        value07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
-        valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
-        onExpand: handleIndicatorExpand,
-        onInstantChange: handleInstantChange,
-        onInstantRangeChange: handleInstantRangeChange,
-        onExport: handleIndicatorExport,
-        doExport: false,
-        fold: 'closed',
-        source: './hexmap-data-vacc-gemeinde.json',
-        loaded: false,
-        path: '',
-        breadcrumbProps: [],
-        interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1),
-        interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
-        interpolatedSat: new FixedValue(1.00),
-        interpolatedVal: new FixedValue(0.40),
-        interpolatedInt: new FixedValue(1.25),
-      }
+      ...DataRepository.DEFAULT_INDICATOR_PROPS
     ],
     navigationBotProps: {
       instantProps: {
@@ -673,6 +536,7 @@ export default () => {
 
         // current instant (closest to date slider date - and date slider will be move to that instant upon update)
         const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instant);
+        // console.log('clampedInstant00', indicatorPropsInstance.source, TimeUtil.formatCategoryDateFull(clampedInstant00));
 
         // one week offset (for "vorwoche" value)
         const clampedInstant07 = dataSetting.getDataset().getValidInstant(clampedInstant00 - TimeUtil.MILLISECONDS_PER___WEEK);
@@ -761,7 +625,7 @@ export default () => {
         };
 
         const indexKeyset = dataSetting.getDataset().getIndexKeyset();
-        const indexSizeFiltered = indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
+        const indexSizeFiltered = indexKeyset.getBreadcrumbKeys().length; // indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
         if (indexSizeFiltered > 1) {
 
           if (selected) {
@@ -891,6 +755,7 @@ export default () => {
             getState: (hexagon) => {
               let ele = hexagon.ele / 2 - 7.5;
               if (hexagon.luc === 0) {
+                // legend
                 let lookupState = valueLookup['l' + hexagon.x];
                 if (!lookupState) {
                   const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
@@ -906,6 +771,7 @@ export default () => {
                   height: lookupState.height + ele
                 }
               } else if (hexagon.luc === 1) { // 3d-chart
+                // history
                 const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
                 let lookupState = valueLookup['c' + hexagon.x];
                 if (!lookupState) {
@@ -929,11 +795,12 @@ export default () => {
                   height: lookupState.height + ele
                 }
               } else {
+                // data
                 let lookupState = valueLookup[hexagon.gkz];
                 if (!lookupState) {
                   const _prefKey = hexagon.gkz.substring(0, prefKey.length)
                   const dataKey = _prefKey + postKey;
-                  const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // .data[dataSetting.date];
+                  const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
                   if (entry00.hasKey(dataKey)) {
                     lookupState = {
                       color: getColor(entry00.getValue(dataKey, dataSetting.getIndex())),

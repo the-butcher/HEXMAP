@@ -18,4 +18,6 @@ export interface IDataEntry {
 
     getValue(key: string, index: number): number;
 
+    addValue(key: string, value: number): void;
+
 }

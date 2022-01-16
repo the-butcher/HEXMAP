@@ -1,3 +1,5 @@
+import { IDataRoot } from "../data/IDataRoot";
+import { IDataset } from "../data/IDataset";
 import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { IInterpolatedValue } from "../util/IInterpolatedValue";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
@@ -36,5 +38,7 @@ export interface IIndicatorProps extends IChartProps {
      * light intensity depending on value
      */
     interpolatedInt: IInterpolatedValue;
+
+    constructDataset: (dataRoot: IDataRoot) => IDataset;
 
 }

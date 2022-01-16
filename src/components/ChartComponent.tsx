@@ -237,6 +237,7 @@ export default (props: IChartProps) => {
       if (seriesType === 'step') {
         seriesClass = am5xy.StepLineSeries;
       }
+      const seriesColor = dataSetting.getDataset().getIndexKeyset().getSeriesColor(valueIndex);
 
       const seriesVal = _chart.series.push(seriesClass.new(_root, {
         name: `seriesVal_${valueIndex}`,
@@ -247,7 +248,7 @@ export default (props: IChartProps) => {
         interpolationDuration: 0,
         sequencedInterpolation: false,
         tooltip: am5.Tooltip.new(_root, {}),
-        stroke: am5.color(fontColor),
+        stroke: am5.color(seriesColor),
         fill: am5.color(fontColor),
       }));
 
