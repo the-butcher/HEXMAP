@@ -53,19 +53,64 @@ export default (props: IChartProps) => {
     _root.dateFormatter.set('dateFormat', 'dd.MM.yyyy');
     _root.locale = am5locales_de_DE;
 
+    let legendRoot = _root;
+    if (!doExport) {
+      legendRoot = am5.Root.new(`legenddiv_${id}`);
+    }
+
+    let _legend = legendRoot.container.children.push(
+      am5.Legend.new(legendRoot, {
+        width: am5.percent(100),
+        x: am5.percent(50),
+        y: am5.percent(100),
+        centerX: am5.percent(50),
+        centerY: am5.percent(100),
+        useDefaultMarker: true,
+        paddingLeft: doExport ? 50 : 0
+      })
+    );
+    _legend.labels.template.setAll({
+      fontFamily,
+      fontSize: 10,
+      fill: labelColor,
+      height: 10
+    });
+    _legend.markerRectangles.template.setAll({
+      width: 16,
+      height: 10,
+      y: 5
+    });
+
+    if (!doExport) {
+      _legend.setAll({
+        layout: legendRoot.verticalLayout,
+      });
+      _legend.itemContainers.template.setAll({
+        paddingBottom: 0,
+        paddingTop: 0
+      });
+      _legend.markerRectangles.template.setAll({
+        x: 115
+      });
+      _legend.labels.template.setAll({
+        x: 116,
+        textAlign: 'right',
+      });
+    }
+
+
     const _chart = _root.container.children.push(
       am5xy.XYChart.new(_root, {
         panX: false,
         panY: false,
         // wheelX: 'panX',
         wheelY: 'zoomX',
-
         layout: _root.verticalLayout,
         stateAnimationDuration: 0,
         paddingTop: 8,
         paddingRight: 5,
         paddingLeft: 5,
-        paddingBottom: 4,
+        paddingBottom: doExport ? 25 : 4,
         background: am5.Rectangle.new(_root, {
           fill: am5.color(0x42423a),
           fillOpacity: doExport ? 1.0 : 0.0
@@ -90,11 +135,9 @@ export default (props: IChartProps) => {
       renderer: yRendererVal,
       interpolationDuration: 0,
       stateAnimationDuration: 0,
-      min: 0
-      // min: -4000,
-      // strictMinMax: true
+      min: 0,
       // logarithmic: true,
-      // treatZeroAs: 0.000001,            
+      // treatZeroAs: 0.000001,
       // min: 1
     }));
     const _yAxisLabel = am5.Label.new(_root, {
@@ -137,10 +180,12 @@ export default (props: IChartProps) => {
     });
     const _xAxisVal: am5xy.DateAxis<am5xy.AxisRendererX> = _chart.xAxes.push(am5xy.DateAxis.new(_root, {
       maxDeviation: 0.2,
-      baseInterval: {
-        timeUnit: 'day',
-        count: 1
-      },
+      baseInterval: { timeUnit: "day", count: 1 },
+      gridIntervals: [
+        { timeUnit: "week", count: 1 },
+        { timeUnit: "month", count: 1 },
+        { timeUnit: "month", count: 3 }
+      ],
       renderer: xRendererVal,
       tooltip: am5.Tooltip.new(_root, {}),
       dateFormats,
@@ -233,14 +278,14 @@ export default (props: IChartProps) => {
       let seriesClass = am5xy.LineSeries;
 
       const seriesLabel = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex);
-      const seriesType = dataSetting.getDataset().getIndexKeyset().getSeriesType(valueIndex);
-      if (seriesType === 'step') {
+      const seriesStyle = dataSetting.getDataset().getIndexKeyset().getSeriesStyle(valueIndex);
+      if (seriesStyle.type === 'step') {
         seriesClass = am5xy.StepLineSeries;
       }
-      const seriesColor = dataSetting.getDataset().getIndexKeyset().getSeriesColor(valueIndex);
+      // const seriesColor = dataSetting.getDataset().getIndexKeyset().getSeriesColor(valueIndex);
 
       const seriesVal = _chart.series.push(seriesClass.new(_root, {
-        name: `seriesVal_${valueIndex}`,
+        name: seriesLabel,
         xAxis: _xAxisVal,
         yAxis: _yAxisVal,
         valueYField: `value_${valueIndex}`,
@@ -248,18 +293,19 @@ export default (props: IChartProps) => {
         interpolationDuration: 0,
         sequencedInterpolation: false,
         tooltip: am5.Tooltip.new(_root, {}),
-        stroke: am5.color(seriesColor),
-        fill: am5.color(fontColor),
+        stroke: am5.color(seriesStyle.color),
+        fill: am5.color(seriesStyle.fill),
+        stacked: seriesStyle.stacked
       }));
 
-      if (seriesType === 'step') {
-        seriesVal.strokes.template.set('strokeWidth', 1);
-        seriesVal.fills.template.setAll({ fillOpacity: 0.0, visible: true });
-      } else {
-        seriesVal.strokes.template.set('strokeWidth', 2);
-        seriesVal.fills.template.setAll({ fillOpacity: 0.2, visible: true });
+      seriesVal.fills.template.setAll({
+        fillOpacity: seriesStyle.fillOpacity,
+        visible: true,
+      });
+      seriesVal.strokes.template.set('strokeWidth', seriesStyle.strokeWidth);
+      if (seriesStyle.strokeDasharray) {
+        seriesVal.strokes.template.set('strokeDasharray', seriesStyle.strokeDasharray);
       }
-
       _series.push(seriesVal);
 
 
@@ -300,6 +346,7 @@ export default (props: IChartProps) => {
     const _chartState: IChartState = {
       root: _root,
       chart: _chart,
+      legend: _legend,
       cursor: _cursor,
       series: _series,
       xAxisLabel: _xAxisLabel,
@@ -323,13 +370,13 @@ export default (props: IChartProps) => {
     const handleStartEndChanged = (chartState1: IChartState) => {
 
       const daysShown = (instantMaxC - instantMinC) / TimeUtil.MILLISECONDS_PER____DAY;
-      chartState1.xAxisVal.series.forEach(s => {
-        if (daysShown > 120 && s instanceof am5xy.StepLineSeries) {
-          s.hide();
-        } else {
-          s.show();
-        }
-      });
+      // chartState1.xAxisVal.series.forEach(s => {
+      //   if (daysShown > 120 && s instanceof am5xy.StepLineSeries) {
+      //     s.hide();
+      //   } else {
+      //     s.show();
+      //   }
+      // });
       handleInstantRangeChange.current(instantMinC, instantMaxC);
 
     };
@@ -407,6 +454,7 @@ export default (props: IChartProps) => {
       s.appear(0);
 
     });
+    chartState.legend.data.setAll(chartState.series);
     chartState.chart?.show();
 
   };

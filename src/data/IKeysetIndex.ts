@@ -1,5 +1,6 @@
 import { SERIES_TYPE } from "../components/ChartComponent";
 import { IKeyset } from "./IKeyset";
+import { ISeriesStyle } from "./ISeriesStyle";
 
 /**
  * definition for types that hold a set of keys, i.e. referring to specific data
@@ -9,13 +10,15 @@ import { IKeyset } from "./IKeyset";
  */
 export interface IKeysetIndex extends IKeyset {
 
-    /**
-     * get the type of series suitable to display this index' data
-     */
-    getSeriesType(key: number): SERIES_TYPE;
+    // /**
+    //  * get the type of series suitable to display this index' data
+    //  */
+    // getSeriesType(key: number): SERIES_TYPE;
 
 
-    getSeriesColor(key: number): number;
+    // getSeriesColor(key: number): number;
+
+    getSeriesStyle(key: number): ISeriesStyle;
 
 
     getBreadcrumbKeys(): string[];

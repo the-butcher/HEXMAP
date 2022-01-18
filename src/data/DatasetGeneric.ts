@@ -1,9 +1,11 @@
+import { FormattingDefinition } from "../util/FormattingDefinition";
 import { TimeUtil } from "../util/TimeUtil";
 import { DataEntry } from "./DataEntry";
 import { DataRepository } from "./DataRepository";
 import { IDataEntry } from "./IDataEntry";
 import { IDataRoot } from "./IDataRoot";
 import { IDataset } from "./IDataset";
+import { IDataValue } from "./IDataValue";
 import { IKeyset } from "./IKeyset";
 import { IKeysetIndex } from "./IKeysetIndex";
 import { KeysetGeneric } from "./KeysetGeneric";
@@ -54,9 +56,25 @@ export class DatasetGeneric implements IDataset {
         this.instantMax = TimeUtil.parseCategoryDateFull(dateKeys[dateKeys.length - 1]);
         this.entryKeys = [];
         this.entries = {};
+
+
         dateKeys.forEach(dateKey => {
+
             this.entryKeys.push(dateKey);
-            this.entries[dateKey] = new DataEntry(TimeUtil.parseCategoryDateFull(dateKey), dataRoot.data[dateKey]);
+            const dataValues: { [K in string]: IDataValue[] } = {};
+
+            const entryKeys = Object.keys(dataRoot.data[dateKey]);
+            entryKeys.forEach(entryKey => {
+                dataValues[entryKey] = dataRoot.data[dateKey][entryKey].map(d => {
+                    return {
+                        value: d,
+                        label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(d)
+                    }
+                });
+            })
+
+            this.entries[dateKey] = new DataEntry(TimeUtil.parseCategoryDateFull(dateKey), dataValues);
+
         });
 
 

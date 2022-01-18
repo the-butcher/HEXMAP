@@ -1,3 +1,5 @@
+import { IDataValue } from "./IDataValue";
+
 /**
  * definition for types that hold a single data entry
  * one entry may hold values for multiple provinces, districts, municipalities
@@ -16,8 +18,8 @@ export interface IDataEntry {
 
     hasKey(key: string): boolean;
 
-    getValue(key: string, index: number): number;
+    getValue(key: string, index: number): IDataValue;
 
-    addValue(key: string, value: number): void;
+    addValue(key: string, value: IDataValue): void;
 
 }

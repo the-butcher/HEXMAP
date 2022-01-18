@@ -661,8 +661,8 @@ export default () => {
            */
           entry00.getKeys().forEach(key => {
             if (key.endsWith(postKey)) {
-              minLegendVal = Math.min(minLegendVal, entry00.getValue(key, dataSetting.getIndex()));
-              maxLegendVal = Math.max(maxLegendVal, entry00.getValue(key, dataSetting.getIndex()));
+              minLegendVal = Math.min(minLegendVal, entry00.getValue(key, dataSetting.getIndex()).value);
+              maxLegendVal = Math.max(maxLegendVal, entry00.getValue(key, dataSetting.getIndex()).value);
             }
           });
 
@@ -670,8 +670,8 @@ export default () => {
           _legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
 
           const entry60 = dataSetting.getDataset().getEntryByInstant(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
-          const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex());
-          const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex());
+          const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex()).value;
+          const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex()).value;
 
           _courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
           _courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
@@ -688,8 +688,8 @@ export default () => {
         const valueKey = prefKey + postKey;
         const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
         const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
-        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()); // dataset00[dataPointer][dataSetting.indx];
-        const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
+        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()).value; // dataset00[dataPointer][dataSetting.indx];
+        const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex()).value;
         const value07 = (value00 - valueM7) / valueM7;
 
         if (selected) {
@@ -779,8 +779,8 @@ export default () => {
                   const historicEntry = dataSetting.getDataset().getEntryByInstant(historicInstant);
                   if (historicEntry.hasKey(prefKey + postKey)) {
                     lookupState = {
-                      color: getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex())),
-                      height: indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()))
+                      color: getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value),
+                      height: indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     lookupState = {
@@ -803,8 +803,8 @@ export default () => {
                   const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
                   if (entry00.hasKey(dataKey)) {
                     lookupState = {
-                      color: getColor(entry00.getValue(dataKey, dataSetting.getIndex())),
-                      height: indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()))
+                      color: getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value),
+                      height: indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     return defaultState;

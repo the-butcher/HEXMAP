@@ -10,6 +10,8 @@ import { KeysetGeneric } from "./KeysetGeneric";
 import { KeysetIndex } from "./KeysetIndex";
 import { Statistics } from "./Statistics";
 import regression from 'regression';
+import { IDataValue } from "./IDataValue";
+import { FormattingDefinition } from "../util/FormattingDefinition";
 
 /**
  * implementation of IDataSet
@@ -47,9 +49,10 @@ export class DatasetIncidence implements IDataset {
         this.indexKeyset = new KeysetIndex(0, [
             'Inzidenz',
             'Fälle',
-            // 'avg',
+            'avg',
             'reg',
-            'exp'
+            'xlo',
+            'xhi'
         ]);
 
         const dateKeys = Object.keys(dataRoot.data);
@@ -71,7 +74,8 @@ export class DatasetIncidence implements IDataset {
             rdata[popsKey] = [];
         });
 
-        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 3 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 12 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 2 - TimeUtil.MILLISECONDS_PER____DAY * 4;
         const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 4;
 
         for (let i = 7; i < dateKeys.length; i++) { // each date
@@ -79,34 +83,50 @@ export class DatasetIncidence implements IDataset {
             const instant = TimeUtil.parseCategoryDateFull(dateKeys[i]);
             const weekday = new Date(instant).getDay();
 
-            const incidenceData: { [x: string]: number[] } = {};
+            const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
-                const cases07 = dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0];
-                const cases01 = dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0];
-                const incdnc7 = cases07 * 100000 / this.populations[popsKey];
+                const incdnc1 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.populations[popsKey];
+                const incdnc7 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.populations[popsKey];
+
                 incidenceData[popsKey] = [];
-                incidenceData[popsKey].push(Math.round(incdnc7 * 100) / 100);
-                incidenceData[popsKey].push(cases01);
+                incidenceData[popsKey].push({
+                    value: incdnc7,
+                    label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdnc7)
+                });
+                incidenceData[popsKey].push({
+                    value: incdnc1,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc1 * this.populations[popsKey] / 700000)
+                });
 
                 if (instant > statsInstantMin && instant <= statsInstantMax) {
 
                     const cases25 = dataRoot.data[dateKeys[i + 2]][popsKey][0] - dataRoot.data[dateKeys[i - 5]][popsKey][0];
                     const cases34 = dataRoot.data[dateKeys[i + 3]][popsKey][0] - dataRoot.data[dateKeys[i - 4]][popsKey][0];
                     const cases43 = dataRoot.data[dateKeys[i + 4]][popsKey][0] - dataRoot.data[dateKeys[i - 3]][popsKey][0];
-                    const casesAv = (cases25 * 25000 + cases34 * 50000 + cases43 * 25000) / this.populations[popsKey];
-                    // incidenceData[popsKey].push(casesAv); // average
-                    stats[popsKey][weekday].addValue(cases01 / casesAv); // store how far off the actual value is from the average
+                    const incdncA = (cases25 * 25000 + cases34 * 50000 + cases43 * 25000) / this.populations[popsKey];
 
-                    const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
-                    const rgresY = this.toRegressionY(casesAv);
-                    rdata[popsKey].push([
-                        rgresX,
-                        rgresY
-                    ]);
+                    incidenceData[popsKey].push({
+                        value: incdncA,
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(incdncA * this.populations[popsKey] / 700000)
+                    }); // average
+
+                    stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store how far off the actual value is from the average
+
+                    if (instant > statsInstantReg) {
+                        const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
+                        const rgresY = this.toRegressionY(incdncA);
+                        rdata[popsKey].push([
+                            rgresX,
+                            rgresY
+                        ]);
+                    }
 
                 } else {
-                    // incidenceData[popsKey].push(0); // average
+                    incidenceData[popsKey].push({
+                        value: 0,
+                        label: () => ''
+                    }); // average
                 }
 
             });
@@ -120,7 +140,7 @@ export class DatasetIncidence implements IDataset {
             const weekday = new Date(instant).getDay();
             popsKeys.forEach(popsKey => {
 
-                if (instant > statsInstantMin) {
+                if (instant > statsInstantReg) {
 
                     if (!rgres[popsKey]) {
                         rgres[popsKey] = regression.polynomial(rdata[popsKey], { order: 3 });
@@ -128,23 +148,67 @@ export class DatasetIncidence implements IDataset {
                     }
 
                     const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
-                    const rgresY = rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3];
-
+                    const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
 
                     // const casesAv = this.entries[dateKeys[i]].getValue(popsKey, 2);
-                    const ratioAv = stats[popsKey][weekday].getAverage();
+                    const ratioAL = stats[popsKey][weekday].getAverage() - stats[popsKey][weekday].getStandardDeviation();
+                    const ratioAU = stats[popsKey][weekday].getStandardDeviation() * 2;
+                    // if (popsKey === '#') {
+                    //     console.log(popsKey, weekday, stats[popsKey][weekday].getStandardDeviation());
+                    // }
 
-                    this.entries[dateKeys[i]].addValue(popsKey, Math.round(rgresY * 100000) / 100); // regression
-                    this.entries[dateKeys[i]].addValue(popsKey, Math.round(rgresY * 1000 * ratioAv)); // expectation
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: rgresY,
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * this.populations[popsKey] / 700000)
+                    }); // regression
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: rgresY * ratioAL,
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAL * this.populations[popsKey] / 700000)
+                    }); // lower expectation
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: rgresY * ratioAU,
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAU * this.populations[popsKey] / 700000)
+                    }); // upper expectation
 
                 } else {
 
-                    this.entries[dateKeys[i]].addValue(popsKey, 0); // regression
-                    this.entries[dateKeys[i]].addValue(popsKey, 0); // expectation
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: 0,
+                        label: () => ''
+                    }); // regression
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: 0,
+                        label: () => ''
+                    }); // lower expectation                    
+                    this.entries[dateKeys[i]].addValue(popsKey, {
+                        value: 0,
+                        label: () => ''
+                    }); // upper expectation
 
                 }
 
             });
+        }
+
+        for (let instant = statsInstantMax + TimeUtil.MILLISECONDS_PER____DAY * 3; instant < statsInstantMax + TimeUtil.MILLISECONDS_PER____DAY * 7; instant += TimeUtil.MILLISECONDS_PER____DAY) { // each date
+
+            const weekday = new Date(instant).getDay();
+            popsKeys.forEach(popsKey => {
+
+                const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
+                const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
+
+                const ratioAv = stats[popsKey][weekday].getAverage();
+
+                // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(casesEx)); // regression //  
+                if (popsKey === '#') {
+                    console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, weekday, ratioAv, Math.round(rgresY * ratioAv * this.populations[popsKey] / 700000));
+                }
+
+                // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(rgresY * ratioAv)); // expectation 
+
+            });
+
         }
 
         this.minY = dataRoot.minY;

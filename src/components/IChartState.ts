@@ -17,6 +17,8 @@ export class IChartState {
      */
     chart: am5xy.XYChart;
 
+    legend: am5.Legend;
+
     cursor: am5xy.XYCursor;
 
     /**

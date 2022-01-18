@@ -51,6 +51,9 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
               <div style={{ fontSize: '10px', textAlign: 'right' }}>{props.instant ? TimeUtil.formatCategoryDateFull(props.instant) : '##.##.####'}</div>
               <div style={{ fontSize: '18px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '12px' }}>{props.value07}</div>
               <div style={{ fontSize: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>gegenüber Vorwoche</div>
+              <div style={{ minHeight: '2px' }} />
+              <div id={`legenddiv_${id}`} style={{ flexGrow: '10' }} />
+              <div style={{ minHeight: openVertical ? '30px' : '0px' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px', minWidth: '40px', width: '40px' }}>
               <IconButton key={`expand_${props.id}`} aria-label='share' onPointerUp={handleExpand} style={{ transform: expandTransform }}>

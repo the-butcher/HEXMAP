@@ -229,15 +229,11 @@ export class DataRepository {
             const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
 
             let valueY = dataEntry.getValue(dataPointer, valueIndex);
-            if (valueY > 0) {
-              chartEntry[`label_${valueIndex}`] = valueY;
-              if (indexName === DataRepository.FAELLE || indexName === 'exp') {
-                valueY = valueY * 700000 / population; // scale daily reports to incidence
-              }
-              chartEntry[`value_${valueIndex}`] = valueY;
+            if (valueY.value > 0) {
+              chartEntry[`value_${valueIndex}`] = valueY.value;
+              chartEntry[`label_${valueIndex}`] = valueY.label();
             }
-
-            maxY = Math.max(maxY, valueY);
+            maxY = Math.max(maxY, valueY.value);
 
           }
 
