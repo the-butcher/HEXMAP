@@ -24,7 +24,7 @@ export class KeysetIndex implements IKeyset {
     }
 
     getBreadcrumbKeys(): string[] {
-        return [this.keys[0]];
+        return this.keys; // [this.keys[0]];
     }
 
     getSeriesStyle(key: number): ISeriesStyle {
@@ -75,6 +75,16 @@ export class KeysetIndex implements IKeyset {
                 fillOpacity: 0.0,
                 strokeDasharray: [1, 2],
                 stacked: false
+            };
+        } else if (this.keysetRaw[key] === 'COVID / 100.000') {
+            return {
+                type: 'line',
+                color: 0xd6781f,
+                fill: 0xc1c1aa,
+                strokeWidth: 1,
+                fillOpacity: 0.2,
+                // strokeDasharray: [1, 2],
+                stacked: true
             };
         } else {
             return {

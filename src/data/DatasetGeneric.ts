@@ -83,6 +83,10 @@ export class DatasetGeneric implements IDataset {
 
     }
 
+    acceptsZero(): boolean {
+        return false;
+    }
+
     getPopulation(key: string): number {
         return this.populations[key];
     }

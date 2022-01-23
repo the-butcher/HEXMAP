@@ -21,7 +21,7 @@ export default (props: IChartProps) => {
   const fontFamily = 'Courier Prime Sans';
   const fontColor = 0xc1c1aa;
 
-  let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, onInstantRangeChange } = props;
+  let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, onInstantRangeChange, onSeriesVisibilityChange } = props;
 
   const openHorizontal = fold === 'open-horizontal' || fold === 'open-vertical';
   const openVertical = fold === 'open-vertical';
@@ -32,6 +32,9 @@ export default (props: IChartProps) => {
 
   const [chartState, setChartState] = useState<IChartState>();
   const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin1: number, instantMax1: number) => {
+    // no op initially 
+  });
+  const handleSeriesVisibilityChange = useRef<(name: string, visibility: boolean) => void>((name: string, visibility: boolean) => {
     // no op initially 
   });
 
@@ -284,6 +287,13 @@ export default (props: IChartProps) => {
       }
       // const seriesColor = dataSetting.getDataset().getIndexKeyset().getSeriesColor(valueIndex);
 
+      let visibility = true;
+      const visibiltyKeys = Object.keys(props.seriesVisibilities);
+      if (visibiltyKeys.indexOf(seriesLabel) >= 0) {
+        visibility = props.seriesVisibilities[seriesLabel];
+        console.log('got explicit setting for', seriesLabel, props.seriesVisibilities[seriesLabel])
+      }
+
       const seriesVal = _chart.series.push(seriesClass.new(_root, {
         name: seriesLabel,
         xAxis: _xAxisVal,
@@ -295,12 +305,13 @@ export default (props: IChartProps) => {
         tooltip: am5.Tooltip.new(_root, {}),
         stroke: am5.color(seriesStyle.color),
         fill: am5.color(seriesStyle.fill),
-        stacked: seriesStyle.stacked
+        stacked: seriesStyle.stacked,
+        visible: visibility
       }));
 
       seriesVal.fills.template.setAll({
         fillOpacity: seriesStyle.fillOpacity,
-        visible: true,
+        visible: seriesStyle.fillOpacity > 0,
       });
       seriesVal.strokes.template.set('strokeWidth', seriesStyle.strokeWidth);
       if (seriesStyle.strokeDasharray) {
@@ -308,6 +319,9 @@ export default (props: IChartProps) => {
       }
       _series.push(seriesVal);
 
+      seriesVal.on('visible', (visible, target) => {
+        handleSeriesVisibilityChange.current(seriesLabel, visible);
+      });
 
       const tooltip = seriesVal.get('tooltip')!;
       tooltip.setAll({
@@ -389,6 +403,7 @@ export default (props: IChartProps) => {
     });
     _chartState.xAxisVal.adapters.add('end', (value, target) => {
       instantMaxC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
+      console.log('instantMaxC', TimeUtil.formatCategoryDateFull(instantMaxC));
       requestAnimationFrame(() => {
         handleStartEndChanged(_chartState);
       });
@@ -449,10 +464,7 @@ export default (props: IChartProps) => {
     const chartData = DataRepository.getInstance().getChartData(source, Number.MIN_VALUE, Number.MAX_VALUE);
     chartState.series.forEach(s => {
       (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
-      // (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('min', -4000);
       s.data.setAll(chartData.entries);
-      s.appear(0);
-
     });
     chartState.legend.data.setAll(chartState.series);
     chartState.chart?.show();
@@ -503,6 +515,10 @@ export default (props: IChartProps) => {
         instantMax = instantMax1;
       }
     };
+
+    handleSeriesVisibilityChange.current = (name: string, visibility: boolean) => {
+      onSeriesVisibilityChange(name, visibility);
+    }
 
   }
 

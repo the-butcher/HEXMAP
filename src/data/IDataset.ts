@@ -4,6 +4,8 @@ import { IKeysetIndex } from "./IKeysetIndex";
 
 export interface IDataset {
 
+    acceptsZero(): boolean;
+
     getEntryByInstant(instant: number): IDataEntry;
 
     getEntryByDate(date: string): IDataEntry;

@@ -29,11 +29,11 @@ export class Color implements IColor {
     }
 
     outline(): IColor {
-        return new Color(this.hsv[0], 1.00, Math.min(1, this.hsv[2] * 1.30)); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
+        return new Color(this.hsv[0], this.hsv[1], Math.min(1, this.hsv[2] * 1.30)); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
     }
 
     hilight(): IColor {
-        return new Color(this.hsv[0], 1.00, 1.00); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
+        return new Color(this.hsv[0], this.hsv[1], Math.min(1, this.hsv[2] * 2.00)); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
     }
 
     darker(steps: number): IColor {

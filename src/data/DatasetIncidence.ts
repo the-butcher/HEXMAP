@@ -74,9 +74,9 @@ export class DatasetIncidence implements IDataset {
             rdata[popsKey] = [];
         });
 
-        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 12 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 13 - TimeUtil.MILLISECONDS_PER____DAY * 4;
         const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 2 - TimeUtil.MILLISECONDS_PER____DAY * 4;
-        const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 5;
 
         for (let i = 7; i < dateKeys.length; i++) { // each date
 
@@ -114,6 +114,9 @@ export class DatasetIncidence implements IDataset {
                     stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store how far off the actual value is from the average
 
                     if (instant > statsInstantReg) {
+
+                        stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store again to give more weight to more recent values store how far off the actual value is from the average
+
                         const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
                         const rgresY = this.toRegressionY(incdncA);
                         rdata[popsKey].push([
@@ -143,12 +146,14 @@ export class DatasetIncidence implements IDataset {
                 if (instant > statsInstantReg) {
 
                     if (!rgres[popsKey]) {
-                        rgres[popsKey] = regression.polynomial(rdata[popsKey], { order: 3 });
-                        // console.log(popsKey, rdata[popsKey], rgres[popsKey]);
+                        rgres[popsKey] = regression.polynomial(rdata[popsKey], { order: 2 });
+                        console.log(popsKey, rdata[popsKey], rgres[popsKey]);
                     }
 
                     const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
-                    const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
+                    // const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
+                    const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 2) + rgres[popsKey].equation[1] * rgresX + rgres[popsKey].equation[2]) * 1000;
+                    // const rgresY = (rgres[popsKey].equation[0] * Math.pow(Math.E, rgres[popsKey].equation[1] * rgresX)) * 1000;
 
                     // const casesAv = this.entries[dateKeys[i]].getValue(popsKey, 2);
                     const ratioAL = stats[popsKey][weekday].getAverage() - stats[popsKey][weekday].getStandardDeviation();
@@ -167,7 +172,7 @@ export class DatasetIncidence implements IDataset {
                     }); // lower expectation
                     this.entries[dateKeys[i]].addValue(popsKey, {
                         value: rgresY * ratioAU,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAU * this.populations[popsKey] / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format((rgresY * ratioAL + rgresY * ratioAU) * this.populations[popsKey] / 700000)
                     }); // upper expectation
 
                 } else {
@@ -214,6 +219,10 @@ export class DatasetIncidence implements IDataset {
         this.minY = dataRoot.minY;
         this.maxY = dataRoot.maxY;
 
+    }
+
+    acceptsZero(): boolean {
+        return false;
     }
 
     toRegressionY(cases: number): number {

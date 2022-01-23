@@ -3,8 +3,10 @@ import { FixedValue } from "../util/FixedValue";
 import { FormattingDefinition } from "../util/FormattingDefinition";
 import { InterpolatedValue } from "../util/InterpolatedValue";
 import { JsonLoader } from "../util/JsonLoader";
+import { TimeUtil } from "../util/TimeUtil";
 import { DatasetGeneric } from "./DatasetGeneric";
 import { DatasetIncidence } from "./DatasetIncidence";
+import { DatasetMortality } from "./DatasetMortality";
 import { DataSetting } from "./DataSetting";
 import { IChartData } from "./IChartData";
 import { IChartEntry } from "./IChartEntry";
@@ -35,6 +37,7 @@ export class DataRepository {
     //   instant: -1,
     //   instantMin: -1,
     //   instantMax: -1,
+    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
     //   name: 'Inzidenz',
     //   desc: 'Salzburger Gemeinden',
     //   value00: '',
@@ -44,6 +47,7 @@ export class DataRepository {
     //   onInstantChange: () => { },
     //   onInstantRangeChange: () => { },
     //   onExport: () => { },
+    //   onSeriesVisibilityChange: () => { },
     //   doExport: false,
     //   fold: 'open-horizontal',
     //   source: './hexmap-data-salzburg-gemeinde.json',
@@ -55,13 +59,15 @@ export class DataRepository {
     //   interpolatedSat: new FixedValue(1.00),
     //   interpolatedVal: new FixedValue(0.40),
     //   interpolatedInt: DataRepository.interpolatedInt7diX,
-    //   constructDataset: dataRoot => new Dataset(dataRoot)
+    //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+    //   seriesVisibilities: {}
     // },
     {
       id: 'i_ems',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
       name: 'Inzidenz',
       desc: 'EMS',
       value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -71,6 +77,7 @@ export class DataRepository {
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
       onExport: () => { },
+      onSeriesVisibilityChange: () => { },
       doExport: false,
       fold: 'open-horizontal',
       source: './hexmap-data-incidence-ems.json',
@@ -82,13 +89,15 @@ export class DataRepository {
       interpolatedSat: new FixedValue(1.00),
       interpolatedVal: new FixedValue(0.40),
       interpolatedInt: DataRepository.interpolatedInt7diX,
-      constructDataset: dataRoot => new DatasetIncidence(dataRoot)
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
     },
     {
       id: 'i_paa',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
       name: 'Inzidenz',
       desc: 'Bundesland und Alter',
       value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -98,6 +107,7 @@ export class DataRepository {
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
       onExport: () => { },
+      onSeriesVisibilityChange: () => { },
       doExport: false,
       fold: 'closed',
       source: './hexmap-data-incidence-age.json',
@@ -109,13 +119,15 @@ export class DataRepository {
       interpolatedSat: new FixedValue(1.00),
       interpolatedVal: new FixedValue(0.40),
       interpolatedInt: DataRepository.interpolatedInt7diX,
-      constructDataset: dataRoot => new DatasetIncidence(dataRoot)
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
     },
     {
       id: 'i_dst',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
       name: 'Inzidenz',
       desc: 'Bezirk',
       value00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
@@ -125,6 +137,7 @@ export class DataRepository {
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
       onExport: () => { },
+      onSeriesVisibilityChange: () => { },
       doExport: false,
       fold: 'closed',
       source: './hexmap-data-incidence-bezirk.json',
@@ -136,13 +149,15 @@ export class DataRepository {
       interpolatedSat: new FixedValue(1.00),
       interpolatedVal: new FixedValue(0.40),
       interpolatedInt: DataRepository.interpolatedInt7diX,
-      constructDataset: dataRoot => new DatasetIncidence(dataRoot)
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
     },
     {
       id: 'v_mnc',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER___WEEK,
       name: 'Impfung',
       desc: 'Gemeinde',
       value00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
@@ -152,19 +167,81 @@ export class DataRepository {
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
       onExport: () => { },
+      onSeriesVisibilityChange: () => { },
       doExport: false,
       fold: 'closed',
       source: './hexmap-data-vacc-gemeinde.json',
       loaded: false,
       path: '',
       breadcrumbProps: [],
-      interpolatedEle: new InterpolatedValue(0, 20, 0.00, 1.00, 1),
-      interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.90, 1),
-      interpolatedSat: new FixedValue(1.00),
-      interpolatedVal: new FixedValue(0.40),
+      interpolatedEle: new InterpolatedValue(-10, 20, 0, 1, 1),
+      interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.65, 0.85, 1),
+      interpolatedSat: new FixedValue(1.00), // new InterpolatedValue(0.50, 1.00, 0.78, 0.82, 1), //
+      interpolatedVal: new FixedValue(0.40), // new InterpolatedValue(0.00, 0.20, 0.78, 0.82, 1), // new FixedValue(0.40),
       interpolatedInt: new FixedValue(1.25),
-      constructDataset: dataRoot => new DatasetGeneric(dataRoot)
-    }
+      constructDataset: dataRoot => new DatasetGeneric(dataRoot),
+      seriesVisibilities: {}
+    },
+    // {
+    //   id: 'p_mnc',
+    //   instant: -1,
+    //   instantMin: -1,
+    //   instantMax: -1,
+    //   instantDif: TimeUtil.MILLISECONDS_PER___YEAR,
+    //   name: 'Alter',
+    //   desc: 'Gemeinde',
+    //   value00: FormattingDefinition.FORMATTER__FLOAT_2.format(0.1111).replaceAll('1', '#'),
+    //   value07: FormattingDefinition.FORMATTER__FLOAT_2.format(0.1111).replaceAll('1', '#'),
+    //   valueFormatter: FormattingDefinition.FORMATTER__FLOAT_2,
+    //   onExpand: () => { },
+    //   onInstantChange: () => { },
+    //   onInstantRangeChange: () => { },
+    //   onExport: () => { },
+    //   onSeriesVisibilityChange: () => { },
+    //   doExport: false,
+    //   fold: 'closed',
+    //   source: './hexmap-data-population-gemeinde.json',
+    //   loaded: false,
+    //   path: '',
+    //   breadcrumbProps: [],
+    //   interpolatedEle: new InterpolatedValue(-5, 5, 22, 52, 1),
+    //   interpolatedHue: new FixedValue(0.17),
+    //   interpolatedSat: new InterpolatedValue(0.8, 0.2, 32, 52, 1), // new InterpolatedValue(0.50, 1.00, 0.78, 0.82, 1), //
+    //   interpolatedVal: new InterpolatedValue(0.5, 0.1, 32, 52, 1),
+    //   interpolatedInt: new FixedValue(1.25),
+    //   constructDataset: dataRoot => new DatasetGeneric(dataRoot),
+    //   seriesVisibilities: {}
+    // },
+    // {
+    //   id: 'd_dst',
+    //   instant: -1,
+    //   instantMin: -1,
+    //   instantMax: -1,
+    //   instantDif: TimeUtil.MILLISECONDS_PER___WEEK,
+    //   name: 'Sterblichkeit',
+    //   desc: 'Bezirk',
+    //   value00: FormattingDefinition.FORMATTER____FIXED.format(0.1111).replaceAll('1', '#'),
+    //   value07: FormattingDefinition.FORMATTER____FIXED.format(0.1111).replaceAll('1', '#'),
+    //   valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+    //   onExpand: () => { },
+    //   onInstantChange: () => { },
+    //   onInstantRangeChange: () => { },
+    //   onExport: () => { },
+    //   onSeriesVisibilityChange: () => { },
+    //   doExport: false,
+    //   fold: 'closed',
+    //   source: './hexmap-data-mortality-bezirk.json',
+    //   loaded: false,
+    //   path: '',
+    //   breadcrumbProps: [],
+    //   interpolatedEle: new InterpolatedValue(0, 40, 0.00, 80.00, 1),
+    //   interpolatedHue: new FixedValue(0.17),
+    //   interpolatedSat: new FixedValue(0.2),
+    //   interpolatedVal: new InterpolatedValue(0.25, 0.05, 0.00, 30.00, 1),
+    //   interpolatedInt: new FixedValue(1.25),
+    //   constructDataset: dataRoot => new DatasetMortality(dataRoot),
+    //   seriesVisibilities: {}
+    // }
   ];
 
   static getInstance(): DataRepository {
@@ -191,7 +268,7 @@ export class DataRepository {
     for (let i = 0; i < keysetKeys.length; i++) {
       dataPointer += dataSetting.getPath(keysetKeys[i]);
     }
-    const population = dataSetting.getDataset().getPopulation(dataPointer);
+    // const population = dataSetting.getDataset().getPopulation(dataPointer);
 
     /**
      * how many series are going to be needed
@@ -229,7 +306,7 @@ export class DataRepository {
             const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
 
             let valueY = dataEntry.getValue(dataPointer, valueIndex);
-            if (valueY.value > 0) {
+            if (dataSetting.getDataset().acceptsZero() || valueY.value > 0) {
               chartEntry[`value_${valueIndex}`] = valueY.value;
               chartEntry[`label_${valueIndex}`] = valueY.label();
             }

@@ -10,6 +10,11 @@ export interface IInstantProps {
     instantMax: number;
 
     /**
+     * the increment or decrement that should be applied
+     */
+    instantDif: number;
+
+    /**
      * callback function to be fired when the value of the slider changes
      */
     onInstantChange: (instant: number) => void;

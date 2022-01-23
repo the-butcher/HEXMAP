@@ -66,6 +66,26 @@ export default () => {
 
   }
 
+  const handleSeriesVisibiltyChange = async (name: string, visibility: boolean) => {
+
+    console.debug('📞 handling series visibility change', name, visibility);
+
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    userInterfaceProp.seriesVisibilities[name] = visibility;
+
+    // setAppState({
+    //   ...appState,
+    //   action: {
+    //     stamp: ObjectUtil.createId(),
+    //     updateScene: false,
+    //     updateLight: false,
+    //     updateDelay: 250
+    //   }
+    // });
+
+  }
+
   const handleInstantRangeChange = async (instantMin: number, instantMax: number) => {
 
     console.debug('📞 handling instant range change', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax), appState.source);
@@ -81,16 +101,15 @@ export default () => {
       userInterfaceProp.instantMax = instantMax;
     }
 
-    setAppState({
-      ...appState,
-      action: {
-        stamp: ObjectUtil.createId(),
-        updateScene: false,
-        updateLight: false,
-        updateDelay: 250
-      }
-    });
-
+    // setAppState({
+    //   ...appState,
+    //   action: {
+    //     stamp: ObjectUtil.createId(),
+    //     updateScene: false,
+    //     updateLight: false,
+    //     updateDelay: 250
+    //   }
+    // });
 
   }
 
@@ -230,6 +249,7 @@ export default () => {
         instant: instant,
         instantMin: TimeUtil.parseCategoryDateFull('01.03.2020'),
         instantMax: instant,
+        instantDif: 0,
         onInstantChange: handleInstantChange
       }
     },
@@ -405,7 +425,7 @@ export default () => {
     hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        label: 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/', // 
+        label: 'https://data.statistik.gv.at', // 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/',
         size: 3,
         position: {
           x: -202,
@@ -482,7 +502,7 @@ export default () => {
      * this is done so the date-slider and date-picker components can call back with the current source
      * and could probably also be solved by putting source on state in this component
      */
-    const instantProps: IInstantProps = {
+    const _instantProps: IInstantProps = {
       ...userInterfaceProps.navigationBotProps.instantProps,
       onInstantChange: handleInstantChange
     }
@@ -520,7 +540,8 @@ export default () => {
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
       const selected = indicatorPropsInstance.source === appState.source;
       if (dataSetting && selected) {
-        instantProps.instant = dataSetting.getInstant();
+        _instantProps.instant = dataSetting.getInstant();
+        _instantProps.instantDif = indicatorPropsInstance.instantDif;
       }
     }
     let mapKeys: string[] = [];
@@ -535,7 +556,7 @@ export default () => {
         const selected = indicatorPropsInstance.source === appState.source;
 
         // current instant (closest to date slider date - and date slider will be move to that instant upon update)
-        const clampedInstant00 = dataSetting.getDataset().getValidInstant(instantProps.instant);
+        const clampedInstant00 = dataSetting.getDataset().getValidInstant(_instantProps.instant);
         // console.log('clampedInstant00', indicatorPropsInstance.source, TimeUtil.formatCategoryDateFull(clampedInstant00));
 
         // one week offset (for "vorwoche" value)
@@ -551,7 +572,7 @@ export default () => {
          */
         const breadcrumbProps: IBreadcrumbProps[] = [];
 
-        const keysetKeys = dataSetting.getDataset().getKeysetKeys();;
+        const keysetKeys = dataSetting.getDataset().getKeysetKeys();
         if (selected) {
           _labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
         }
@@ -680,8 +701,8 @@ export default () => {
 
         const getColor = (value: number) => {
           const h = indicatorPropsInstance.interpolatedHue.getOut(value);
-          const s = indicatorPropsInstance.interpolatedSat.getOut(value);
-          const v = indicatorPropsInstance.interpolatedVal.getOut(value);
+          const s = Math.max(0, indicatorPropsInstance.interpolatedSat.getOut(value));
+          const v = Math.max(0, indicatorPropsInstance.interpolatedVal.getOut(value));
           return new Color(h, s, v);
         }
 
@@ -707,7 +728,8 @@ export default () => {
             onExpand: handleIndicatorExpand,
             onExport: handleIndicatorExport,
             onInstantChange: handleInstantChange,
-            onInstantRangeChange: handleInstantRangeChange
+            onInstantRangeChange: handleInstantRangeChange,
+            onSeriesVisibilityChange: handleSeriesVisibiltyChange
           };
 
           _lightProps.forEach(props => {
@@ -726,7 +748,8 @@ export default () => {
             onExpand: handleIndicatorExpand,
             onExport: handleIndicatorExport,
             onInstantChange: handleInstantChange,
-            onInstantRangeChange: handleInstantRangeChange
+            onInstantRangeChange: handleInstantRangeChange,
+            onSeriesVisibilityChange: handleSeriesVisibiltyChange
           };
 
         }
@@ -835,7 +858,7 @@ export default () => {
       // userInterfaceProps.indicatorProps,
       navigationBotProps: {
         ...userInterfaceProps.navigationBotProps,
-        instantProps
+        instantProps: _instantProps
       },
       onDataPicked: handleIndicatorExpand,
     });
@@ -845,7 +868,7 @@ export default () => {
     */
     const _controlProps = {
       ...mapProps.controlsProps,
-      instant: instantProps.instant,
+      instant: _instantProps.instant,
       stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp,
       onInstantChange: handleInstantChange,
     }

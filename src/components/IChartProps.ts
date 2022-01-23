@@ -38,6 +38,10 @@ export interface IChartProps extends IInstantProps {
      */
     onInstantRangeChange: (instantMin: number, instantMax: number) => void;
 
+    onSeriesVisibilityChange: (name: string, visibility: boolean) => void;
+
+    seriesVisibilities: { [K in string]: boolean };
+
     /**
      * if set to true the chart shall trigger an export directly after being fully rendered
      */

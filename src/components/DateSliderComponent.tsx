@@ -15,7 +15,7 @@ export default (props: IInstantProps) => {
 
     const [key, setKey] = useState<string>(ObjectUtil.createId())
 
-    const { instant, instantMin, instantMax, onInstantChange } = props;
+    const { instant, instantMin, instantMax, instantDif, onInstantChange } = props;
 
     const [incrementableInstant, setIncrementableInstant] = useState<number>(instant);
     const handleInstantDecr = useRef<() => void>(() => {
@@ -62,13 +62,13 @@ export default (props: IInstantProps) => {
 
         console.debug('✨ updating date slider component (instant)', props);
         handleInstantDecr.current = () => {
-            onInstantChange(instant - TimeUtil.MILLISECONDS_PER____DAY);
+            onInstantChange(instant - props.instantDif);
         }
         handleInstantIncr.current = () => {
-            onInstantChange(instant + TimeUtil.MILLISECONDS_PER____DAY);
+            onInstantChange(instant + props.instantDif);
         }
 
-    }, [instant]);
+    }, [instant, instantMin, instantMax, instantDif]);
 
     /**
      * triggered from the slider, calling the callback specified in props

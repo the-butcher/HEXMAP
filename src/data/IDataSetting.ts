@@ -41,17 +41,9 @@ export interface IDataSetting {
      */
     getInstant(): number;
 
-    // getInstantMin(): number;
-
-    // getInstantMax(): number;
-
     /**
      * set the instant for this setting
      */
     setInstant(instant: number): void;
-
-    // setInstantMin(instantMin: number): void;
-
-    // setInstantMax(instantMax: number): void;
 
 }

@@ -6,8 +6,8 @@ export class DataSetting implements IDataSetting {
     private readonly dataSet: IDataset;
     private index: number;
     private instant: number;
-    private instantMin: number;
-    private instantMax: number;
+    // private instantMin: number;
+    // private instantMax: number;
     private path: { [K in string]: string };
 
     constructor(dataSet: IDataset) {
@@ -15,8 +15,8 @@ export class DataSetting implements IDataSetting {
         this.dataSet = dataSet;
         this.index = parseInt(dataSet.getIndexKeyset().getDefaultKey());
         this.instant = dataSet.getInstantMax();
-        this.instantMin = dataSet.getInstantMin();
-        this.instantMax = dataSet.getInstantMax();
+        // this.instantMin = dataSet.getInstantMin();
+        // this.instantMax = dataSet.getInstantMax();
         this.path = {};
         dataSet.getKeysetKeys().forEach(keysetKey => {
             this.path[keysetKey] = dataSet.getKeyset(keysetKey).getDefaultKey();

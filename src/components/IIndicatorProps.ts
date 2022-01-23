@@ -39,6 +39,10 @@ export interface IIndicatorProps extends IChartProps {
      */
     interpolatedInt: IInterpolatedValue;
 
+    /**
+     * let each indicator props instance decide which type of dataset it creates
+     * for incidence there is a special type of dataset
+     */
     constructDataset: (dataRoot: IDataRoot) => IDataset;
 
 }
