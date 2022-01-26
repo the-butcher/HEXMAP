@@ -1,17 +1,19 @@
 import { Download, DownloadForOffline, DownloadForOfflineOutlined, ExpandMore } from '@mui/icons-material';
-import { Breadcrumbs, Card, CardActions, CardContent, IconButton, useTheme } from '@mui/material';
+import { Breadcrumbs, Card, CardActions, CardContent, IconButton, useTheme, FormLabel, FormControl, FormGroup, FormControlLabel, Switch } from '@mui/material';
+import { calcPosFromAngles } from '@react-three/drei';
+import { invalidate } from '@react-three/fiber';
+import { useRef } from 'react';
 import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import BreadcrumbComponent from './BreadcrumbComponent';
 import ChartComponent from './ChartComponent';
 import { IIndicatorProps } from './IIndicatorProps';
 
-
 export default (props: IIndicatorProps & React.CSSProperties) => {
 
   const theme = useTheme();
 
-  const { id, loaded, onExpand, onExport, breadcrumbProps } = props;
+  const { id, loaded, logarithmic, onExpand, onExport, onLogarithmicChange, breadcrumbProps } = props;
 
   const openHorizontal = props.fold === 'open-horizontal' || props.fold === 'open-vertical';
   const openVertical = props.fold === 'open-vertical';
@@ -26,6 +28,10 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
 
   const handleExport = () => {
     onExport(id);
+  }
+
+  const handleLogarithmicChange = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    onLogarithmicChange(checked);
   }
 
   const chartBounds = document.getElementById(`chartdiv_${id}`)?.getBoundingClientRect();
@@ -45,15 +51,25 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
               </Breadcrumbs> : null
             }
           </div>
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', minHeight: indicatorMinHeight }}>
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', minHeight: indicatorMinHeight }}>
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: '140px', flexGrow: '1' }}>
               <div style={{ fontSize: '36px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '20px' }}>{props.value00}</div>
               <div style={{ fontSize: '10px', textAlign: 'right' }}>{props.instant ? TimeUtil.formatCategoryDateFull(props.instant) : '##.##.####'}</div>
               <div style={{ fontSize: '18px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '12px' }}>{props.value07}</div>
               <div style={{ fontSize: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>gegenüber Vorwoche</div>
-              <div style={{ minHeight: '3px' }} />
-              <div id={`legenddiv_${id}`} style={{ flexGrow: '10' }} />
-              <div style={{ minHeight: openVertical ? '30px' : '0px' }} />
+              <div style={{ minHeight: '3px', flexGrow: '100' }} />
+
+              <div style={{ display: 'flex', flexDirection: 'column', height: openVertical ? '260px' : '0px', transition: 'all 250ms ease-in-out' }}>
+                <div style={{ flexGrow: '10' }} />
+                <FormControl variant="standard" size="small" style={{ left: 'auto', right: '0px', width: '100%' }}>
+                  <FormControlLabel label="logarithmic" labelPlacement="start" control={
+                    <Switch checked={logarithmic} onChange={handleLogarithmicChange} name="logarithmic" />
+                  } />
+                </FormControl>
+                <div id={`legenddiv_${id}`} style={{ height: '100px' }} />
+                <div style={{ minHeight: '30px' }} />
+              </div>
+
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px', minWidth: '40px', width: '40px' }}>
               <IconButton key={`expand_${props.id}`} aria-label='share' onPointerUp={handleExpand} style={{ transform: expandTransform }}>

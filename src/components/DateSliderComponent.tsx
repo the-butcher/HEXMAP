@@ -15,7 +15,7 @@ export default (props: IInstantProps) => {
 
     const [key, setKey] = useState<string>(ObjectUtil.createId())
 
-    const { instant, instantMin, instantMax, instantDif, onInstantChange } = props;
+    const { source, instant, instantMin, instantMax, instantDif, onInstantChange } = props;
 
     const [incrementableInstant, setIncrementableInstant] = useState<number>(instant);
     const handleInstantDecr = useRef<() => void>(() => {
@@ -68,7 +68,7 @@ export default (props: IInstantProps) => {
             onInstantChange(instant + props.instantDif);
         }
 
-    }, [instant, instantMin, instantMax, instantDif]);
+    }, [source, instant, instantMin, instantMax, instantDif]);
 
     /**
      * triggered from the slider, calling the callback specified in props

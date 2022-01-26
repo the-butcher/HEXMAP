@@ -12,6 +12,7 @@ import { Statistics } from "./Statistics";
 import regression from 'regression';
 import { IDataValue } from "./IDataValue";
 import { FormattingDefinition } from "../util/FormattingDefinition";
+import { SeriesKey } from "./SeriesStyle";
 
 /**
  * implementation of IDataSet
@@ -23,7 +24,7 @@ import { FormattingDefinition } from "../util/FormattingDefinition";
 export class DatasetIncidence implements IDataset {
 
     // private readonly dataRoot: IDataRoot;
-    private readonly populations: { [K in string]: number };
+    private readonly populations: { [K in string]: number[] };
     private readonly keysetKeys: string[];
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
@@ -46,14 +47,26 @@ export class DatasetIncidence implements IDataset {
             this.keysets[keysetKey] = new KeysetGeneric(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
         });
 
-        this.indexKeyset = new KeysetIndex(0, [
+        const hasFatal = (dataRoot.idxs.length === 2 && dataRoot.idxs[1].name === 'fatal');
+        const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
-            'avg',
-            'reg',
-            'xlo',
-            'xhi'
-        ]);
+            'Sterblichkeit',
+            'Todesfälle',
+            'avg_cases',
+            'reg_cases',
+            'xlo_cases',
+            'xhi_cases'
+        ] : [
+            'Inzidenz',
+            'Fälle',
+            'avg_cases',
+            'reg_cases',
+            'xlo_cases',
+            'xhi_cases'
+        ];
+
+        this.indexKeyset = new KeysetIndex(0, indexKeys);
 
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[7]);
@@ -74,9 +87,9 @@ export class DatasetIncidence implements IDataset {
             rdata[popsKey] = [];
         });
 
-        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 13 - TimeUtil.MILLISECONDS_PER____DAY * 4;
-        const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 2 - TimeUtil.MILLISECONDS_PER____DAY * 4;
-        const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 5;
+        const statsInstantMin = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 5 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 3 - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 4;
 
         for (let i = 7; i < dateKeys.length; i++) { // each date
 
@@ -86,29 +99,46 @@ export class DatasetIncidence implements IDataset {
             const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
-                const incdnc1 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.populations[popsKey];
-                const incdnc7 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.populations[popsKey];
+                const incdnc1 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
+                const incdnc7 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
 
                 incidenceData[popsKey] = [];
-                incidenceData[popsKey].push({
+                incidenceData[popsKey].push({ // incidence
                     value: incdnc7,
                     label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdnc7)
                 });
-                incidenceData[popsKey].push({
+                incidenceData[popsKey].push({ // cases
                     value: incdnc1,
-                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc1 * this.populations[popsKey] / 700000)
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc1 * this.getPopulation(popsKey) / 700000)
                 });
+
+                if (hasFatal) {
+
+                    // attention multiplied
+
+                    const fatal1 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 1]][popsKey][1]) * 700000 / this.getPopulation(popsKey);
+                    const fatal7 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 7]][popsKey][1]) * 100000 / this.getPopulation(popsKey);
+                    incidenceData[popsKey].push({ // mortality
+                        value: fatal7,
+                        label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(fatal7)
+                    });
+                    incidenceData[popsKey].push({ // fatal
+                        value: fatal1,
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(fatal1 * this.getPopulation(popsKey) / 700000)
+                    });
+
+                }
 
                 if (instant > statsInstantMin && instant <= statsInstantMax) {
 
                     const cases25 = dataRoot.data[dateKeys[i + 2]][popsKey][0] - dataRoot.data[dateKeys[i - 5]][popsKey][0];
                     const cases34 = dataRoot.data[dateKeys[i + 3]][popsKey][0] - dataRoot.data[dateKeys[i - 4]][popsKey][0];
                     const cases43 = dataRoot.data[dateKeys[i + 4]][popsKey][0] - dataRoot.data[dateKeys[i - 3]][popsKey][0];
-                    const incdncA = (cases25 * 25000 + cases34 * 50000 + cases43 * 25000) / this.populations[popsKey];
+                    const incdncA = (cases25 * 25000 + cases34 * 50000 + cases43 * 25000) / this.getPopulation(popsKey);
 
                     incidenceData[popsKey].push({
                         value: incdncA,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(incdncA * this.populations[popsKey] / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(incdncA * this.getPopulation(popsKey) / 700000)
                     }); // average
 
                     stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store how far off the actual value is from the average
@@ -132,6 +162,8 @@ export class DatasetIncidence implements IDataset {
                     }); // average
                 }
 
+
+
             });
             this.entryKeys.push(dateKeys[i]);
             this.entries[dateKeys[i]] = new DataEntry(instant, incidenceData);
@@ -147,7 +179,7 @@ export class DatasetIncidence implements IDataset {
 
                     if (!rgres[popsKey]) {
                         rgres[popsKey] = regression.polynomial(rdata[popsKey], { order: 2 });
-                        console.log(popsKey, rdata[popsKey], rgres[popsKey]);
+                        // console.log(popsKey, rdata[popsKey], rgres[popsKey]);
                     }
 
                     const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
@@ -155,7 +187,6 @@ export class DatasetIncidence implements IDataset {
                     const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 2) + rgres[popsKey].equation[1] * rgresX + rgres[popsKey].equation[2]) * 1000;
                     // const rgresY = (rgres[popsKey].equation[0] * Math.pow(Math.E, rgres[popsKey].equation[1] * rgresX)) * 1000;
 
-                    // const casesAv = this.entries[dateKeys[i]].getValue(popsKey, 2);
                     const ratioAL = stats[popsKey][weekday].getAverage() - stats[popsKey][weekday].getStandardDeviation();
                     const ratioAU = stats[popsKey][weekday].getStandardDeviation() * 2;
                     // if (popsKey === '#') {
@@ -164,15 +195,15 @@ export class DatasetIncidence implements IDataset {
 
                     this.entries[dateKeys[i]].addValue(popsKey, {
                         value: rgresY,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * this.populations[popsKey] / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * this.getPopulation(popsKey) / 700000)
                     }); // regression
                     this.entries[dateKeys[i]].addValue(popsKey, {
                         value: rgresY * ratioAL,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAL * this.populations[popsKey] / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAL * this.getPopulation(popsKey) / 700000)
                     }); // lower expectation
                     this.entries[dateKeys[i]].addValue(popsKey, {
                         value: rgresY * ratioAU,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format((rgresY * ratioAL + rgresY * ratioAU) * this.populations[popsKey] / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format((rgresY * ratioAL + rgresY * ratioAU) * this.getPopulation(popsKey) / 700000)
                     }); // upper expectation
 
                 } else {
@@ -206,9 +237,9 @@ export class DatasetIncidence implements IDataset {
                 const ratioAv = stats[popsKey][weekday].getAverage();
 
                 // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(casesEx)); // regression //  
-                if (popsKey === '#') {
-                    console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, weekday, ratioAv, Math.round(rgresY * ratioAv * this.populations[popsKey] / 700000));
-                }
+                // if (popsKey === '#') {
+                //     console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, weekday, ratioAv, Math.round(rgresY * ratioAv * this.populations[popsKey] / 700000));
+                // }
 
                 // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(rgresY * ratioAv)); // expectation 
 
@@ -216,8 +247,8 @@ export class DatasetIncidence implements IDataset {
 
         }
 
-        this.minY = dataRoot.minY;
-        this.maxY = dataRoot.maxY;
+        this.minY = dataRoot.idxs[0].minY;
+        this.maxY = dataRoot.idxs[0].maxY;
 
     }
 
@@ -234,12 +265,13 @@ export class DatasetIncidence implements IDataset {
     }
 
     getPopulation(key: string): number {
-        return this.populations[key];
+        return this.populations[key][0];
     }
 
     getMinY(): number {
         return this.minY;
     }
+
     getMaxY(): number {
         return this.maxY;
     }

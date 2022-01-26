@@ -14,11 +14,6 @@ export interface IChartProps extends IInstantProps {
 
     valueFormatter: IFormattingDefinition;
 
-    /**
-     * points to the data, retrievable from DataRepository
-     */
-    source: string;
-
     path: string;
 
     breadcrumbProps: IBreadcrumbProps[];
@@ -38,14 +33,19 @@ export interface IChartProps extends IInstantProps {
      */
     onInstantRangeChange: (instantMin: number, instantMax: number) => void;
 
+    seriesVisibilities: { [K in string]: boolean };
+
     onSeriesVisibilityChange: (name: string, visibility: boolean) => void;
 
-    seriesVisibilities: { [K in string]: boolean };
 
     /**
      * if set to true the chart shall trigger an export directly after being fully rendered
      */
     doExport: boolean;
+
+    logarithmic: boolean;
+
+    onLogarithmicChange: (logarithmic: boolean) => void;
 
     style?: React.CSSProperties;
 

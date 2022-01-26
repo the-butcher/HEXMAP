@@ -23,7 +23,7 @@ import { FormattingDefinition } from "../util/FormattingDefinition";
 export class DatasetMortality implements IDataset {
 
     // private readonly dataRoot: IDataRoot;
-    private readonly populations: { [K in string]: number };
+    private readonly populations: { [K in string]: number[] };
     private readonly keysetKeys: string[];
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
@@ -75,8 +75,8 @@ export class DatasetMortality implements IDataset {
                 const mortA00 = dataRoot.data[dateKeys[i]][popsKey][1] - mortC00;
                 const mortAP1 = dataRoot.data[dateKeys[i + 1]][popsKey][1] - mortCP1;
 
-                const incdncC = (mortCM1 * 0.25 + mortC00 * 0.50 + mortCP1 * 0.25) * 100000 / this.populations[popsKey];
-                const incdncA = (mortAM1 * 0.25 + mortA00 * 0.50 + mortAP1 * 0.25) * 100000 / this.populations[popsKey];
+                const incdncC = (mortCM1 * 0.25 + mortC00 * 0.50 + mortCP1 * 0.25) * 100000 / this.getPopulation(popsKey);
+                const incdncA = (mortAM1 * 0.25 + mortA00 * 0.50 + mortAP1 * 0.25) * 100000 / this.getPopulation(popsKey);
 
                 incidenceData[popsKey] = [];
                 // incidenceData[popsKey].push({
@@ -97,8 +97,8 @@ export class DatasetMortality implements IDataset {
             this.entries[dateKeys[i]] = new DataEntry(instant, incidenceData);
         }
 
-        this.minY = dataRoot.minY;
-        this.maxY = dataRoot.maxY;
+        this.minY = 0;
+        this.maxY = 50;
 
     }
 
@@ -110,12 +110,12 @@ export class DatasetMortality implements IDataset {
     //     return cases / 1000;
     // }
 
-    // toRegressionX(instant: number, instantMin: number, instantMax: number): number {
+    // toRegressionX(instant: number, instantMin: number, instantMax: number): number { 
     //     return (instant - instantMin) / (instantMax - instantMin);
     // }
 
     getPopulation(key: string): number {
-        return this.populations[key];
+        return this.populations[key][0];
     }
 
     getMinY(): number {

@@ -213,6 +213,54 @@ export default (props: IUserInterfaceProps) => {
             boxShadow: '0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)'
           }
         },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          root: {
+            width: 'unset',
+            padding: '12px 14px 10px 3px'
+          },
+          thumb: {
+            marginTop: '4px',
+            marginLeft: '0px',
+            height: '10px',
+            width: '10px',
+            borderRadius: '2px',
+          },
+          track: {
+            height: '12px',
+            borderRadius: '3px',
+            width: '18px',
+            backgroundColor: '#36362f',
+          },
+          switchBase: {
+            padding: '9px 4px',
+            color: '#616155',
+            '&.Mui-checked': {
+              color: '#c1c1aa',
+              transform: 'translateX(6px)',
+              '&+.MuiSwitch-track': {
+                backgroundColor: '#36362f',
+              }
+            }
+          }
+        }
+      },
+      MuiFormControl: {
+        styleOverrides: {
+          root: {
+            // width: '100%'
+          }
+        }
+      },
+      MuiFormControlLabel: {
+        styleOverrides: {
+          label: {
+            fontFamily,
+            fontSize: '10px',
+            color: 'var(--color-text)'
+          }
+        }
       }
     },
   });

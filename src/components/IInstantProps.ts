@@ -1,6 +1,11 @@
 export interface IInstantProps {
 
     /**
+     * points to the data, retrievable from DataRepository
+     */
+    source: string;
+
+    /**
      * the initial instant that the slider shall display
      */
     instant: number;

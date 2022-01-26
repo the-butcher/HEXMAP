@@ -21,7 +21,7 @@ export default (props: IChartProps) => {
   const fontFamily = 'Courier Prime Sans';
   const fontColor = 0xc1c1aa;
 
-  let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, onInstantRangeChange, onSeriesVisibilityChange } = props;
+  let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, logarithmic, onInstantRangeChange, onSeriesVisibilityChange } = props;
 
   const openHorizontal = fold === 'open-horizontal' || fold === 'open-vertical';
   const openVertical = fold === 'open-vertical';
@@ -83,6 +83,11 @@ export default (props: IChartProps) => {
       height: 10,
       y: 5
     });
+    if (!doExport) {
+      document.getElementById(`legenddiv_${id}`).style.height = `${valueCount * 18 - 2}px`;
+    }
+
+
 
     if (!doExport) {
       _legend.setAll({
@@ -117,7 +122,8 @@ export default (props: IChartProps) => {
         background: am5.Rectangle.new(_root, {
           fill: am5.color(0x42423a),
           fillOpacity: doExport ? 1.0 : 0.0
-        })
+        }),
+        maxTooltipDistance: 8
       })
     );
 
@@ -233,8 +239,8 @@ export default (props: IChartProps) => {
     // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
     let _cursor = _chart.set('cursor', am5xy.XYCursor.new(_root, {
       behavior: 'zoomX',
-      alwaysShow: true, // doExport,
-      exportable: true,
+      // alwaysShow: true, // doExport,
+      // exportable: true,
       positionX
     }));
     _cursor.lineY.set('visible', false);
@@ -291,7 +297,7 @@ export default (props: IChartProps) => {
       const visibiltyKeys = Object.keys(props.seriesVisibilities);
       if (visibiltyKeys.indexOf(seriesLabel) >= 0) {
         visibility = props.seriesVisibilities[seriesLabel];
-        console.log('got explicit setting for', seriesLabel, props.seriesVisibilities[seriesLabel])
+        // console.log('got explicit setting for', seriesLabel, props.seriesVisibilities[seriesLabel])
       }
 
       const seriesVal = _chart.series.push(seriesClass.new(_root, {
@@ -323,37 +329,39 @@ export default (props: IChartProps) => {
         handleSeriesVisibilityChange.current(seriesLabel, visible);
       });
 
-      const tooltip = seriesVal.get('tooltip')!;
-      tooltip.setAll({
-        labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${valueIndex}}`, // '{valueY}',
-        paddingTop: 4,
-        paddingRight: 4,
-        paddingBottom: 4,
-        paddingLeft: 6,
-        getFillFromSprite: false,
-        getStrokeFromSprite: false,
-        getLabelFillFromSprite: false,
-        exportable: true
-      });
-      tooltip.label.setAll({
-        fill: labelColor,
-        fontFamily,
-        fontSize: 14,
-      });
-      (tooltip.get('background') as am5.PointedRectangle)!.setAll({
-        stroke: am5.color(0xFF0011),
-        fill: am5.color(0x42423a),
-        strokeOpacity: 0,
-        cornerRadius: 0,
-        shadowOffsetX: 3,
-        shadowOffsetY: 3,
-        shadowColor: am5.color(0x000000),
-        shadowBlur: 3,
-        shadowOpacity: 0.3,
-      });
-      tooltip.label.adapters.add('fill', (value, target) => {
-        return labelColor;
-      });
+      if (!doExport) {
+        const tooltip = seriesVal.get('tooltip')!;
+        tooltip.setAll({
+          labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${valueIndex}}`, // '{valueY}',
+          paddingTop: 4,
+          paddingRight: 4,
+          paddingBottom: 4,
+          paddingLeft: 6,
+          getFillFromSprite: false,
+          getStrokeFromSprite: false,
+          getLabelFillFromSprite: false,
+          exportable: true
+        });
+        tooltip.label.setAll({
+          fill: labelColor,
+          fontFamily,
+          fontSize: 14,
+        });
+        (tooltip.get('background') as am5.PointedRectangle)!.setAll({
+          stroke: am5.color(0xFF0011),
+          fill: am5.color(0x42423a),
+          strokeOpacity: 0,
+          cornerRadius: 0,
+          shadowOffsetX: 3,
+          shadowOffsetY: 3,
+          shadowColor: am5.color(0x000000),
+          shadowBlur: 3,
+          shadowOpacity: 0.3,
+        });
+        tooltip.label.adapters.add('fill', (value, target) => {
+          return labelColor;
+        });
+      }
 
     }
 
@@ -403,7 +411,7 @@ export default (props: IChartProps) => {
     });
     _chartState.xAxisVal.adapters.add('end', (value, target) => {
       instantMaxC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
-      console.log('instantMaxC', TimeUtil.formatCategoryDateFull(instantMaxC));
+      // console.log('instantMaxC', TimeUtil.formatCategoryDateFull(instantMaxC));
       requestAnimationFrame(() => {
         handleStartEndChanged(_chartState);
       });
@@ -414,8 +422,6 @@ export default (props: IChartProps) => {
     setChartState(_chartState);
 
     _xAxisVal.data.setAll([]);
-
-
 
     // https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/
     if (doExport) {
@@ -478,6 +484,24 @@ export default (props: IChartProps) => {
     chartState.yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
 
   };
+
+  const updateLogarithmic = (chartState: IChartState) => {
+
+    if (logarithmic) {
+      chartState.yAxisVal.setAll({
+        logarithmic: true,
+        treatZeroAs: 0.000001,
+        min: 1
+      });
+    } else {
+      chartState.yAxisVal.setAll({
+        logarithmic: false,
+        treatZeroAs: 0.000001,
+        min: 0
+      });
+    }
+
+  }
 
   const updateInstants = (chartState: IChartState) => {
 
@@ -546,6 +570,17 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
+    console.debug('🔧 updating chart component (fold)', props);
+
+    if (chartState) {
+      updateLogarithmic(chartState);
+      updateCallbacks();
+    }
+
+  }, [logarithmic]);
+
+  useEffect(() => {
+
     console.debug('🔧 updating chart component (instant)', props);
     if (chartState) {
       updateInstants(chartState);
@@ -560,6 +595,7 @@ export default (props: IChartProps) => {
     if (chartState) {
       updatePath(chartState);
       updateFold(chartState);
+      updateLogarithmic(chartState);
       updateCallbacks();
     }
 

@@ -66,6 +66,26 @@ export default () => {
 
   }
 
+  const handleLogarithmicChange = async (logarithmic: boolean) => {
+
+    console.debug('📞 handling logarithmic change', logarithmic);
+
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    userInterfaceProp.logarithmic = logarithmic;
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 250
+      }
+    });
+
+  }
+
   const handleSeriesVisibiltyChange = async (name: string, visibility: boolean) => {
 
     console.debug('📞 handling series visibility change', name, visibility);
@@ -246,6 +266,7 @@ export default () => {
     ],
     navigationBotProps: {
       instantProps: {
+        source: '',
         instant: instant,
         instantMin: TimeUtil.parseCategoryDateFull('01.03.2020'),
         instantMax: instant,
@@ -425,7 +446,7 @@ export default () => {
     hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        label: 'https://data.statistik.gv.at', // 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/',
+        label: 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/', // 'https://data.statistik.gv.at'
         size: 3,
         position: {
           x: -202,
@@ -540,6 +561,7 @@ export default () => {
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
       const selected = indicatorPropsInstance.source === appState.source;
       if (dataSetting && selected) {
+        _instantProps.source = indicatorPropsInstance.source;
         _instantProps.instant = dataSetting.getInstant();
         _instantProps.instantDif = indicatorPropsInstance.instantDif;
       }
@@ -550,8 +572,10 @@ export default () => {
 
       const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
-
       if (dataSetting) {
+
+        const indexKeysetInstance = dataSetting.getDataset().getIndexKeyset();
+        const rendererPropsInstance = indicatorPropsInstance.getRendererProps(dataSetting.getIndex(), indexKeysetInstance.getValue(dataSetting.getIndex()));
 
         const selected = indicatorPropsInstance.source === appState.source;
 
@@ -645,19 +669,19 @@ export default () => {
 
         };
 
-        const indexKeyset = dataSetting.getDataset().getIndexKeyset();
-        const indexSizeFiltered = indexKeyset.getBreadcrumbKeys().length; // indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
+        // const indexKeyset = dataSetting.getDataset().getIndexKeyset();
+        const indexSizeFiltered = indexKeysetInstance.getBreadcrumbKeys().length; // indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
         if (indexSizeFiltered > 1) {
 
           if (selected) {
-            label1 += ' / ' + indexKeyset.getValue(dataSetting.getIndex().toString());
+            label1 += ' / ' + indexKeysetInstance.getValue(dataSetting.getIndex().toString());
           }
 
           const path = dataSetting.getIndex().toString();
           breadcrumbProps.push({
             source: appState.source,
             name: 'index',
-            keys: indexKeyset,
+            keys: indexKeysetInstance,
             path,
             onPathChange: handleIndxChange,
           });
@@ -700,16 +724,16 @@ export default () => {
         }
 
         const getColor = (value: number) => {
-          const h = indicatorPropsInstance.interpolatedHue.getOut(value);
-          const s = Math.max(0, indicatorPropsInstance.interpolatedSat.getOut(value));
-          const v = Math.max(0, indicatorPropsInstance.interpolatedVal.getOut(value));
+          const h = rendererPropsInstance.interpolatedHue.getOut(value);
+          const s = Math.max(0, rendererPropsInstance.interpolatedSat.getOut(value));
+          const v = Math.max(0, rendererPropsInstance.interpolatedVal.getOut(value));
           return new Color(h, s, v);
         }
 
         const valueKey = prefKey + postKey;
-        const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant00)];
+        const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00);
         const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
-        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()).value; // dataset00[dataPointer][dataSetting.indx];
+        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()).value;
         const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex()).value;
         const value07 = (value00 - valueM7) / valueM7;
 
@@ -729,14 +753,16 @@ export default () => {
             onExport: handleIndicatorExport,
             onInstantChange: handleInstantChange,
             onInstantRangeChange: handleInstantRangeChange,
-            onSeriesVisibilityChange: handleSeriesVisibiltyChange
+            onSeriesVisibilityChange: handleSeriesVisibiltyChange,
+            onLogarithmicChange: handleLogarithmicChange
           };
 
           _lightProps.forEach(props => {
-            props.intensity = userInterfaceProps.indicatorProps[i].interpolatedInt.getOut(value00)
+            props.intensity = rendererPropsInstance.interpolatedInt.getOut(value00)
           });
 
         } else {
+
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             value00: indicatorPropsInstance.valueFormatter.format(value00),
@@ -749,7 +775,8 @@ export default () => {
             onExport: handleIndicatorExport,
             onInstantChange: handleInstantChange,
             onInstantRangeChange: handleInstantRangeChange,
-            onSeriesVisibilityChange: handleSeriesVisibiltyChange
+            onSeriesVisibilityChange: handleSeriesVisibiltyChange,
+            onLogarithmicChange: handleLogarithmicChange
           };
 
         }
@@ -785,7 +812,7 @@ export default () => {
                   const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
                   lookupState = {
                     color: getColor(val),
-                    height: indicatorPropsInstance.interpolatedEle.getOut(val)
+                    height: rendererPropsInstance.interpolatedEle.getOut(val)
                   }
                   valueLookup['l' + hexagon.x] = lookupState;
                 }
@@ -803,7 +830,7 @@ export default () => {
                   if (historicEntry.hasKey(prefKey + postKey)) {
                     lookupState = {
                       color: getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value),
-                      height: indicatorPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value)
+                      height: rendererPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     lookupState = {
@@ -827,7 +854,7 @@ export default () => {
                   if (entry00.hasKey(dataKey)) {
                     lookupState = {
                       color: getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value),
-                      height: indicatorPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
+                      height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     return defaultState;

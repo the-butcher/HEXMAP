@@ -1,14 +1,17 @@
 # Issues in Hexmap
-- find a way to add mortality as datasource
+- add median population as indicator
+- hospitalization
+- add cumulative numbers for cases and deaths
 - move base config to file (maybe multiple files)
 - in municipality mode only municipalities of the respective province are outlined
 
 # later
-- logarithmic option in chart
 - tabular view
 - export options for chart, map, data
 
 # solved
+- ~~find a way to add mortality as datasource~~
+- ~~logarithmic option in chart~~
 - ~~restore map props rebuild so delayed map props build is possible again~~
 - ~~first chart shows only after another path is chosen~~
 - ~~adapt date slider tooltip to match chart tooltip~~

@@ -21,7 +21,7 @@ import { KeysetIndex } from "./KeysetIndex";
 export class DatasetGeneric implements IDataset {
 
     // private readonly dataRoot: IDataRoot;
-    private readonly populations: { [K in string]: number };
+    private readonly populations: { [K in string]: number[] };
     private readonly keysetKeys: string[];
     private readonly keysets: { [K in string]: IKeyset };
     private readonly entryKeys: string[]; // the actual formatted dates
@@ -49,7 +49,7 @@ export class DatasetGeneric implements IDataset {
         // for (let i = 0; i < indexKeys.length; i++) {
         //     indexKeysetRaw[i] = indexKeys[i];
         // }
-        this.indexKeyset = new KeysetIndex(dataRoot.indx, dataRoot.idxs);
+        this.indexKeyset = new KeysetIndex(dataRoot.indx, dataRoot.idxs.map(m => m.name));
 
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[0]);
@@ -78,8 +78,8 @@ export class DatasetGeneric implements IDataset {
         });
 
 
-        this.minY = dataRoot.minY;
-        this.maxY = dataRoot.maxY;
+        // this.minY = dataRoot.minY;
+        // this.maxY = dataRoot.maxY;
 
     }
 
@@ -88,12 +88,13 @@ export class DatasetGeneric implements IDataset {
     }
 
     getPopulation(key: string): number {
-        return this.populations[key];
+        return this.populations[key][0];
     }
 
     getMinY(): number {
         return this.minY;
     }
+
     getMaxY(): number {
         return this.maxY;
     }

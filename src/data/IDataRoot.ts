@@ -1,3 +1,5 @@
+import { IDataIndex } from "./IDataIndex";
+
 /**
  * definition of the format that data is supposed to be provided in
  * 
@@ -6,18 +8,14 @@
  */
 export interface IDataRoot {
 
-    keys: { [K in string]: { [K in string]: string }};
+    keys: { [K in string]: { [K in string]: string } };
 
-    pops: { [K in string]: number };
+    pops: { [K in string]: number[] };
 
-    data: { [K in string]: { [K in string]: number[] }};
+    data: { [K in string]: { [K in string]: number[] } };
 
-    idxs: string[];
+    idxs: IDataIndex[];
 
     indx: number;
 
-    minY: number;
-
-    maxY: number;
-    
 }
