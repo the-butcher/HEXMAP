@@ -52,7 +52,6 @@ export default (props: IChartProps) => {
     _root.setThemes([
       am5themes_Dark.new(_root)
     ]);
-    _root.numberFormatter.set('numberFormat', props.valueFormatter.chartFormat);
     _root.dateFormatter.set('dateFormat', 'dd.MM.yyyy');
     _root.locale = am5locales_de_DE;
 
@@ -138,7 +137,6 @@ export default (props: IChartProps) => {
       fontFamily,
       fontSize: 10,
       fill: labelColor,
-      // text: `{valueY.formatNumber('${props.valueFormatter.chartFormat}')}`          
     });
     const _yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY> = _chart.yAxes.push(am5xy.ValueAxis.new(_root, {
       renderer: yRendererVal,

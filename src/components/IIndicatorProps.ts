@@ -10,9 +10,9 @@ export type INDICATOR_PROPS_FOLD = 'closed' | 'open-horizontal' | 'open-vertical
 
 export interface IIndicatorProps extends IChartProps {
 
-    value00: string;
+    label00: string;
 
-    value07: string;
+    label07: string;
 
     /**
      * callback to be triggered when an indicator wants to open horizontally

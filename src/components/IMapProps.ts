@@ -13,7 +13,7 @@ import { ILightProps } from "./ILightProps";
  */
 export interface IMapProps {
 
-    // selected,
+    fraction: number;
 
     lightProps: ILightProps[];
 
@@ -27,6 +27,6 @@ export interface IMapProps {
 
     courseLabelProps: ILegendProps,
 
-    hyperlinkProps: IHyperlinkProps[], 
+    hyperlinkProps: IHyperlinkProps[],
 
 }

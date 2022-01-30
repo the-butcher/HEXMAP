@@ -51,6 +51,7 @@ export class DatasetIncidence implements IDataset {
         const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
+            // 'Gesamt',
             'Sterblichkeit',
             'Todesfälle',
             'avg_cases',
@@ -60,6 +61,7 @@ export class DatasetIncidence implements IDataset {
         ] : [
             'Inzidenz',
             'Fälle',
+            // 'Gesamt',
             'avg_cases',
             'reg_cases',
             'xlo_cases',
@@ -99,18 +101,23 @@ export class DatasetIncidence implements IDataset {
             const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
+                // const caseAll = dataRoot.data[dateKeys[i]][popsKey][0] * 5000 / this.getPopulation(popsKey)
                 const incdnc1 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
                 const incdnc7 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
 
                 incidenceData[popsKey] = [];
                 incidenceData[popsKey].push({ // incidence
                     value: incdnc7,
-                    label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdnc7)
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc7)
                 });
                 incidenceData[popsKey].push({ // cases
                     value: incdnc1,
                     label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc1 * this.getPopulation(popsKey) / 700000)
                 });
+                // incidenceData[popsKey].push({ // gesamt
+                //     value: caseAll,
+                //     label: () => FormattingDefinition.FORMATTER_PERCENT.format(caseAll / 5000)
+                // });
 
                 if (hasFatal) {
 

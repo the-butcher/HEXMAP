@@ -12,7 +12,7 @@ export interface IChartProps extends IInstantProps {
 
     desc: string;
 
-    valueFormatter: IFormattingDefinition;
+    // valueFormatter: IFormattingDefinition;
 
     path: string;
 

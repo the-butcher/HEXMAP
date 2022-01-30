@@ -1,4 +1,5 @@
 import { FormattingDefinition } from "../util/FormattingDefinition";
+import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { TimeUtil } from "../util/TimeUtil";
 import { DataEntry } from "./DataEntry";
 import { DataRepository } from "./DataRepository";
@@ -33,7 +34,7 @@ export class DatasetGeneric implements IDataset {
     private readonly minY: number;
     private readonly maxY: number;
 
-    constructor(dataRoot: IDataRoot) {
+    constructor(dataRoot: IDataRoot, valueFormatter: IFormattingDefinition) {
 
         this.populations = dataRoot.pops;
 
@@ -68,7 +69,7 @@ export class DatasetGeneric implements IDataset {
                 dataValues[entryKey] = dataRoot.data[dateKey][entryKey].map(d => {
                     return {
                         value: d,
-                        label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(d)
+                        label: () => valueFormatter.format(d)
                     }
                 });
             })

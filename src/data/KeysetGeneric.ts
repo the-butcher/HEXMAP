@@ -45,7 +45,6 @@ export class KeysetGeneric implements IKeyset {
         if (this.hasSubsets && keyTrimmed.length > 0 && keyTrimmed.length != key.length) {
             if (!this.subsets[key]) {
 
-                const keyTrimmed = key.replaceAll('#', '');
                 const _keys = Object.keys(this.keysetRaw).sort();
                 const subkeys = _keys.filter(k => k.indexOf('#') == -1 && k.startsWith(keyTrimmed)).sort();
                 const subsetRaw: { [K in string]: string } = {};

@@ -17,7 +17,7 @@ import { IHexagonState } from './IHexagonState';
 export default (props: IHexagonsProps) => {
 
   const { invalidate, gl, scene, camera } = useThree();
-  const { onPathChange, onHexagonsLoaded } = props;
+  const { stamp, fraction, onPathChange, onHexagonsLoaded } = props;
 
   const hexagonCount = 174414;
 
@@ -36,7 +36,11 @@ export default (props: IHexagonsProps) => {
    * helpers for updating color
    */
   // const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
-  const colorArray = useMemo(() => new Float32Array(hexagonCount * 3), []);
+  const colorCurr = useMemo(() => new Float32Array(hexagonCount * 3), []);
+  const colorDest = useMemo(() => new Float32Array(hexagonCount * 3), []);
+
+  const heightCurr = useMemo(() => new Float32Array(hexagonCount), []);
+  const heightDest = useMemo(() => new Float32Array(hexagonCount), []);
 
   let hexagonValue: IHexagon;
   useEffect(() => {
@@ -66,8 +70,8 @@ export default (props: IHexagonsProps) => {
         vertices.push(0, SpatialUtil.HEXAGON_OFFSET_Y, 0); // center
 
         // 3 normals pointing upwards
-        normals.push(0, 1, 0);
-        normals.push(0, 1, 0);
+        normals.push(cosCurr * radius, 1, sinCurr * radius);
+        normals.push(cosLast * radius, 1, sinLast * radius);
         normals.push(0, 1, 0);
 
         //vertical triangle A
@@ -75,18 +79,18 @@ export default (props: IHexagonsProps) => {
         vertices.push(cosCurr * radius, 0, sinCurr * radius);
         vertices.push(cosLast * radius, SpatialUtil.HEXAGON_OFFSET_Y, sinLast * radius);
 
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
+        normals.push((sinLast + 0) / 1, 0, (cosLast + 0) / -1);
+        normals.push((sinLast + 0) / 1, 0, (cosLast + 0) / -1);
+        normals.push((0 + sinCurr) / 1, 0, (0 + cosCurr) / -1);
 
         //vertical triangle B
         vertices.push(cosLast * radius, SpatialUtil.HEXAGON_OFFSET_Y, sinLast * radius);
         vertices.push(cosCurr * radius, 0, sinCurr * radius);
         vertices.push(cosLast * radius, 0, sinLast * radius);
 
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
-        normals.push((sinLast + sinCurr) / 2, 0, (cosLast + cosCurr) / -2);
+        normals.push((0 + sinCurr) / 1, 0, (0 + cosCurr) / -1);
+        normals.push((sinLast + 0) / 1, 0, (cosLast + 0) / -1);
+        normals.push((0 + sinCurr) / 1, 0, (0 + cosCurr) / -1);
 
         cosLast = cosCurr;
         sinLast = sinCurr;
@@ -110,7 +114,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating hexagons component', props);
+    console.debug('🔧 updating hexagons component (stamp)', props);
     const tsA = Date.now();
 
     let counter = 0;
@@ -123,18 +127,18 @@ export default (props: IHexagonsProps) => {
     HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
       state = props.getState(hexagon);
-      tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + state.height, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
-      // tempObject.rotateY(Math.PI);
-      // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
-      tempObject.updateMatrix();
-      meshRef.current.setMatrixAt(counter, tempObject.matrix);
-      meshRef.current.instanceMatrix.needsUpdate = true
+      heightDest[counter] = state.height;
+
+      // tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + state.height, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      // tempObject.updateMatrix();
+      // meshRef.current.setMatrixAt(counter, tempObject.matrix);
+      // meshRef.current.instanceMatrix.needsUpdate = true
 
       rgb = state.color.getRgb();
-      colorArray[counter * 3 + 0] = rgb[0];
-      colorArray[counter * 3 + 1] = rgb[1];
-      colorArray[counter * 3 + 2] = rgb[2];
-      meshRef.current.geometry.attributes.color.needsUpdate = true;
+      colorDest[counter * 3 + 0] = rgb[0];
+      colorDest[counter * 3 + 1] = rgb[1];
+      colorDest[counter * 3 + 2] = rgb[2];
+      // meshRef.current.geometry.attributes.color.needsUpdate = true;
 
       counter++;
 
@@ -146,19 +150,50 @@ export default (props: IHexagonsProps) => {
           state = props.getState(borderHexagon);
           let color = state.color;
           let rgb = path === props.path ? color.hilight().getRgb() : color.outline().getRgb();
-          colorArray[borderHexagon.i * 3 + 0] = rgb[0];
-          colorArray[borderHexagon.i * 3 + 1] = rgb[1];
-          colorArray[borderHexagon.i * 3 + 2] = rgb[2];
-          meshRef.current.geometry.attributes.color.needsUpdate = true;
+          colorDest[borderHexagon.i * 3 + 0] = rgb[0];
+          colorDest[borderHexagon.i * 3 + 1] = rgb[1];
+          colorDest[borderHexagon.i * 3 + 2] = rgb[2];
+          // meshRef.current.geometry.attributes.color.needsUpdate = true;
         });
       });
     });
 
-    console.debug('🕓 updating hexagons component (done)', Date.now() - tsA);
+    console.debug('🕓 updating hexagons component (stamp, done)', Date.now() - tsA);
 
     invalidate();
 
-  }, [props.stamp]);
+  }, [stamp]);
+
+  useEffect(() => {
+
+    console.debug('🔧 updating hexagons component (fraction)', fraction);
+    const tsA = Date.now();
+
+    let counter = 0;
+    HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
+
+      heightCurr[counter] = heightCurr[counter] + (heightDest[counter] - heightCurr[counter]) * fraction;
+      tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + heightCurr[counter], hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      // tempObject.rotateY(Math.PI);
+      // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
+      tempObject.updateMatrix();
+      meshRef.current.setMatrixAt(counter, tempObject.matrix);
+      meshRef.current.instanceMatrix.needsUpdate = true
+
+      counter++;
+
+    });
+
+    console.log('frame', Date.now());
+    for (let i = 0; i < colorDest.length; i++) {
+      colorCurr[i] = colorCurr[i] + (colorDest[i] - colorCurr[i]) * fraction;
+    }
+    meshRef.current.geometry.attributes.color.needsUpdate = true;
+
+    console.debug('🕓 updating hexagons component (fraction, done)', Date.now() - tsA);
+
+  }, [fraction]);
+
 
   let handleClick = (e: ThreeEvent<PointerEvent>) => { // 
 
@@ -178,9 +213,9 @@ export default (props: IHexagonsProps) => {
   return (
     <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onClick={handleClick}>
       <bufferGeometry ref={geomRef}>
-        <instancedBufferAttribute attachObject={['attributes', 'color']} args={[colorArray, 3]}></instancedBufferAttribute>
+        <instancedBufferAttribute attachObject={['attributes', 'color']} args={[colorCurr, 3]}></instancedBufferAttribute>
       </bufferGeometry>
-      <meshStandardMaterial ref={mtrlRef} vertexColors={true} color={[0.5, 0.5, 0.5]} flatShading={true} />
+      <meshStandardMaterial ref={mtrlRef} vertexColors={true} color={[0.5, 0.5, 0.5]} />
     </instancedMesh>
   );
 

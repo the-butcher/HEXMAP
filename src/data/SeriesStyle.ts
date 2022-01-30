@@ -1,5 +1,6 @@
 import { ISeriesStyle } from "./ISeriesStyle";
 
+
 export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'xlo_cases' | 'xhi_cases' | 'avg_cases' | 'reg_cases';
 
 export class SeriesStyle {
@@ -54,6 +55,7 @@ export class SeriesStyle {
     static readonly PREDFINED_STYLE: { [K in SeriesKey]: ISeriesStyle } = {
         'Inzidenz': this.SERIES_STYLE____DEFAULT,
         'Fälle': this.SERIES_STYLE______CASES,
+        // 'Gesamt': this.SERIES_STYLE______CASES,
         'Sterblichkeit': this.SERIES_STYLE____DEFAULT,
         'Todesfälle': this.SERIES_STYLE______CASES,
         'xlo_cases': this.SERIES_STYLE__CASERANGE,

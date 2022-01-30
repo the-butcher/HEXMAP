@@ -14,6 +14,8 @@ export interface IHexagonsProps {
 
     stamp: string;
 
+    fraction: number;
+
     onPathChange: (source: string, name: string, path: string) => void;
 
     onHexagonsLoaded: () => void;

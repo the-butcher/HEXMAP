@@ -13,7 +13,7 @@ import { IInstantProps } from "./IInstantProps";
  */
 export default (props: IInstantProps) => {
 
-    const [key, setKey] = useState<string>(ObjectUtil.createId())
+    const [key, setKey] = useState<string>(ObjectUtil.createId());
 
     const { source, instant, instantMin, instantMax, instantDif, onInstantChange } = props;
 
@@ -24,6 +24,7 @@ export default (props: IInstantProps) => {
     const handleInstantIncr = useRef<() => void>(() => {
         // no op initially 
     });
+    const handleInstantTo = useRef<number>(-1);
 
     const minDate = new Date(props.instantMin); // 2020
     const maxDate = new Date(props.instantMax); // 2020
@@ -76,7 +77,10 @@ export default (props: IInstantProps) => {
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        onInstantChange(value as number);
+        window.clearTimeout(handleInstantTo.current);
+        handleInstantTo.current = window.setTimeout(() => {
+            onInstantChange(value as number);
+        }, 1);
     }
 
 

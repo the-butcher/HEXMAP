@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import * as three from 'three';
+import { useEffect, useRef, useState } from 'react';
 import ChartComponent from './components/ChartComponent';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IChartProps } from './components/IChartProps';
@@ -23,6 +24,33 @@ import { TimeUtil } from './util/TimeUtil';
 
 export default () => {
 
+  const fracTo = useRef<number>(-1);
+  const [fracstamp, setFracstamp] = useState<number>(-1);
+  const [fracvalue, setFracvalue] = useState<number>(0);
+
+  useEffect(() => {
+
+    console.debug('📞 handling frac changed', fracstamp, fracvalue);
+
+    window.clearTimeout(fracTo.current);
+
+    /**
+     * update fracvalue, which will cause other calls to this method as along as value does not exceed 1
+     */
+    fracTo.current = window.setTimeout(() => {
+
+      const elapstamp = Date.now() - fracstamp;
+      if (elapstamp < 250) {
+        const _fracvalue = three.MathUtils.smoothstep(elapstamp, 0, 250);
+        setFracvalue(_fracvalue);
+      } else {
+        setFracvalue(1);
+      }
+
+    }, 10);
+
+  }, [fracstamp, fracvalue]);
+
   const handleScreenshotRequested = () => {
 
     console.debug('📞 handling screenshot requested');
@@ -38,6 +66,7 @@ export default () => {
     });
 
   }
+
 
   /**
    * handles changes originating from either date-slider or data-picker
@@ -281,6 +310,7 @@ export default () => {
 
   const [updateMapTo, setUpdateMapTo] = useState<number>(-1);
   const [mapProps, setMapProps] = useState<IMapProps>({
+    fraction: -1,
     lightProps: [
       {
         id: ObjectUtil.createId(),
@@ -316,6 +346,7 @@ export default () => {
       name: '',
       keys: [],
       path: '',
+      fraction: -1,
       stamp: ObjectUtil.createId(),
       onPathChange: handlePathChange,
       getState: (values) => {
@@ -692,8 +723,10 @@ export default () => {
           _labelProps[1].label = label1;
         }
 
-        let minLegendVal = Number.MAX_VALUE;
-        let maxLegendVal = Number.MIN_VALUE;
+        let minLegendValue = Number.MAX_VALUE;
+        let maxLegendValue = Number.MIN_VALUE;
+        let minLegendLabel = '';
+        let maxLegendLabel = '';
         if (selected) {
 
           _labelProps[2].label = TimeUtil.formatCategoryDateFull(clampedInstant60);
@@ -706,20 +739,27 @@ export default () => {
            */
           entry00.getKeys().forEach(key => {
             if (key.endsWith(postKey)) {
-              minLegendVal = Math.min(minLegendVal, entry00.getValue(key, dataSetting.getIndex()).value);
-              maxLegendVal = Math.max(maxLegendVal, entry00.getValue(key, dataSetting.getIndex()).value);
+              const value00 = entry00.getValue(key, dataSetting.getIndex());
+              if (value00.value < minLegendValue) {
+                minLegendValue = value00.value;
+                minLegendLabel = value00.label();
+              }
+              if (value00.value > maxLegendValue) {
+                maxLegendValue = value00.value;
+                maxLegendLabel = value00.label();
+              }
             }
           });
 
-          _legendLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minLegendVal).padStart(8, ' '); // right align by padding monospaced text
-          _legendLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxLegendVal);
+          _legendLabelProps.min.label = minLegendLabel.padStart(8, ' '); // right align by padding monospaced text
+          _legendLabelProps.max.label = maxLegendLabel;
 
           const entry60 = dataSetting.getDataset().getEntryByInstant(clampedInstant60); // dataSetting.data[TimeUtil.formatCategoryDateFull(clampedInstant60)];
-          const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex()).value;
-          const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex()).value;
+          const minCourseVal = entry60.getValue(prefKey + postKey, dataSetting.getIndex());
+          const maxCourseVal = entry00.getValue(prefKey + postKey, dataSetting.getIndex());
 
-          _courseLabelProps.min.label = indicatorPropsInstance.valueFormatter.format(minCourseVal).padStart(8, ' '); // right align by padding monospaced text
-          _courseLabelProps.max.label = indicatorPropsInstance.valueFormatter.format(maxCourseVal);
+          _courseLabelProps.min.label = minCourseVal.label().padStart(8, ' '); // right align by padding monospaced text
+          _courseLabelProps.max.label = maxCourseVal.label();
 
         }
 
@@ -733,16 +773,16 @@ export default () => {
         const valueKey = prefKey + postKey;
         const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00);
         const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
-        const value00 = entry00.getValue(valueKey, dataSetting.getIndex()).value;
-        const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex()).value;
-        const value07 = (value00 - valueM7) / valueM7;
+        const value00 = entry00.getValue(valueKey, dataSetting.getIndex());
+        const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
+        const value07 = (value00.value - valueM7.value) / valueM7.value;
 
         if (selected) {
 
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
-            value00: indicatorPropsInstance.valueFormatter.format(value00),
-            value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
+            label00: value00.label(),
+            label07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             breadcrumbProps: breadcrumbProps,
             path: valueKey,
             fold: appState.fold,
@@ -758,15 +798,15 @@ export default () => {
           };
 
           _lightProps.forEach(props => {
-            props.intensity = rendererPropsInstance.interpolatedInt.getOut(value00)
+            props.intensity = rendererPropsInstance.interpolatedInt.getOut(value00.value)
           });
 
         } else {
 
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
-            value00: indicatorPropsInstance.valueFormatter.format(value00),
-            value07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
+            label00: value00.label(),
+            label07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
             fold: 'closed',
             instant: clampedInstant00,
             // instantMin: dataSetting.getInstantMin(),
@@ -792,11 +832,12 @@ export default () => {
           const valueLookup: { [K in string]: IHexagonState } = {};
 
           _hexagonProps = {
-            // onHover: setHovered,
+            ...mapProps.hexagonProps,
             source: appState.source,
             name: keysetKeys[0],
             keys: mapKeys,
             path: prefKey,
+            // fraction: mapProps.hexagonProps.fraction,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
             getPath: (values) => {
@@ -809,7 +850,7 @@ export default () => {
                 let lookupState = valueLookup['l' + hexagon.x];
                 if (!lookupState) {
                   const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
-                  const val = minLegendVal + (maxLegendVal - minLegendVal) * legendFraction;
+                  const val = minLegendValue + (maxLegendValue - minLegendValue) * legendFraction;
                   lookupState = {
                     color: getColor(val),
                     height: rendererPropsInstance.interpolatedEle.getOut(val)
@@ -857,7 +898,10 @@ export default () => {
                       height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
                     }
                   } else {
-                    return defaultState;
+                    return {
+                      color: defaultState.color,
+                      height: defaultState.height + ele
+                    }
                   }
                   valueLookup[hexagon.gkz] = lookupState;
                 }
@@ -903,13 +947,13 @@ export default () => {
     /**
     * update stamps on all lights (triggering a shadow update)
     */
-    const _lightPropsFast = _lightProps.map(props => {
-      return {
-        ...props,
-        stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
-        shadowEnabled: false
-      }
-    });
+    // const _lightPropsFast = _lightProps.map(props => {
+    //   return {
+    //     ...props,
+    //     stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
+    //     shadowEnabled: false
+    //   }
+    // });
     const _lightPropsSlow = _lightProps.map(props => {
       return {
         ...props,
@@ -918,35 +962,46 @@ export default () => {
       }
     });
 
-    if (appState.action.updateDelay > 0) {
-      setMapProps({
-        ...mapProps,
-        labelProps: _labelProps,
-        legendLabelProps: _legendLabelProps,
-        courseLabelProps: _courseLabelProps,
-        hexagonProps: _hexagonProps,
-        lightProps: _lightPropsFast,
-        controlsProps: _controlProps
-      });
-    }
+    /**
+     * have a direct (fast) update
+     */
+    // if (appState.action.updateDelay > 0) {
+
+    /**
+     * actually sets the target value on the map component
+     */
+    setMapProps({
+      ...mapProps,
+      labelProps: _labelProps,
+      legendLabelProps: _legendLabelProps,
+      courseLabelProps: _courseLabelProps,
+      hexagonProps: _hexagonProps,
+      lightProps: _lightPropsSlow,
+      controlsProps: _controlProps
+    });
+    // }
 
     /**
     * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
     */
     window.clearTimeout(updateMapTo);
     setUpdateMapTo(window.setTimeout(() => {
-      setMapProps({
-        ...mapProps,
-        labelProps: _labelProps,
-        legendLabelProps: _legendLabelProps,
-        courseLabelProps: _courseLabelProps,
-        hexagonProps: _hexagonProps,
-        lightProps: _lightPropsSlow,
-        controlsProps: _controlProps
-      });
+      setFracstamp(Date.now());
+      // setMapProps({
+      //   ...mapProps,
+      //   labelProps: _labelProps,
+      //   legendLabelProps: _legendLabelProps,
+      //   courseLabelProps: _courseLabelProps,
+      //   hexagonProps: _hexagonProps,
+      //   lightProps: _lightPropsSlow,
+      //   controlsProps: _controlProps
+      // });
     }, appState.action.updateDelay));
 
     // });
+
+
+
 
   }, [appState]);
 
@@ -967,9 +1022,10 @@ export default () => {
 
   }, []);
 
+
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-      <MapComponent {...mapProps} />
+      <MapComponent {...mapProps} fraction={fracvalue} />
       <UserInterfaceComponent {...userInterfaceProps} />
       {
         exportableChart ? <ChartComponent key={exportableChart.id} {...exportableChart} style={{ width: '1200px', height: '675px', position: 'absolute', left: '-2000px', top: '-1000px' }} /> : null

@@ -53,9 +53,9 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', minHeight: indicatorMinHeight }}>
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: '140px', flexGrow: '1' }}>
-              <div style={{ fontSize: '36px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '20px' }}>{props.value00}</div>
+              <div style={{ fontSize: '36px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '20px' }}>{props.label00}</div>
               <div style={{ fontSize: '10px', textAlign: 'right' }}>{props.instant ? TimeUtil.formatCategoryDateFull(props.instant) : '##.##.####'}</div>
-              <div style={{ fontSize: '18px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '12px' }}>{props.value07}</div>
+              <div style={{ fontSize: '18px', textAlign: 'right', whiteSpace: 'nowrap', lineHeight: '50%', paddingTop: '12px' }}>{props.label07}</div>
               <div style={{ fontSize: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>gegenüber Vorwoche</div>
               <div style={{ minHeight: '3px', flexGrow: '100' }} />
 
