@@ -64,200 +64,53 @@ export class DataRepository {
     //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
     //   seriesVisibilities: {}
     // },
-    // {
-    //   id: 'i_ems',
-    //   instant: -1,
-    //   instantMin: -1,
-    //   instantMax: -1,
-    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-    //   name: 'Inzidenz',
-    //   desc: 'EMS',
-    //   label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-    //   onExpand: () => { },
-    //   onInstantChange: () => { },
-    //   onInstantRangeChange: () => { },
-    //   onExport: () => { },
-    //   onSeriesVisibilityChange: () => { },
-    //   onLogarithmicChange: () => { },
-    //   doExport: false,
-    //   logarithmic: false,
-    //   fold: 'open-horizontal',
-    //   source: './hexmap-data-incidence-ems.json',
-    //   loaded: false,
-    //   path: '',
-    //   breadcrumbProps: [],
-    //   getRendererProps: (index: number, name: string) => {
-    //     return {
-    //       interpolatedEle: DataRepository.interpolatedEle7di3,
-    //       interpolatedHue: DataRepository.interpolatedHue7di3,
-    //       interpolatedSat: new FixedValue(1.00),
-    //       interpolatedVal: new FixedValue(0.40),
-    //       interpolatedInt: DataRepository.interpolatedInt7diX,
-    //     }
-    //   },
-    //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
-    //   seriesVisibilities: {}
-    // },
-    // {
-    //   id: 'i_paa',
-    //   instant: -1,
-    //   instantMin: -1,
-    //   instantMax: -1,
-    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-    //   name: 'Inzidenz',
-    //   desc: 'Bundesland und Alter',
-    //   label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-    //   onExpand: () => { },
-    //   onInstantChange: () => { },
-    //   onInstantRangeChange: () => { },
-    //   onExport: () => { },
-    //   onSeriesVisibilityChange: () => { },
-    //   onLogarithmicChange: () => { },
-    //   doExport: false,
-    //   logarithmic: false,
-    //   fold: 'closed',
-    //   source: './hexmap-data-incidence-age.json',
-    //   loaded: false,
-    //   path: '',
-    //   breadcrumbProps: [],
-    //   getRendererProps: (index: number, name: string) => {
-    //     return {
-    //       interpolatedEle: DataRepository.interpolatedEle7di3,
-    //       interpolatedHue: DataRepository.interpolatedHue7di3,
-    //       interpolatedSat: new FixedValue(1.00),
-    //       interpolatedVal: new FixedValue(0.40),
-    //       interpolatedInt: DataRepository.interpolatedInt7diX,
-    //     }
-    //   },
-    //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
-    //   seriesVisibilities: {}
-    // },
-    // {
-    //   id: 'i_dst',
-    //   instant: -1,
-    //   instantMin: -1,
-    //   instantMax: -1,
-    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-    //   name: 'Inzidenz',
-    //   desc: 'Bezirk',
-    //   label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-    //   // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-    //   onExpand: () => { },
-    //   onInstantChange: () => { },
-    //   onInstantRangeChange: () => { },
-    //   onExport: () => { },
-    //   onSeriesVisibilityChange: () => { },
-    //   onLogarithmicChange: () => { },
-    //   doExport: false,
-    //   logarithmic: false,
-    //   fold: 'closed',
-    //   source: './hexmap-data-incidence-bezirk.json',
-    //   loaded: false,
-    //   path: '',
-    //   breadcrumbProps: [],
-    //   getRendererProps: (index: number, name: string) => {
-    //     if (name === 'Sterblichkeit' || name === 'Todesfälle') {
-    //       return {
-    //         interpolatedEle: DataRepository.interpolatedEle7dm3,
-    //         interpolatedHue: new FixedValue(0.17),
-    //         interpolatedSat: new FixedValue(0.20),
-    //         interpolatedVal: new InterpolatedValue(0.25, 0.05, 0.00, 30.00, 1),
-    //         interpolatedInt: DataRepository.interpolatedInt7diX,
-    //       }
-    //     } else {
-    //       return {
-    //         interpolatedEle: DataRepository.interpolatedEle7di3,
-    //         interpolatedHue: DataRepository.interpolatedHue7di3,
-    //         interpolatedSat: new FixedValue(1.00),
-    //         interpolatedVal: new FixedValue(0.40),
-    //         interpolatedInt: DataRepository.interpolatedInt7diX,
-    //       }
-    //     }
-    //   },
-    //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
-    //   seriesVisibilities: {}
-    // },
-    // {
-    //   id: 'v_mnc',
-    //   instant: -1,
-    //   instantMin: -1,
-    //   instantMax: -1,
-    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-    //   name: 'Impfung',
-    //   desc: 'Gemeinde',
-    //   label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
-    //   label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
-    //   // valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
-    //   onExpand: () => { },
-    //   onInstantChange: () => { },
-    //   onInstantRangeChange: () => { },
-    //   onExport: () => { },
-    //   onSeriesVisibilityChange: () => { },
-    //   onLogarithmicChange: () => { },
-    //   doExport: false,
-    //   logarithmic: false,
-    //   fold: 'closed',
-    //   source: './hexmap-data-vacc-gemeinde.json',
-    //   loaded: false,
-    //   path: '',
-    //   breadcrumbProps: [],
-    //   getRendererProps: (index: number, name: string) => {
-    //     if (index === 3) { // impfprämie
-    //       return {
-    //         interpolatedEle: new InterpolatedValue(-7, 20, 0, 1, 1),
-    //         interpolatedHue: new FixedValue(0.33),
-    //         interpolatedSat: {
-    //           getOut: (val: number) => {
-    //             if (val < 0.8) {
-    //               return 0;
-    //             } else {
-    //               return 1.00;
-    //             }
-    //           }
-    //         },
-    //         interpolatedVal: {
-    //           getOut: (val: number) => {
-    //             if (val < 0.8) {
-    //               return 0;
-    //             } else if (val < 0.85) {
-    //               return 0.20;
-    //             } else if (val < 0.90) {
-    //               return 0.30;
-    //             } else {
-    //               return 0.40;
-    //             }
-    //           }
-    //         },
-    //         interpolatedInt: new FixedValue(1.65),
-    //       }
-    //     } else {
-    //       return {
-    //         interpolatedEle: new InterpolatedValue(-7, 20, 0, 1, 1),
-    //         interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.85, 1),
-    //         interpolatedSat: new FixedValue(1.00),
-    //         interpolatedVal: new FixedValue(0.40),
-    //         interpolatedInt: new FixedValue(1.25),
-    //       }
-    //     }
-    //   },
-    //   constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
-    //   seriesVisibilities: {}
-    // },
     {
-      id: 'v_dst',
+      id: 'i_ems',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
       instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-      name: 'Impfung',
-      desc: 'Bezirk',
-      label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
-      label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      name: 'Inzidenz',
+      desc: 'EMS',
+      label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+      onExpand: () => { },
+      onInstantChange: () => { },
+      onInstantRangeChange: () => { },
+      onExport: () => { },
+      onSeriesVisibilityChange: () => { },
+      onLogarithmicChange: () => { },
+      doExport: false,
+      logarithmic: false,
+      fold: 'open-horizontal',
+      source: './hexmap-data-incidence-ems.json',
+      loaded: false,
+      path: '',
+      breadcrumbProps: [],
+      getRendererProps: (index: number, name: string) => {
+        return {
+          interpolatedEle: DataRepository.interpolatedEle7di3,
+          interpolatedHue: DataRepository.interpolatedHue7di3,
+          interpolatedSat: new FixedValue(1.00),
+          interpolatedVal: new FixedValue(0.40),
+          interpolatedInt: DataRepository.interpolatedInt7diX,
+        }
+      },
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
+    },
+    {
+      id: 'i_paa',
+      instant: -1,
+      instantMin: -1,
+      instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+      name: 'Inzidenz',
+      desc: 'Bundesland und Alter',
+      label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
       onExpand: () => { },
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
@@ -267,51 +120,167 @@ export class DataRepository {
       doExport: false,
       logarithmic: false,
       fold: 'closed',
-      source: './hexmap-data-vacc-age.json',
+      source: './hexmap-data-incidence-age.json',
       loaded: false,
       path: '',
       breadcrumbProps: [],
       getRendererProps: (index: number, name: string) => {
         return {
-          interpolatedEle: new InterpolatedValue(-5, 10, 0, 1, 1),
-          interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.10, 0.80, 1),
+          interpolatedEle: DataRepository.interpolatedEle7di3,
+          interpolatedHue: DataRepository.interpolatedHue7di3,
           interpolatedSat: new FixedValue(1.00),
           interpolatedVal: new FixedValue(0.40),
-          interpolatedInt: new FixedValue(1.25),
+          interpolatedInt: DataRepository.interpolatedInt7diX,
         }
-
+      },
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
+    },
+    {
+      id: 'i_dst',
+      instant: -1,
+      instantMin: -1,
+      instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+      name: 'Inzidenz',
+      desc: 'Bezirk',
+      label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
+      onExpand: () => { },
+      onInstantChange: () => { },
+      onInstantRangeChange: () => { },
+      onExport: () => { },
+      onSeriesVisibilityChange: () => { },
+      onLogarithmicChange: () => { },
+      doExport: false,
+      logarithmic: false,
+      fold: 'closed',
+      source: './hexmap-data-incidence-bezirk.json',
+      loaded: false,
+      path: '',
+      breadcrumbProps: [],
+      getRendererProps: (index: number, name: string) => {
+        if (name === 'Sterblichkeit' || name === 'Todesfälle') {
+          return {
+            interpolatedEle: DataRepository.interpolatedEle7dm3,
+            interpolatedHue: new FixedValue(0.17),
+            interpolatedSat: new FixedValue(0.20),
+            interpolatedVal: new InterpolatedValue(0.25, 0.05, 0.00, 30.00, 1),
+            interpolatedInt: DataRepository.interpolatedInt7diX,
+          }
+        } else {
+          return {
+            interpolatedEle: DataRepository.interpolatedEle7di3,
+            interpolatedHue: DataRepository.interpolatedHue7di3,
+            interpolatedSat: new FixedValue(1.00),
+            interpolatedVal: new FixedValue(0.40),
+            interpolatedInt: DataRepository.interpolatedInt7diX,
+          }
+        }
+      },
+      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+      seriesVisibilities: {}
+    },
+    {
+      id: 'v_mnc',
+      instant: -1,
+      instantMin: -1,
+      instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+      name: 'Impfung',
+      desc: 'Gemeinde',
+      label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      // valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
+      onExpand: () => { },
+      onInstantChange: () => { },
+      onInstantRangeChange: () => { },
+      onExport: () => { },
+      onSeriesVisibilityChange: () => { },
+      onLogarithmicChange: () => { },
+      doExport: false,
+      logarithmic: false,
+      fold: 'closed',
+      source: './hexmap-data-vacc-gemeinde.json',
+      loaded: false,
+      path: '',
+      breadcrumbProps: [],
+      getRendererProps: (index: number, name: string) => {
+        if (index === 3) { // impfprämie
+          return {
+            interpolatedEle: new InterpolatedValue(-7, 20, 0, 1, 1),
+            interpolatedHue: new FixedValue(0.33),
+            interpolatedSat: {
+              getOut: (val: number) => {
+                if (val < 0.8) {
+                  return 0;
+                } else {
+                  return 1.00;
+                }
+              }
+            },
+            interpolatedVal: {
+              getOut: (val: number) => {
+                if (val < 0.8) {
+                  return 0;
+                } else if (val < 0.85) {
+                  return 0.20;
+                } else if (val < 0.90) {
+                  return 0.30;
+                } else {
+                  return 0.40;
+                }
+              }
+            },
+            interpolatedInt: new FixedValue(1.65),
+          }
+        } else {
+          return {
+            interpolatedEle: new InterpolatedValue(-7, 20, 0, 1, 1),
+            interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.85, 1),
+            interpolatedSat: new FixedValue(1.00),
+            interpolatedVal: new FixedValue(0.40),
+            interpolatedInt: new FixedValue(1.25),
+          }
+        }
       },
       constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
       seriesVisibilities: {}
     },
     // {
-    //   id: 'p_mnc',
+    //   id: 'v_dst',
     //   instant: -1,
     //   instantMin: -1,
     //   instantMax: -1,
-    //   instantDif: TimeUtil.MILLISECONDS_PER___YEAR,
-    //   name: 'Alter',
-    //   desc: 'Gemeinde',
-    //   value00: FormattingDefinition.FORMATTER__FLOAT_2.format(0.1111).replaceAll('1', '#'),
-    //   value07: FormattingDefinition.FORMATTER__FLOAT_2.format(0.1111).replaceAll('1', '#'),
-    //   valueFormatter: FormattingDefinition.FORMATTER__FLOAT_2,
+    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+    //   name: 'Impfung',
+    //   desc: 'Bezirk',
+    //   label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+    //   label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
     //   onExpand: () => { },
     //   onInstantChange: () => { },
     //   onInstantRangeChange: () => { },
     //   onExport: () => { },
     //   onSeriesVisibilityChange: () => { },
+    //   onLogarithmicChange: () => { },
     //   doExport: false,
+    //   logarithmic: false,
     //   fold: 'closed',
-    //   source: './hexmap-data-population-gemeinde.json',
+    //   source: './hexmap-data-vacc-age.json',
     //   loaded: false,
     //   path: '',
     //   breadcrumbProps: [],
-    //   interpolatedEle: new InterpolatedValue(-5, 5, 22, 52, 1),
-    //   interpolatedHue: new FixedValue(0.17),
-    //   interpolatedSat: new InterpolatedValue(0.8, 0.2, 32, 52, 1), // new InterpolatedValue(0.50, 1.00, 0.78, 0.82, 1), //
-    //   interpolatedVal: new InterpolatedValue(0.5, 0.1, 32, 52, 1),
-    //   interpolatedInt: new FixedValue(1.25),
-    //   constructDataset: dataRoot => new DatasetGeneric(dataRoot),
+    //   getRendererProps: (index: number, name: string) => {
+    //     return {
+    //       interpolatedEle: new InterpolatedValue(-5, 10, 0, 1, 1),
+    //       interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.10, 0.80, 1),
+    //       interpolatedSat: new FixedValue(1.00),
+    //       interpolatedVal: new FixedValue(0.40),
+    //       interpolatedInt: new FixedValue(1.25),
+    //     }
+    //   },
+    //   constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
     //   seriesVisibilities: {}
     // }
   ];

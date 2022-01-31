@@ -52,6 +52,10 @@ export class KeysetIndex implements IKeyset {
         return this.defaultKey;
     }
 
+    hasKey(key: string | number): boolean {
+        return this.keys[key] !== undefined;
+    }
+
     getKeys(): string[] {
         return this.keys;
     }

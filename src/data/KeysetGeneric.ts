@@ -40,25 +40,29 @@ export class KeysetGeneric implements IKeyset {
     }
 
     getSubset(key: string): IKeyset {
+
         const keyTrimmed = key.replaceAll('#', '');
-        // subsets allowed, not root but another category
+
+        // subsets allowed, not root but another category 
         if (this.hasSubsets && keyTrimmed.length > 0 && keyTrimmed.length != key.length) {
             if (!this.subsets[key]) {
 
                 const _keys = Object.keys(this.keysetRaw).sort();
-                const subkeys = _keys.filter(k => k.indexOf('#') == -1 && k.startsWith(keyTrimmed)).sort();
+                const subkeys = _keys.filter(k => k !== key && k.startsWith(keyTrimmed)).sort(); // k => k.indexOf('#') == -1 && 
                 const subsetRaw: { [K in string]: string } = {};
 
-                subsetRaw[key] = 'alle Einträge';
-                subkeys.forEach(subkey => {
-                    subsetRaw[subkey] = this.keysetRaw[subkey];
-                });
-
-                this.subsets[key] = new KeysetGeneric(this.keysetKey, subkeys[0], subsetRaw);
+                if (subkeys.length > 0) {
+                    subsetRaw[key] = 'alle Einträge';
+                    subkeys.forEach(subkey => {
+                        subsetRaw[subkey] = this.keysetRaw[subkey];
+                    });
+                    this.subsets[key] = new KeysetGeneric(this.keysetKey, subkeys[0], subsetRaw);
+                }
             }
             return this.subsets[key];
         }
         return undefined;
+
     }
 
     size(): number {
@@ -67,6 +71,10 @@ export class KeysetGeneric implements IKeyset {
 
     getDefaultKey(): string {
         return this.defaultKey;
+    }
+
+    hasKey(key: string | number): boolean {
+        return this.keysetRaw[key] !== undefined;
     }
 
     getKeys(): string[] {

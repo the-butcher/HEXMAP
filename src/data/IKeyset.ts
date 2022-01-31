@@ -19,6 +19,8 @@ export interface IKeyset {
      */
     getDefaultKey(): string;
 
+    hasKey(key: string | number): boolean;
+
     /**
      * get the keys that this instance holds
      */

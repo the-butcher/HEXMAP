@@ -36,6 +36,8 @@ export interface IDataSetting {
      */
     setPath(key: string, value: string): void;
 
+    validatePath(key: string, value: string): string;
+
     /**
      * the current data instant
      */

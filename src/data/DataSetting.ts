@@ -18,8 +18,8 @@ export class DataSetting implements IDataSetting {
         // this.instantMin = dataSet.getInstantMin();
         // this.instantMax = dataSet.getInstantMax();
         this.path = {};
-        dataSet.getKeysetKeys().forEach(keysetKey => {
-            this.path[keysetKey] = dataSet.getKeyset(keysetKey).getDefaultKey();
+        dataSet.getKeysetKeys().forEach(key => {
+            this.path[key] = dataSet.getKeyset(key).getDefaultKey();
         });
 
     }
@@ -40,8 +40,19 @@ export class DataSetting implements IDataSetting {
         return this.index;
     }
 
+    validatePath(key: string, value: string): string {
+        while (!this.dataSet.getKeyset(key).hasKey(value)) {
+            const indexOfFirstHash = value.indexOf('#') >= 0 ? value.indexOf('#') - 1 : value.length - 1;
+            value = value.substring(0, indexOfFirstHash).padEnd(value.length, '#');
+            if (value.charAt(1) === '#') {
+                break;
+            }
+        }
+        return value;
+    }
+
     setPath(key: string, value: string): void {
-        this.path[key] = value;
+        this.path[key] = this.validatePath(key, value);
     }
 
     getInstant(): number {

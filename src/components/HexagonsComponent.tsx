@@ -184,7 +184,7 @@ export default (props: IHexagonsProps) => {
 
     });
 
-    console.log('frame', Date.now());
+    // console.log('frame', Date.now());
     for (let i = 0; i < colorDest.length; i++) {
       colorCurr[i] = colorCurr[i] + (colorDest[i] - colorCurr[i]) * fraction;
     }

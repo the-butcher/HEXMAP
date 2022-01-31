@@ -89,7 +89,7 @@ export default () => {
         stamp: ObjectUtil.createId(),
         updateScene: true,
         updateLight: true,
-        updateDelay: 250
+        updateDelay: 10
       }
     });
 
@@ -270,8 +270,8 @@ export default () => {
 
     console.debug('📞 handling path change', source, name, path);
 
-    const dataSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    dataSettings.setPath(name, path);
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSetting.setPath(name, path); // the setting will try to adjust the path if needed (i.e. vienna district codes)
 
     setAppState({
       ...appState,
@@ -655,15 +655,19 @@ export default () => {
 
           if (selected) {
 
+            console.log('prefKey', prefKey, 'postKey', postKey);
+
             mapKeys = keyset.getRaws();
 
             /**
              * the path refers to subset (if there is subsets)
              * therefore the top crumbs needs to be adapted
+             * path may i.e. be "502##"
              */
             let validPath = path;
             keyset.getKeys().forEach(key => {
-              if (path.startsWith(key.replaceAll('#', ''))) { // includes #####, but will match 
+              const keyTrimmed = key.replaceAll('#', '');
+              if (keyTrimmed !== '' && path !== key && path.startsWith(keyTrimmed)) { // includes #####, but will match 
                 validPath = key;
               }
             });
@@ -738,7 +742,7 @@ export default () => {
            * find min and max values referring to the map display date
            */
           entry00.getKeys().forEach(key => {
-            if (key.endsWith(postKey)) {
+            if (key.endsWith(postKey)) { // TODO what does this do, why has endsWith relevance
               const value00 = entry00.getValue(key, dataSetting.getIndex());
               if (value00.value < minLegendValue) {
                 minLegendValue = value00.value;
@@ -769,6 +773,8 @@ export default () => {
           const v = Math.max(0, rendererPropsInstance.interpolatedVal.getOut(value));
           return new Color(h, s, v);
         }
+
+
 
         const valueKey = prefKey + postKey;
         const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00);
@@ -840,8 +846,8 @@ export default () => {
             // fraction: mapProps.hexagonProps.fraction,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
-            getPath: (values) => {
-              return values.gkz.substring(0, prefKey.length);
+            getPath: (hexagon) => {
+              return hexagon.gkz.substring(0, prefKey.length);
             },
             getState: (hexagon) => {
               let ele = hexagon.ele / 2 - 7.5;
@@ -889,9 +895,11 @@ export default () => {
                 // data
                 let lookupState = valueLookup[hexagon.gkz];
                 if (!lookupState) {
-                  const _prefKey = hexagon.gkz.substring(0, prefKey.length)
+
+                  const _prefKey = dataSetting.validatePath(dataSetting.getDataset().getKeysetKeys()[0], hexagon.gkz.substring(0, prefKey.length));
                   const dataKey = _prefKey + postKey;
                   const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
+
                   if (entry00.hasKey(dataKey)) {
                     lookupState = {
                       color: getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value),
@@ -909,6 +917,7 @@ export default () => {
                   color: lookupState.color,
                   height: lookupState.height + ele
                 }
+
               }
 
             },
@@ -968,7 +977,7 @@ export default () => {
     // if (appState.action.updateDelay > 0) {
 
     /**
-     * actually sets the target value on the map component
+     * sets the destination values on the map
      */
     setMapProps({
       ...mapProps,
@@ -986,20 +995,8 @@ export default () => {
     */
     window.clearTimeout(updateMapTo);
     setUpdateMapTo(window.setTimeout(() => {
-      setFracstamp(Date.now());
-      // setMapProps({
-      //   ...mapProps,
-      //   labelProps: _labelProps,
-      //   legendLabelProps: _legendLabelProps,
-      //   courseLabelProps: _courseLabelProps,
-      //   hexagonProps: _hexagonProps,
-      //   lightProps: _lightPropsSlow,
-      //   controlsProps: _controlProps
-      // });
+      setFracstamp(Date.now()); // kick off animation
     }, appState.action.updateDelay));
-
-    // });
-
 
 
 
