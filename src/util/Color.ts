@@ -33,7 +33,7 @@ export class Color implements IColor {
     }
 
     hilight(): IColor {
-        return new Color(this.hsv[0], this.hsv[1], Math.min(1, this.hsv[2] * 2.00)); // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
+        return new Color(this.hsv[0], this.hsv[1], Math.min(1, (this.hsv[2] + 0.03) * 3.00)); // Math.min(1, this.hsv[2] * 2.00) // Math.min(1, this.hsv[1] * 1.5), Math.min(1, this.hsv[2] * 1.5));
     }
 
     darker(steps: number): IColor {

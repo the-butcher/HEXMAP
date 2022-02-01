@@ -12,7 +12,7 @@ import { IMapProps } from "./IMapProps";
 import LabelComponent from "./LabelComponent";
 import LightCompoment from "./LightCompoment";
 import * as three from 'three';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * functional react component describing the entire map / scene
@@ -22,21 +22,11 @@ import { useEffect, useRef } from "react";
  */
 export default (props: IMapProps) => {
 
-    const { fraction, lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps, courseLabelProps, hyperlinkProps } = props;
+    const { lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps, courseLabelProps, hyperlinkProps } = props;
 
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
     }
-
-    useEffect(() => {
-
-        console.debug('🔧 updating map component (hexagonProps.fraction)', fraction);
-
-        // pass the fraction down to hexagon component
-        hexagonProps.fraction = fraction;
-        lightProps.forEach(l => l.stamp = ObjectUtil.createId());
-
-    }, [fraction]);
 
     return (
         <div style={{ position: 'absolute', height: '100%', width: '100%' }}>

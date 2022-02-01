@@ -13,8 +13,6 @@ import { ILightProps } from "./ILightProps";
  */
 export interface IMapProps {
 
-    fraction: number;
-
     lightProps: ILightProps[];
 
     controlsProps: IControlsProps;

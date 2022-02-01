@@ -26,6 +26,8 @@ export class HexagonRepository {
     private readonly borderHexagons: { [K in string]: IHexagon[] };
     private readonly pathLengthHistory: number[];
 
+    private hexagonIndicesN: number[];
+
     constructor() {
         this.hexagons = [];
         this.borderHexagons = {};
@@ -59,7 +61,7 @@ export class HexagonRepository {
                 joinableHexagonsByColAndRow[v.col] = {};
             }
             joinableHexagonsByColAndRow[v.col][v.row] = {
-                i: v.i,
+                i: v.sortkeyN,
                 path: props.getPath(v)
             }
             minCol = Math.min(minCol, v.col);
@@ -141,12 +143,14 @@ export class HexagonRepository {
 
     async load(): Promise<void> {
 
-        let hexagonValue: IHexagon;
+        let hexagon: IHexagon;
         const pbfHexagons = await new PbfHexagonsLoader().load('./hexagons.pbf');
+
+        console.log('hexagons loaded ...');
 
         let values: number[];
         let yOffset: number;
-        let color: number[];
+        let counter = 0;
 
         pbfHexagons.getHexagons().forEach(pbfHexagon => {
 
@@ -158,8 +162,9 @@ export class HexagonRepository {
             /**
              * intial values
              */
-            hexagonValue = {
-                i: -1,
+            hexagon = {
+                sortkeyN: -1,
+                sortkeyS: -1,
                 x: values[HexagonRepository.VALUE_INDEX___X] * SpatialUtil.HEXAGON_SPACING_Y + SpatialUtil.HEXAGON_ORIGIN_X,
                 y: 0,
                 z: values[HexagonRepository.VALUE_INDEX___Y] * SpatialUtil.HEXAGON_SPACING_X - yOffset - SpatialUtil.HEXAGON_ORIGIN_Y,
@@ -172,17 +177,28 @@ export class HexagonRepository {
                 luc: values[HexagonRepository.VALUE_INDEX_LUC],
                 ele: SpatialUtil.toZ(values[HexagonRepository.VALUE_INDEX___Z] / SpatialUtil.SCALE_PRECISION)
             };
-            this.hexagons.push(hexagonValue);
-            hexagonValue.y = hexagonValue.ele; // props.renderer.getHeight(hexagonValue);
+            this.hexagons.push(hexagon);
+            hexagon.y = hexagon.ele; // props.renderer.getHeight(hexagonValue);
 
         });
+
+        console.log('hexagons built ...');
+
+        this.hexagons.sort((a, b) => a.z - b.z);
+        counter = 0;
+        this.hexagons.forEach(hexagonValue => {
+            hexagonValue.sortkeyS = counter++;
+        });
+
+        console.log('hexagons sorted 1 ...');
 
         this.hexagons.sort((a, b) => b.z - a.z);
-
-        let counter = 0;
+        counter = 0;
         this.hexagons.forEach(hexagonValue => {
-            hexagonValue.i = counter++;
+            hexagonValue.sortkeyN = counter++;
         });
+
+        console.log('hexagons sorted 2 ...');
 
         return;
 

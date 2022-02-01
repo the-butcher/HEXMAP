@@ -10,7 +10,8 @@ export interface IHexagon {
     /**
      * the index of this hexagon
      */
-    i: number;
+    sortkeyN: number;
+    sortkeyS: number;
 
     /**
      * positions of the hexagon

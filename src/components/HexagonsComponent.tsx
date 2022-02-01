@@ -37,12 +37,13 @@ export default (props: IHexagonsProps) => {
    */
   // const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
   const colorCurr = useMemo(() => new Float32Array(hexagonCount * 3), []);
-  const colorDest = useMemo(() => new Float32Array(hexagonCount * 3), []);
+  const colorOrig = useMemo(() => new Float32Array(hexagonCount * 3), []);
+  const colorDiff = useMemo(() => new Float32Array(hexagonCount * 3), []);
 
   const heightCurr = useMemo(() => new Float32Array(hexagonCount), []);
-  const heightDest = useMemo(() => new Float32Array(hexagonCount), []);
+  const heightOrig = useMemo(() => new Float32Array(hexagonCount), []);
+  const heightDiff = useMemo(() => new Float32Array(hexagonCount), []);
 
-  let hexagonValue: IHexagon;
   useEffect(() => {
 
     console.debug('✨ building hexagons component', props);
@@ -111,13 +112,13 @@ export default (props: IHexagonsProps) => {
   }, []);
 
 
-
   useEffect(() => {
 
     console.debug('🔧 updating hexagons component (stamp)', props);
     const tsA = Date.now();
 
-    let counter = 0;
+    let sortkey = 0;
+    let colrkey = 0;
     let rgb: number[];
     let state: IHexagonState;
 
@@ -126,41 +127,50 @@ export default (props: IHexagonsProps) => {
      */
     HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
-      state = props.getState(hexagon);
-      heightDest[counter] = state.height;
+      sortkey = hexagon.sortkeyN;
 
-      // tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + state.height, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
-      // tempObject.updateMatrix();
-      // meshRef.current.setMatrixAt(counter, tempObject.matrix);
-      // meshRef.current.instanceMatrix.needsUpdate = true
+      state = props.getState(hexagon);
+
+      heightOrig[sortkey] = heightCurr[sortkey];
+      heightDiff[sortkey] = state.height - heightCurr[sortkey];
 
       rgb = state.color.getRgb();
-      colorDest[counter * 3 + 0] = rgb[0];
-      colorDest[counter * 3 + 1] = rgb[1];
-      colorDest[counter * 3 + 2] = rgb[2];
-      // meshRef.current.geometry.attributes.color.needsUpdate = true;
 
-      counter++;
+      colrkey = sortkey * 3;
+      colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
+      colorOrig[colrkey + 1] = colorCurr[colrkey + 1];
+      colorOrig[colrkey + 2] = colorCurr[colrkey + 2];
+      colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
+      colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
+      colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
+      // meshRef.current.geometry.attributes.color.needsUpdate = true;
 
     });
 
     props.keys.forEach(path => {
       HexagonRepository.getInstance().getBorder(path, props).then(borderHexagons => {
         borderHexagons.forEach(borderHexagon => {
+
+          sortkey = borderHexagon.sortkeyN;
           state = props.getState(borderHexagon);
+
           let color = state.color;
           let rgb = path === props.path ? color.hilight().getRgb() : color.outline().getRgb();
-          colorDest[borderHexagon.i * 3 + 0] = rgb[0];
-          colorDest[borderHexagon.i * 3 + 1] = rgb[1];
-          colorDest[borderHexagon.i * 3 + 2] = rgb[2];
+
+          colrkey = sortkey * 3;
+          colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
+          colorOrig[colrkey + 1] = colorCurr[colrkey + 1];
+          colorOrig[colrkey + 2] = colorCurr[colrkey + 2];
+          colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
+          colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
+          colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
           // meshRef.current.geometry.attributes.color.needsUpdate = true;
+
         });
       });
     });
 
     console.debug('🕓 updating hexagons component (stamp, done)', Date.now() - tsA);
-
-    invalidate();
 
   }, [stamp]);
 
@@ -169,28 +179,40 @@ export default (props: IHexagonsProps) => {
     console.debug('🔧 updating hexagons component (fraction)', fraction);
     const tsA = Date.now();
 
-    let counter = 0;
+    let sortkey = 0;
+    let colrkey0 = 0;
+    let colrkey1 = 0;
+    let colrkey2 = 0;
     HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
-      heightCurr[counter] = heightCurr[counter] + (heightDest[counter] - heightCurr[counter]) * fraction;
-      tempObject.position.set(hexagon.x, -SpatialUtil.HEXAGON_OFFSET_Y + heightCurr[counter], hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
-      // tempObject.rotateY(Math.PI);
-      // tempObject.scale.set(1, (SpatialUtil.HEXAGON_OFFSET_Y + yDest) /  SpatialUtil.HEXAGON_OFFSET_Y, 1);
-      tempObject.updateMatrix();
-      meshRef.current.setMatrixAt(counter, tempObject.matrix);
-      meshRef.current.instanceMatrix.needsUpdate = true
+      sortkey = hexagon.sortkeyN;
+      heightCurr[sortkey] = heightOrig[sortkey] + heightDiff[sortkey] * fraction;
 
-      counter++;
+      tempObject.position.set(hexagon.x, heightCurr[sortkey] - SpatialUtil.HEXAGON_OFFSET_Y, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
+      tempObject.updateMatrix();
+
+      meshRef.current.setMatrixAt(sortkey, tempObject.matrix);
+
+      colrkey0 = sortkey * 3;
+      colrkey1 = sortkey * 3 + 1;
+      colrkey2 = sortkey * 3 + 2;
+      colorCurr[colrkey0] = colorOrig[colrkey0] + colorDiff[colrkey0] * fraction;
+      colorCurr[colrkey1] = colorOrig[colrkey1] + colorDiff[colrkey1] * fraction;
+      colorCurr[colrkey2] = colorOrig[colrkey2] + colorDiff[colrkey2] * fraction;
 
     });
 
-    // console.log('frame', Date.now());
-    for (let i = 0; i < colorDest.length; i++) {
-      colorCurr[i] = colorCurr[i] + (colorDest[i] - colorCurr[i]) * fraction;
-    }
+    // // // console.log('frame', Date.now());
+    // for (let i = 0; i < colorDiff.length; i++) {
+    //   colorCurr[i] = colorOrig[i] + colorDiff[i] * fraction;
+    // }
+
+    meshRef.current.instanceMatrix.needsUpdate = true;
     meshRef.current.geometry.attributes.color.needsUpdate = true;
 
     console.debug('🕓 updating hexagons component (fraction, done)', Date.now() - tsA);
+
+    invalidate();
 
   }, [fraction]);
 

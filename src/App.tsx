@@ -26,30 +26,8 @@ export default () => {
 
   const fracTo = useRef<number>(-1);
   const [fracstamp, setFracstamp] = useState<number>(-1);
-  const [fracvalue, setFracvalue] = useState<number>(0);
+  // const [fracvalue, setFracvalue] = useState<number>(0);
 
-  useEffect(() => {
-
-    console.debug('📞 handling frac changed', fracstamp, fracvalue);
-
-    window.clearTimeout(fracTo.current);
-
-    /**
-     * update fracvalue, which will cause other calls to this method as along as value does not exceed 1
-     */
-    fracTo.current = window.setTimeout(() => {
-
-      const elapstamp = Date.now() - fracstamp;
-      if (elapstamp < 250) {
-        const _fracvalue = three.MathUtils.smoothstep(elapstamp, 0, 250);
-        setFracvalue(_fracvalue);
-      } else {
-        setFracvalue(1);
-      }
-
-    }, 10);
-
-  }, [fracstamp, fracvalue]);
 
   const handleScreenshotRequested = () => {
 
@@ -310,7 +288,6 @@ export default () => {
 
   const [updateMapTo, setUpdateMapTo] = useState<number>(-1);
   const [mapProps, setMapProps] = useState<IMapProps>({
-    fraction: -1,
     lightProps: [
       {
         id: ObjectUtil.createId(),
@@ -502,6 +479,42 @@ export default () => {
     ]
   });
 
+
+  useEffect(() => {
+
+    if (fracstamp < 0) {
+      return;
+    }
+    console.debug('📞 handling frac changed', fracstamp);
+
+    /**
+     * update fracvalue, which will cause other calls to this method as along as value does not exceed 1
+     */
+    window.clearTimeout(fracTo.current);
+    fracTo.current = window.setTimeout(() => {
+
+      const elapstamp = Date.now() - fracstamp;
+      const fraction = three.MathUtils.smootherstep(elapstamp, 0, 250);
+      const _mapProps: IMapProps = {
+        ...mapProps,
+        hexagonProps: {
+          ...mapProps.hexagonProps,
+          fraction
+        },
+        lightProps: mapProps.lightProps.map(props => {
+          return {
+            ...props,
+            stamp: ObjectUtil.createId(),
+            shadowEnabled: true // fraction === 1
+          }
+        })
+      };
+      setMapProps(_mapProps);
+
+    }, 10);
+
+  }, [fracstamp, mapProps.hexagonProps.fraction]);
+
   const [updateDimensionsTo, setUpdateDimensionsTo] = useState<number>(-1);
   const [dimensions, setDimensions] = useState({
     height: window.innerHeight,
@@ -655,7 +668,7 @@ export default () => {
 
           if (selected) {
 
-            console.log('prefKey', prefKey, 'postKey', postKey);
+            // console.log('prefKey', prefKey, 'postKey', postKey);
 
             mapKeys = keyset.getRaws();
 
@@ -829,7 +842,7 @@ export default () => {
 
         const defaultState = {
           color: new Color(0, 0, 0),
-          height: 0
+          height: 4.0
         };
 
         if (selected) {
@@ -956,13 +969,13 @@ export default () => {
     /**
     * update stamps on all lights (triggering a shadow update)
     */
-    // const _lightPropsFast = _lightProps.map(props => {
-    //   return {
-    //     ...props,
-    //     stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
-    //     shadowEnabled: false
-    //   }
-    // });
+    const _lightPropsFast = _lightProps.map(props => {
+      return {
+        ...props,
+        stamp: appState.action.updateLight ? ObjectUtil.createId() : props.stamp,
+        shadowEnabled: true
+      }
+    });
     const _lightPropsSlow = _lightProps.map(props => {
       return {
         ...props,
@@ -979,24 +992,29 @@ export default () => {
     /**
      * sets the destination values on the map
      */
-    setMapProps({
-      ...mapProps,
-      labelProps: _labelProps,
-      legendLabelProps: _legendLabelProps,
-      courseLabelProps: _courseLabelProps,
-      hexagonProps: _hexagonProps,
-      lightProps: _lightPropsSlow,
-      controlsProps: _controlProps
-    });
+    if (appState.action.updateScene || appState.action.updateLight) {
+
+      setMapProps({
+        ...mapProps,
+        labelProps: _labelProps,
+        legendLabelProps: _legendLabelProps,
+        courseLabelProps: _courseLabelProps,
+        hexagonProps: _hexagonProps,
+        lightProps: _lightPropsFast,
+        controlsProps: _controlProps
+      });
+      /**
+      * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
+      */
+      window.clearTimeout(updateMapTo);
+      setUpdateMapTo(window.setTimeout(() => {
+        setFracstamp(Date.now()); // kick off animation
+      }, appState.action.updateDelay));
+
+    }
     // }
 
-    /**
-    * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
-    */
-    window.clearTimeout(updateMapTo);
-    setUpdateMapTo(window.setTimeout(() => {
-      setFracstamp(Date.now()); // kick off animation
-    }, appState.action.updateDelay));
+
 
 
 
@@ -1022,7 +1040,7 @@ export default () => {
 
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-      <MapComponent {...mapProps} fraction={fracvalue} />
+      <MapComponent {...mapProps} />
       <UserInterfaceComponent {...userInterfaceProps} />
       {
         exportableChart ? <ChartComponent key={exportableChart.id} {...exportableChart} style={{ width: '1200px', height: '675px', position: 'absolute', left: '-2000px', top: '-1000px' }} /> : null
