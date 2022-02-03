@@ -1,17 +1,26 @@
 import { IDataRoot } from "../data/IDataRoot";
 import { IDataset } from "../data/IDataset";
-import { IFormattingDefinition } from "../util/IFormattingDefinition";
-import { IInterpolatedValue } from "../util/IInterpolatedValue";
-import { IBreadcrumbProps } from "./IBreadcrumbProps";
 import { IChartProps } from "./IChartProps";
 import { IRendererProps } from "./IRendererProps";
 
 export type INDICATOR_PROPS_FOLD = 'closed' | 'open-horizontal' | 'open-vertical';
 
+/**
+ * configuration for a single indicator instance
+ * 
+ * @author h.fleischer
+ * @since 03.02.2022
+ */
 export interface IIndicatorProps extends IChartProps {
 
+    /**
+     * current value
+     */
     label00: string;
 
+    /**
+     * label indicatinf the weekly change
+     */
     label07: string;
 
     /**
@@ -29,6 +38,9 @@ export interface IIndicatorProps extends IChartProps {
      */
     loaded: boolean;
 
+    /**
+     * get an instance 
+     */
     getRendererProps: (index: number, name: string) => IRendererProps;
 
     /**

@@ -121,6 +121,8 @@ export class HexagonRepository {
 
     async getBorder(path: string, props: IHexagonsProps): Promise<IHexagon[]> {
 
+        // console.debug('⚙ get border', path);
+
         if (this.hexagons.length === 0) {
             return [];
         }
@@ -146,7 +148,7 @@ export class HexagonRepository {
         let hexagon: IHexagon;
         const pbfHexagons = await new PbfHexagonsLoader().load('./hexagons.pbf');
 
-        console.log('hexagons loaded ...');
+        // console.log('hexagons loaded ...');
 
         let values: number[];
         let yOffset: number;
@@ -182,7 +184,7 @@ export class HexagonRepository {
 
         });
 
-        console.log('hexagons built ...');
+        // console.log('hexagons built ...');
 
         this.hexagons.sort((a, b) => a.z - b.z);
         counter = 0;
@@ -190,7 +192,7 @@ export class HexagonRepository {
             hexagonValue.sortkeyS = counter++;
         });
 
-        console.log('hexagons sorted 1 ...');
+        // console.log('hexagons sorted 1 ...');
 
         this.hexagons.sort((a, b) => b.z - a.z);
         counter = 0;
@@ -198,7 +200,7 @@ export class HexagonRepository {
             hexagonValue.sortkeyN = counter++;
         });
 
-        console.log('hexagons sorted 2 ...');
+        // console.log('hexagons sorted 2 ...');
 
         return;
 

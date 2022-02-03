@@ -252,7 +252,7 @@ export default (props: IChartProps) => {
       getFillFromSprite: false,
       getStrokeFromSprite: false,
       getLabelFillFromSprite: false,
-      exportable: true
+      exportable: false
     });
     tooltip.label.setAll({
       fontFamily,
@@ -338,7 +338,7 @@ export default (props: IChartProps) => {
           getFillFromSprite: false,
           getStrokeFromSprite: false,
           getLabelFillFromSprite: false,
-          exportable: true
+          exportable: false
         });
         tooltip.label.setAll({
           fill: labelColor,
@@ -376,14 +376,14 @@ export default (props: IChartProps) => {
       exporting: _exporting
     };
 
-    if (!doExport) {
-      _chart.events.on('globalpointermove', e => {
-        if (_chart.inPlot(e.point)) {
-          _cursor.show();
-          _cursor.remove('positionX');
-        }
-      });
-    }
+    // if (!doExport) {
+    //   _chart.events.on('globalpointermove', e => {
+    //     if (_chart.inPlot(e.point)) {
+    //       // _cursor.show();
+    //       _cursor.remove('positionX');
+    //     }
+    //   });
+    // }
 
     let instantMinC: number;
     let instantMaxC: number;
@@ -503,26 +503,26 @@ export default (props: IChartProps) => {
 
   const updateInstants = (chartState: IChartState) => {
 
-    let positionMin = 0;
-    let positionMax = 1;
+    // let positionMin = 0;
+    // let positionMax = 1;
 
-    if (instantMin > 0 && instantMax > 0) {
+    // if (instantMin > 0 && instantMax > 0) {
 
-      positionMin = chartState.xAxisVal.valueToPosition(instantMin);
-      positionMax = chartState.xAxisVal.valueToPosition(instantMax);
+    //   positionMin = chartState.xAxisVal.valueToPosition(instantMin);
+    //   positionMax = chartState.xAxisVal.valueToPosition(instantMax);
 
-    }
+    // }
 
-    let positionDst = (chartState.xAxisVal.valueToPosition(instant) - positionMin) / (positionMax - positionMin);
-    if (positionDst < 0 || positionDst > 1) {
-      chartState.cursor.hide();
-    } else {
-      chartState.cursor.show();
-    }
+    // let positionDst = (chartState.xAxisVal.valueToPosition(instant) - positionMin) / (positionMax - positionMin);
+    // if (positionDst < 0 || positionDst > 1) {
+    //   // chartState.cursor.hide();
+    // } else {
+    //   // chartState.cursor.show();
+    // }
 
-    if (!Number.isNaN(positionDst)) {
-      chartState.cursor.set('positionX', positionDst);
-    }
+    // if (!Number.isNaN(positionDst)) {
+    //   chartState.cursor.set('positionX', positionDst);
+    // }
 
   }
 

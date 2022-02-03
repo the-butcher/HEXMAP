@@ -12,7 +12,7 @@ import { IHyperlinkProps } from './IHyperlinkProps';
  */
 export default (props: IHyperlinkProps) => {
 
-  const { size, position } = props;
+  const { size, position, label, href } = props;
 
   const geomTextRef = useRef<three.ShapeGeometry>();
   const mtrlTextRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
@@ -67,7 +67,7 @@ export default (props: IHyperlinkProps) => {
 
     }
 
-  }, [props.label, font]);
+  }, [label, href, font]);
 
   return (
     <group onClick={e => window.open(props.href)}>

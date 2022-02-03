@@ -1,18 +1,26 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
+import * as three from 'three';
+import { Plane } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ScreenshotUtil } from '../util/ScreenshotUtil';
 import { IControlsProps } from './IControlsProps';
 
 export default (props: IControlsProps) => {
 
-    const { invalidate, gl, camera } = useThree(); // camera, gl, scene
+    const { invalidate, gl, camera, scene } = useThree(); // camera, gl, scene
     let controls = useRef<OrbitControls>();
+    let navplane = useRef<Plane>(new three.Plane(new three.Vector3(0, 1, 0), 0));
+    let mousepos = useRef<[number, number, number]>([0, 0, 0]);
+    let northray = useRef<boolean>(true);
 
     const resetAngleConstraints = () => {
 
-        controls.current.minAzimuthAngle = -Math.PI / 4;
-        controls.current.maxAzimuthAngle = Math.PI / 8;
+        // controls.current.minAzimuthAngle = -Math.PI / 4;
+        // controls.current.maxAzimuthAngle = Math.PI / 8;
+        controls.current.minAzimuthAngle = Number.POSITIVE_INFINITY;
+        controls.current.maxAzimuthAngle = Number.POSITIVE_INFINITY;
+
         controls.current.minPolarAngle = 0; // Math.PI / 4; // how far above ground the map can be tilted
         controls.current.maxPolarAngle = Math.PI / 2.05;
         controls.current.update();
@@ -27,21 +35,33 @@ export default (props: IControlsProps) => {
 
         controls.current = new OrbitControls(camera, gl.domElement);
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
-        // controls.enableZoom = false;
+        controls.current.enableZoom = false;
+
         controls.current.addEventListener('change', invalidate)
         controls.current.rotateSpeed = 0.25;
 
         controls.current.enableDamping = false;
-        controls.current.dampingFactor = 0.05;
-        controls.current.enableKeys = true;
+        // controls.current.dampingFactor = 0.05;
+        // controls.current.enableKeys = true;
 
         controls.current.addEventListener('change', e => {
             // console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
+
+            const _northray = controls.current.target.z < camera.position.z;
+            if (_northray !== northray.current) {
+                console.log('northray.current', northray.current);
+                northray.current = _northray;
+            }
+
+
         });
 
         camera.position.set(-198, 450, 577);
         controls.current.target.set(0, 0, 0);
         controls.current.update();
+
+        // const helper = new three.CameraHelper(camera);
+        // scene.add(helper);
 
         const angleIncrement = 0.005;
         window.addEventListener('keyup', e => {
@@ -81,6 +101,22 @@ export default (props: IControlsProps) => {
         });
 
 
+
+        window.addEventListener('mousemove', e => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = - (e.clientY / window.innerHeight) * 2 + 1;
+            mousepos.current = [x, y, 0];
+        });
+
+        gl.domElement.addEventListener('wheel', (e: WheelEvent) => {
+            // console.log('wheel', e.deltaY);
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = - (e.clientY / window.innerHeight) * 2 + 1;
+            mousepos.current = [x, y, e.deltaY];
+            invalidate();
+        });
+
+
     }, []);
 
     useFrame(({ gl, scene, camera }) => {
@@ -89,7 +125,53 @@ export default (props: IControlsProps) => {
         if (screenshotOptions) {
             ScreenshotUtil.getInstance().renderToFrame(gl, scene, camera)
         } else {
+
+
+            if (mousepos.current[2] !== 0) {
+
+                const zoomFactor = mousepos.current[2] / 1000;
+
+                var raycaster = new three.Raycaster();
+
+                raycaster.setFromCamera(new three.Vector3(mousepos.current[0], mousepos.current[1], 1), camera);
+                const zoomCenterCurr = raycaster.ray.intersectPlane(navplane.current, new three.Vector3());
+
+                raycaster.setFromCamera(new three.Vector3(0, 0, 1), camera);
+                const zoomTargetCurr = raycaster.ray.intersectPlane(navplane.current, new three.Vector3());
+
+                const zoomCameraCurr = camera.position;
+
+                const zoomTargetDiff = new three.Vector3().subVectors(zoomCenterCurr, zoomTargetCurr);
+                const zoomCameraDiff = new three.Vector3().subVectors(zoomCameraCurr, zoomCenterCurr);
+
+                const zoomTargetDest = new three.Vector3().addVectors(zoomTargetCurr, zoomTargetDiff.multiplyScalar(-zoomFactor));
+                const zoomCameraDest = new three.Vector3().addVectors(zoomCameraCurr, zoomCameraDiff.multiplyScalar(zoomFactor));
+
+                /**
+                 * angles need to be fixed for some reason when altering target and camera
+                 */
+                const azimuthalAngle = controls.current.getAzimuthalAngle();
+                controls.current.minAzimuthAngle = azimuthalAngle;
+                controls.current.maxAzimuthAngle = azimuthalAngle;
+                const polarAngle = controls.current.getPolarAngle()
+                controls.current.minPolarAngle = polarAngle;
+                controls.current.maxPolarAngle = polarAngle;
+
+                controls.current.target.set(zoomTargetDest.x, zoomTargetDest.y, zoomTargetDest.z);
+                camera.position.set(zoomCameraDest.x, zoomCameraDest.y, zoomCameraDest.z);
+                controls.current.update();
+
+                resetAngleConstraints();
+
+                // reset so there is no further zooming
+                mousepos.current[2] = 0;
+
+            }
+
             gl.render(scene, camera);
+
+            // var intersects = raycaster.intersectObjects(scene.children, true);
+
         }
 
     }, 10);

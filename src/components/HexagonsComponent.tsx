@@ -4,7 +4,6 @@ import * as three from 'three';
 import { BufferGeometry, Material } from 'three';
 import { HexagonRepository } from '../data/HexagonRepository';
 import { SpatialUtil } from '../util/SpatialUtil';
-import { IHexagon } from './IHexagon';
 import { IHexagonsProps } from './IHexagonsProps';
 import { IHexagonState } from './IHexagonState';
 
@@ -25,17 +24,18 @@ export default (props: IHexagonsProps) => {
   const mtrlRef = useRef<three.MeshStandardMaterial>(new three.MeshStandardMaterial());
   const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, hexagonCount));
 
+  const handlePathChange = useRef<(source: string, name: string, path: string) => void>((source: string, name: string, path: string) => {
+    // no op initially 
+  });
 
   /**
    * helper objects for setting up position and color before applying to indexed instances
    */
   const tempObject = new three.Object3D();
-  // const tempColor = new three.Color();
 
   /**
    * helpers for updating color
    */
-  // const data = Array.from({ length: hexagonCount }, () => ({ color: '#FF0000', scale: 1 }))
   const colorCurr = useMemo(() => new Float32Array(hexagonCount * 3), []);
   const colorOrig = useMemo(() => new Float32Array(hexagonCount * 3), []);
   const colorDiff = useMemo(() => new Float32Array(hexagonCount * 3), []);
@@ -50,7 +50,6 @@ export default (props: IHexagonsProps) => {
 
     if (meshRef.current && geomRef.current) {
 
-      // const offsetHeight = 20000 * SpatialUtil.SCALE_SCENE;
       const vertices: number[] = [];
       const normals: number[] = [];
       const radius = 440 * SpatialUtil.SCALE_SCENE; // 440
@@ -111,7 +110,6 @@ export default (props: IHexagonsProps) => {
 
   }, []);
 
-
   useEffect(() => {
 
     console.debug('🔧 updating hexagons component (stamp)', props);
@@ -147,15 +145,17 @@ export default (props: IHexagonsProps) => {
 
     });
 
-    props.keys.forEach(path => {
-      HexagonRepository.getInstance().getBorder(path, props).then(borderHexagons => {
+    const keys = props.keys; // .sort().reverse();
+    keys.forEach(key => {
+      HexagonRepository.getInstance().getBorder(key, props).then(borderHexagons => {
+        // console.log('borderHexagons', key, props, borderHexagons);
         borderHexagons.forEach(borderHexagon => {
 
           sortkey = borderHexagon.sortkeyN;
           state = props.getState(borderHexagon);
 
           let color = state.color;
-          let rgb = path === props.path ? color.hilight().getRgb() : color.outline().getRgb();
+          let rgb = key === props.path ? color.hilight().getRgb() : color.outline().getRgb();
 
           colrkey = sortkey * 3;
           colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
@@ -173,6 +173,16 @@ export default (props: IHexagonsProps) => {
     console.debug('🕓 updating hexagons component (stamp, done)', Date.now() - tsA);
 
   }, [stamp]);
+
+  useEffect(() => {
+
+    console.debug('🔧 updating hexagons component (onPathChange)', props);
+
+    handlePathChange.current = (source: string, name: string, path: string) => {
+      onPathChange(source, name, path);
+    };
+
+  }, [onPathChange]);
 
   useEffect(() => {
 
@@ -202,11 +212,6 @@ export default (props: IHexagonsProps) => {
 
     });
 
-    // // // console.log('frame', Date.now());
-    // for (let i = 0; i < colorDiff.length; i++) {
-    //   colorCurr[i] = colorOrig[i] + colorDiff[i] * fraction;
-    // }
-
     meshRef.current.instanceMatrix.needsUpdate = true;
     meshRef.current.geometry.attributes.color.needsUpdate = true;
 
@@ -225,12 +230,13 @@ export default (props: IHexagonsProps) => {
       if (hexagonValue.luc >= 100) {
         const path = props.getPath(hexagonValue);
         if (path !== props.path) {
-          onPathChange(props.source, props.name, path);
+          handlePathChange.current(props.source, props.name, path);
         }
       }
     }
 
   }
+
 
   return (
     <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onClick={handleClick}>
@@ -242,3 +248,5 @@ export default (props: IHexagonsProps) => {
   );
 
 };
+
+// transparent={true} opacity={0.3}

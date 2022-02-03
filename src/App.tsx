@@ -26,8 +26,6 @@ export default () => {
 
   const fracTo = useRef<number>(-1);
   const [fracstamp, setFracstamp] = useState<number>(-1);
-  // const [fracvalue, setFracvalue] = useState<number>(0);
-
 
   const handleScreenshotRequested = () => {
 
@@ -211,6 +209,25 @@ export default () => {
 
   }
 
+  const handlePathChange = async (source: string, name: string, path: string) => {
+
+    console.debug('📞 handling path change', source, name, path, appState.fold);
+
+    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    dataSetting.setPath(name, path); // the setting will try to adjust the path if needed (i.e. vienna district codes)
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: true,
+        updateLight: true,
+        updateDelay: 0
+      },
+    });
+
+  };
+
   const [exportableChart, setExportableChart] = useState<IChartProps>();
   const handleIndicatorExport = async (id: string) => {
 
@@ -243,27 +260,6 @@ export default () => {
     });
 
   }
-
-  const handlePathChange = async (source: string, name: string, path: string) => {
-
-    console.debug('📞 handling path change', source, name, path);
-
-    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    dataSetting.setPath(name, path); // the setting will try to adjust the path if needed (i.e. vienna district codes)
-
-    setAppState({
-      ...appState,
-      action: {
-        stamp: ObjectUtil.createId(),
-        updateScene: true,
-        updateLight: true,
-        updateDelay: 0
-      },
-    });
-
-  };
-
-
 
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
@@ -454,7 +450,7 @@ export default () => {
     hyperlinkProps: [
       {
         id: ObjectUtil.createId(),
-        label: 'https://www.data.gv.at/covid-19/', // 'https://fitforfire.github.io/covid-sbg/#/', // 'https://data.statistik.gv.at'
+        label: '', // 'https://www.data.gv.at/covid-19/' 'https://fitforfire.github.io/covid-sbg/#/', // 'https://data.statistik.gv.at'
         size: 3,
         position: {
           x: -202,
@@ -485,6 +481,7 @@ export default () => {
     if (fracstamp < 0) {
       return;
     }
+
     console.debug('📞 handling frac changed', fracstamp);
 
     /**
@@ -494,7 +491,7 @@ export default () => {
     fracTo.current = window.setTimeout(() => {
 
       const elapstamp = Date.now() - fracstamp;
-      const fraction = three.MathUtils.smootherstep(elapstamp, 0, 250);
+      const fraction = three.MathUtils.smootherstep(elapstamp, 0, 500);
       const _mapProps: IMapProps = {
         ...mapProps,
         hexagonProps: {
@@ -591,6 +588,11 @@ export default () => {
       min: { ...mapProps.courseLabelProps.min },
       max: { ...mapProps.courseLabelProps.max },
     }
+    const _hyperlinkProps = mapProps.hyperlinkProps.map(props => {
+      return {
+        ...props
+      }
+    });
     let _hexagonProps: IHexagonsProps = {
       ...mapProps.hexagonProps
     };
@@ -633,8 +635,6 @@ export default () => {
         // ~ 2 month back (for the history hexagon slot)
         const clampedInstant60 = dataSetting.getDataset().getValidInstant(clampedInstant00 - TimeUtil.MILLISECONDS_PER____DAY * 60);
 
-        // dataSetting.date = TimeUtil.formatCategoryDateFull(clampedInstant00);
-
         /**
          * set up breadcrumbs to show options of current indicator
          */
@@ -642,7 +642,13 @@ export default () => {
 
         const keysetKeys = dataSetting.getDataset().getKeysetKeys();
         if (selected) {
+
           _labelProps[0].label = indicatorPropsInstance.name + ' nach ' + indicatorPropsInstance.desc;
+
+          // console.log('update hyperling to')
+          _hyperlinkProps[0].label = indicatorPropsInstance.copy;
+          _hyperlinkProps[0].href = indicatorPropsInstance.copy;
+
         }
         let label1 = '';
 
@@ -795,13 +801,15 @@ export default () => {
         const value00 = entry00.getValue(valueKey, dataSetting.getIndex());
         const valueM7 = entry07.getValue(valueKey, dataSetting.getIndex());
         const value07 = (value00.value - valueM7.value) / valueM7.value;
+        const label07 = (value07 < 0 ? '-' : '+') + FormattingDefinition.FORMATTER_PERCENT.format(Math.abs(value07));
+
 
         if (selected) {
 
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             label00: value00.label(),
-            label07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
+            label07,
             breadcrumbProps: breadcrumbProps,
             path: valueKey,
             fold: appState.fold,
@@ -825,7 +833,7 @@ export default () => {
           userInterfaceProps.indicatorProps[i] = {
             ...indicatorPropsInstance,
             label00: value00.label(),
-            label07: FormattingDefinition.FORMATTER_PERCENT.format(value07),
+            label07,
             fold: 'closed',
             instant: clampedInstant00,
             // instantMin: dataSetting.getInstantMin(),
@@ -992,17 +1000,20 @@ export default () => {
     /**
      * sets the destination values on the map
      */
+
+    setMapProps({
+      ...mapProps,
+      labelProps: _labelProps,
+      legendLabelProps: _legendLabelProps,
+      courseLabelProps: _courseLabelProps,
+      hyperlinkProps: _hyperlinkProps,
+      hexagonProps: _hexagonProps,
+      lightProps: _lightPropsFast,
+      controlsProps: _controlProps
+    });
+
     if (appState.action.updateScene || appState.action.updateLight) {
 
-      setMapProps({
-        ...mapProps,
-        labelProps: _labelProps,
-        legendLabelProps: _legendLabelProps,
-        courseLabelProps: _courseLabelProps,
-        hexagonProps: _hexagonProps,
-        lightProps: _lightPropsFast,
-        controlsProps: _controlProps
-      });
       /**
       * set map-props in way that will cause the map to pick up current data, triggers re-rendering by changing the id of the properties (a useEffect method listens for this)
       */
@@ -1012,7 +1023,6 @@ export default () => {
       }, appState.action.updateDelay));
 
     }
-    // }
 
 
 
@@ -1032,7 +1042,7 @@ export default () => {
           handleDataLoaded(props.source)
         });
       }, delay);
-      delay += 500;
+      delay += 2000;
     });
 
   }, []);

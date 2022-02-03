@@ -1,7 +1,7 @@
 import { ControlPoint } from "@mui/icons-material";
 import { Stats } from "@react-three/drei";
 import { Canvas, RootState, useFrame } from "@react-three/fiber";
-import { PCFSoftShadowMap } from "three";
+import { PCFSoftShadowMap, PlaneGeometry } from "three";
 import { ObjectUtil } from "../util/ObjectUtil";
 import BoundariesComponent from "./BoundariesComponent";
 import ControlsComponent from "./ControlsComponent";
@@ -24,6 +24,8 @@ export default (props: IMapProps) => {
 
     const { lightProps, hexagonProps, controlsProps, labelProps, legendLabelProps, courseLabelProps, hyperlinkProps } = props;
 
+    // const planegeomref = useRef<PlaneGeometry>(new PlaneGeometry(400, 500));
+
     function onCreated(state: RootState): void {
         state.gl.setClearColor("#42423a");
     }
@@ -36,7 +38,7 @@ export default (props: IMapProps) => {
                 {/* <Stats /> */}
                 {lightProps.map(props => <LightCompoment key={props.id} {...props} />)}
                 <ambientLight intensity={0.05} />
-                {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']}  /> */}
+                {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']} /> */}
                 <group name={'root'}>
                     <HexagonsComponent {...hexagonProps} />
                     <BoundariesComponent />
@@ -48,6 +50,10 @@ export default (props: IMapProps) => {
                     <LabelComponent key={courseLabelProps.min.id} {...courseLabelProps.min} />
                     <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} />
                     {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
+                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.2, 0]}>
+                        <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
+                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} />
+                    </mesh> */}
                 </group>
             </Canvas>
         </div>

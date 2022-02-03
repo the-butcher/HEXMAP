@@ -1,15 +1,21 @@
 # Issues in Hexmap
-- add median population as indicator
-- hospitalization
-- add cumulative numbers for cases and deaths
+- outline only show partially (maybe an issue connected to key sorting)
+- click on undefined data causes error (salzburg only)
 - move base config to file (maybe multiple files)
-- in municipality mode only municipalities of the respective province are outlined
 
 # later
+- add median population as indicator
+- add hospitalization as indicator
+- add cumulative numbers for cases and deaths (?)
 - tabular view
-- export options for chart, map, data
+- export options for chart, map, data (csv export)
 
 # solved
+- ~~show a plus symbol on the percentage change~~
+- ~~apply copyright as of indicator~~
+- ~~selecting in the map resets fold of the chart~~
+- ~~in municipality mode only municipalities of the respective province are outlined~~
+- ~~proper zoom around mouse center~~
 - ~~find a way to add mortality as datasource~~
 - ~~logarithmic option in chart~~
 - ~~restore map props rebuild so delayed map props build is possible again~~
