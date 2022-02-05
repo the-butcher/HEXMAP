@@ -1,7 +1,14 @@
-import { IColor } from "../util/IColor";
 import { IHexagon } from "./IHexagon";
 import { IHexagonState } from "./IHexagonState";
 
+export type ViewOrientation = 'northwards' | 'southwards';
+
+/**
+ * definition of the hexagon-component properties
+ * 
+ * @author h.fleischer
+ * @since 05.02.2022
+ */
 export interface IHexagonsProps {
 
     source: string;
@@ -14,15 +21,13 @@ export interface IHexagonsProps {
 
     stamp: string;
 
-    fraction: number;
+    frac: number;
+
+    view: ViewOrientation;
 
     onPathChange: (source: string, name: string, path: string) => void;
 
     onHexagonsLoaded: () => void;
-
-    // getHeight: (values: IHexagon) => number;
-
-    // getColor: (values: IHexagon) => IColor;
 
     getState: (hexagon: IHexagon) => IHexagonState;
 

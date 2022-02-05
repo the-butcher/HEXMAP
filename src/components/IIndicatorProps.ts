@@ -3,7 +3,7 @@ import { IDataset } from "../data/IDataset";
 import { IChartProps } from "./IChartProps";
 import { IRendererProps } from "./IRendererProps";
 
-export type INDICATOR_PROPS_FOLD = 'closed' | 'open-horizontal' | 'open-vertical';
+export type IndicatorPropsFold = 'closed' | 'open-horizontal' | 'open-vertical';
 
 /**
  * configuration for a single indicator instance

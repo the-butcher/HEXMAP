@@ -35,7 +35,7 @@ export default (props: ILabelProps) => {
 
     console.debug('🔧 updating label component', props);
 
-    if (font) {
+    if (font && font instanceof three.Font) {
 
       const shapes = font!.generateShapes(label, size);
       geomTextRef.current = new three.ShapeGeometry(shapes);

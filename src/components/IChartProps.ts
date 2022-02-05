@@ -1,6 +1,6 @@
 import React from "react";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
-import { INDICATOR_PROPS_FOLD } from "./IIndicatorProps";
+import { IndicatorPropsFold } from "./IIndicatorProps";
 import { IInstantProps } from "./IInstantProps";
 
 /**
@@ -32,7 +32,7 @@ export interface IChartProps extends IInstantProps {
     /**
      * the state that the parent component passes to the indicator
      */
-    fold: INDICATOR_PROPS_FOLD;
+    fold: IndicatorPropsFold;
 
     /**
      * callback to be triggered when an instant change is requested

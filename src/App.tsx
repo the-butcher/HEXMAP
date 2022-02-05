@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import ChartComponent from './components/ChartComponent';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IChartProps } from './components/IChartProps';
-import { IHexagonsProps } from './components/IHexagonsProps';
+import { IHexagonsProps, ViewOrientation } from './components/IHexagonsProps';
 import { IHexagonState } from './components/IHexagonState';
-import { INDICATOR_PROPS_FOLD } from './components/IIndicatorProps';
+import { IndicatorPropsFold } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { ILegendProps } from './components/ILegendProps';
 import { IMapProps } from './components/IMapProps';
@@ -67,6 +67,23 @@ export default () => {
         updateLight: true,
         updateDelay: 10
       }
+    });
+
+  }
+
+  const handleViewChange = async (view: ViewOrientation) => {
+
+    console.debug('📞 handling view change', view);
+
+    setAppState({
+      ...appState,
+      action: {
+        stamp: ObjectUtil.createId(),
+        updateScene: false,
+        updateLight: false,
+        updateDelay: 10
+      },
+      view
     });
 
   }
@@ -179,7 +196,7 @@ export default () => {
 
     console.debug('📞 handling indicator fold', id, appState.source, ' >> ', indicatorProps.source);
 
-    let fold: INDICATOR_PROPS_FOLD = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
+    let fold: IndicatorPropsFold = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
 
       fold = 'open-horizontal';
@@ -312,19 +329,23 @@ export default () => {
       id: ObjectUtil.createId(),
       stamp: ObjectUtil.createId(),
       instant,
-      onInstantChange: handleInstantChange
+      onInstantChange: handleInstantChange,
+      onViewChange: handleViewChange
     },
     hexagonProps: {
       source: '',
       name: '',
       keys: [],
       path: '',
-      fraction: -1,
+      frac: -1,
       stamp: ObjectUtil.createId(),
+      view: 'northwards',
       onPathChange: handlePathChange,
       getState: (values) => {
         return {
           color: ColorUtil.getCorineColor(values.luc),
+          col_h: ColorUtil.getCorineColor(values.luc),
+          col_o: ColorUtil.getCorineColor(values.luc),
           height: values.ele
         }
       },
@@ -496,7 +517,7 @@ export default () => {
         ...mapProps,
         hexagonProps: {
           ...mapProps.hexagonProps,
-          fraction
+          frac: fraction
         },
         lightProps: mapProps.lightProps.map(props => {
           return {
@@ -510,7 +531,7 @@ export default () => {
 
     }, 10);
 
-  }, [fracstamp, mapProps.hexagonProps.fraction]);
+  }, [fracstamp, mapProps.hexagonProps.frac]);
 
   const [updateDimensionsTo, setUpdateDimensionsTo] = useState<number>(-1);
   const [dimensions, setDimensions] = useState({
@@ -549,7 +570,8 @@ export default () => {
       updateLight: false,
       updateDelay: 1000
     },
-    fold: indicatorProps.fold
+    fold: indicatorProps.fold,
+    view: 'northwards'
   });
 
 
@@ -850,6 +872,8 @@ export default () => {
 
         const defaultState = {
           color: new Color(0, 0, 0),
+          col_o: new Color(0, 0, 0),
+          col_h: new Color(0, 0, 0),
           height: 4.0
         };
 
@@ -864,6 +888,7 @@ export default () => {
             name: keysetKeys[0],
             keys: mapKeys,
             path: prefKey,
+            view: appState.view,
             // fraction: mapProps.hexagonProps.fraction,
             onPathChange: handlePathChange,
             stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.hexagonProps.stamp,
@@ -878,14 +903,17 @@ export default () => {
                 if (!lookupState) {
                   const legendFraction = HexagonRepository.getInstance().getLegendFraction(hexagon);
                   const val = minLegendValue + (maxLegendValue - minLegendValue) * legendFraction;
+                  const col = getColor(val);
                   lookupState = {
-                    color: getColor(val),
+                    color: col,
+                    col_h: col,
+                    col_o: col,
                     height: rendererPropsInstance.interpolatedEle.getOut(val)
                   }
                   valueLookup['l' + hexagon.x] = lookupState;
                 }
                 return {
-                  color: lookupState.color,
+                  ...lookupState,
                   height: lookupState.height + ele
                 }
               } else if (hexagon.luc === 1) { // 3d-chart
@@ -896,20 +924,25 @@ export default () => {
                   const historicInstant = dataSetting.getDataset().getValidInstant(clampedInstant60 + (clampedInstant00 - clampedInstant60) * legendFraction);
                   const historicEntry = dataSetting.getDataset().getEntryByInstant(historicInstant);
                   if (historicEntry.hasKey(prefKey + postKey)) {
+                    const col = getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value);
                     lookupState = {
-                      color: getColor(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value),
+                      color: col,
+                      col_h: col,
+                      col_o: col,
                       height: rendererPropsInstance.interpolatedEle.getOut(historicEntry.getValue(prefKey + postKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     lookupState = {
                       color: Color.DARK_GREY,
+                      col_h: Color.DARK_GREY,
+                      col_o: Color.DARK_GREY,
                       height: 0
                     }
                   }
                   valueLookup['c' + hexagon.x] = lookupState;
                 }
                 return {
-                  color: lookupState.color,
+                  ...lookupState,
                   height: lookupState.height + ele
                 }
               } else {
@@ -920,22 +953,25 @@ export default () => {
                   const _prefKey = dataSetting.validatePath(dataSetting.getDataset().getKeysetKeys()[0], hexagon.gkz.substring(0, prefKey.length));
                   const dataKey = _prefKey + postKey;
                   const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
+                  const col = getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value);
 
                   if (entry00.hasKey(dataKey)) {
                     lookupState = {
-                      color: getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value),
+                      color: col,
+                      col_h: col.hilight(),
+                      col_o: col.outline(),
                       height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
                     }
                   } else {
                     return {
-                      color: defaultState.color,
+                      ...defaultState,
                       height: defaultState.height + ele
                     }
                   }
                   valueLookup[hexagon.gkz] = lookupState;
                 }
                 return {
-                  color: lookupState.color,
+                  ...lookupState,
                   height: lookupState.height + ele
                 }
 
@@ -972,6 +1008,7 @@ export default () => {
       instant: _instantProps.instant,
       stamp: appState.action.updateScene ? ObjectUtil.createId() : mapProps.controlsProps.stamp,
       onInstantChange: handleInstantChange,
+      onViewChange: handleViewChange
     }
 
     /**

@@ -87,22 +87,22 @@ export class HexagonRepository {
                 joinableHexagon = this.hexagons[joinableBorder.i];
                 joinablePath = joinableBorder.path;
 
-                // south
-                joinableBorder.b090 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]);
+                // // south
+                joinableBorder.b090 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 2]);
 
-                // north
-                joinableBorder.b270 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]);
+                // // north
+                joinableBorder.b270 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 2]);
 
                 if (joinableHexagon.col % 2 === 0) {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
                 } else {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
                 }
 
                 const isBorderHexagon = [joinableBorder.b030, joinableBorder.b090, joinableBorder.b150, joinableBorder.b210, joinableBorder.b270, joinableBorder.b330].find(v => v);

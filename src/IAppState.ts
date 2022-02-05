@@ -1,5 +1,5 @@
-import { IChartProps } from "./components/IChartProps";
-import { INDICATOR_PROPS_FOLD as INDICATOR_PROPS_HATCH } from "./components/IIndicatorProps";
+import { ViewOrientation } from "./components/IHexagonsProps";
+import { IndicatorPropsFold } from "./components/IIndicatorProps";
 import { IAppAction } from "./IAppAction";
 
 export interface IAppState {
@@ -11,6 +11,8 @@ export interface IAppState {
 
     action: IAppAction;
 
-    fold: INDICATOR_PROPS_HATCH;
+    fold: IndicatorPropsFold;
+
+    view: ViewOrientation;
 
 }

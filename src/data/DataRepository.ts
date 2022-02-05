@@ -90,12 +90,22 @@ export class DataRepository {
       path: '',
       breadcrumbProps: [],
       getRendererProps: (index: number, name: string) => {
-        return {
-          interpolatedEle: DataRepository.interpolatedEle7di3,
-          interpolatedHue: DataRepository.interpolatedHue7di3,
-          interpolatedSat: new FixedValue(1.00),
-          interpolatedVal: new FixedValue(0.40),
-          interpolatedInt: DataRepository.interpolatedInt7diX,
+        if (index === 2) {
+          return {
+            interpolatedEle: new InterpolatedValue(-5, 20, -0.5, 2.00, 1),
+            interpolatedHue: new InterpolatedValue(0.3, 0.0, -0.001, 0.001, 1),
+            interpolatedSat: new FixedValue(1),
+            interpolatedVal: new FixedValue(0.7),
+            interpolatedInt: new FixedValue(1.65),
+          }
+        } else {
+          return {
+            interpolatedEle: DataRepository.interpolatedEle7di3,
+            interpolatedHue: DataRepository.interpolatedHue7di3,
+            interpolatedSat: new FixedValue(1.00),
+            interpolatedVal: new FixedValue(0.40),
+            interpolatedInt: DataRepository.interpolatedInt7diX,
+          }
         }
       },
       constructDataset: dataRoot => new DatasetIncidence(dataRoot),
@@ -164,6 +174,15 @@ export class DataRepository {
       path: '',
       breadcrumbProps: [],
       getRendererProps: (index: number, name: string) => {
+        // if (index === 2) {
+        //   return {
+        //     interpolatedEle: new InterpolatedValue(-5, 20, -0.5, 2.00, 1),
+        //     interpolatedHue: new InterpolatedValue(0.3, 0.0, -0.15, 0.15, 1),
+        //     interpolatedSat: new FixedValue(1),
+        //     interpolatedVal: new FixedValue(0.7),
+        //     interpolatedInt: new FixedValue(1.65),
+        //   }
+        // } else
         if (name === 'Sterblichkeit' || name === 'Todesfälle') {
           return {
             interpolatedEle: DataRepository.interpolatedEle7dm3,

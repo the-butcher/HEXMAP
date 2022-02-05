@@ -37,7 +37,7 @@ export default (props: IMapProps) => {
                 {/* demand | always */}
                 {/* <Stats /> */}
                 {lightProps.map(props => <LightCompoment key={props.id} {...props} />)}
-                <ambientLight intensity={0.05} />
+                <ambientLight intensity={0.07} />
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']} /> */}
                 <group name={'root'}>
                     <HexagonsComponent {...hexagonProps} />

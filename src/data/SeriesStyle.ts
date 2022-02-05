@@ -1,7 +1,7 @@
 import { ISeriesStyle } from "./ISeriesStyle";
 
 
-export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'xlo_cases' | 'xhi_cases' | 'avg_cases' | 'reg_cases';
+export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'xlo_cases' | 'xhi_cases' | 'avg_cases' | 'reg_cases' | 'dlt_incdc';
 
 export class SeriesStyle {
 
@@ -62,6 +62,7 @@ export class SeriesStyle {
         'xhi_cases': { ... this.SERIES_STYLE__CASERANGE, stacked: true, fillOpacity: 0.3 },
         'avg_cases': this.SERIES_STYLE____AVERAGE,
         'reg_cases': this.SERIES_STYLE_REGRESSION,
+        'dlt_incdc': this.SERIES_STYLE____AVERAGE,
     }
 
 }

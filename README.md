@@ -1,5 +1,5 @@
 # Issues in Hexmap
-- outline only show partially (maybe an issue connected to key sorting)
+- outlines only show partially (maybe an issue connected to key sorting)
 - click on undefined data causes error (salzburg only)
 - move base config to file (maybe multiple files)
 

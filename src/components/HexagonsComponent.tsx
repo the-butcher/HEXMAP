@@ -16,7 +16,7 @@ import { IHexagonState } from './IHexagonState';
 export default (props: IHexagonsProps) => {
 
   const { invalidate, gl, scene, camera } = useThree();
-  const { stamp, fraction, onPathChange, onHexagonsLoaded } = props;
+  const { stamp, frac, onPathChange, onHexagonsLoaded } = props;
 
   const hexagonCount = 174414;
 
@@ -141,7 +141,6 @@ export default (props: IHexagonsProps) => {
       colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
       colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
       colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
-      // meshRef.current.geometry.attributes.color.needsUpdate = true;
 
     });
 
@@ -153,9 +152,7 @@ export default (props: IHexagonsProps) => {
 
           sortkey = borderHexagon.sortkeyN;
           state = props.getState(borderHexagon);
-
-          let color = state.color;
-          let rgb = key === props.path ? color.hilight().getRgb() : color.outline().getRgb();
+          rgb = state.col_o.getRgb();
 
           colrkey = sortkey * 3;
           colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
@@ -164,9 +161,31 @@ export default (props: IHexagonsProps) => {
           colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
           colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
           colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
-          // meshRef.current.geometry.attributes.color.needsUpdate = true;
 
         });
+      });
+    });
+
+    const shortProps = {
+      ...props,
+      keys: [props.path]
+    }
+    HexagonRepository.getInstance().getBorder(shortProps.path, shortProps).then(borderHexagons => {
+      // console.log('borderHexagons', shortProps.path, shortProps, borderHexagons);
+      borderHexagons.forEach(borderHexagon => {
+
+        sortkey = borderHexagon.sortkeyN;
+        state = shortProps.getState(borderHexagon);
+        rgb = state.col_h.getRgb();
+
+        colrkey = sortkey * 3;
+        colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
+        colorOrig[colrkey + 1] = colorCurr[colrkey + 1];
+        colorOrig[colrkey + 2] = colorCurr[colrkey + 2];
+        colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
+        colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
+        colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
+
       });
     });
 
@@ -186,7 +205,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating hexagons component (fraction)', fraction);
+    console.debug('🔧 updating hexagons component (frac)', frac);
     const tsA = Date.now();
 
     let sortkey = 0;
@@ -196,7 +215,7 @@ export default (props: IHexagonsProps) => {
     HexagonRepository.getInstance().getHexagons().forEach(hexagon => {
 
       sortkey = hexagon.sortkeyN;
-      heightCurr[sortkey] = heightOrig[sortkey] + heightDiff[sortkey] * fraction;
+      heightCurr[sortkey] = heightOrig[sortkey] + heightDiff[sortkey] * frac;
 
       tempObject.position.set(hexagon.x, heightCurr[sortkey] - SpatialUtil.HEXAGON_OFFSET_Y, hexagon.z);  // hexagonValue.y - SpatialUtil.HEXAGON_SEMIHEIGHT
       tempObject.updateMatrix();
@@ -206,9 +225,9 @@ export default (props: IHexagonsProps) => {
       colrkey0 = sortkey * 3;
       colrkey1 = sortkey * 3 + 1;
       colrkey2 = sortkey * 3 + 2;
-      colorCurr[colrkey0] = colorOrig[colrkey0] + colorDiff[colrkey0] * fraction;
-      colorCurr[colrkey1] = colorOrig[colrkey1] + colorDiff[colrkey1] * fraction;
-      colorCurr[colrkey2] = colorOrig[colrkey2] + colorDiff[colrkey2] * fraction;
+      colorCurr[colrkey0] = colorOrig[colrkey0] + colorDiff[colrkey0] * frac;
+      colorCurr[colrkey1] = colorOrig[colrkey1] + colorDiff[colrkey1] * frac;
+      colorCurr[colrkey2] = colorOrig[colrkey2] + colorDiff[colrkey2] * frac;
 
     });
 
@@ -219,7 +238,7 @@ export default (props: IHexagonsProps) => {
 
     invalidate();
 
-  }, [fraction]);
+  }, [frac]);
 
 
   let handleClick = (e: ThreeEvent<PointerEvent>) => { // 

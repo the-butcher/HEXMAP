@@ -1,3 +1,5 @@
+import { ViewOrientation } from "./IHexagonsProps";
+
 /**
  * definition of properties for the ControlsCompoment
  * 
@@ -9,4 +11,5 @@ export interface IControlsProps {
     stamp: string;
     instant: number;
     onInstantChange: (instant: number) => void;
+    onViewChange: (view: ViewOrientation) => void;
 } 

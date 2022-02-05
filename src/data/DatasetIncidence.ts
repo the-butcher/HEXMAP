@@ -51,6 +51,7 @@ export class DatasetIncidence implements IDataset {
         const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
+            // 'dlt_incdc',
             // 'Gesamt',
             'Sterblichkeit',
             'Todesfälle',
@@ -58,9 +59,11 @@ export class DatasetIncidence implements IDataset {
             'reg_cases',
             'xlo_cases',
             'xhi_cases'
+
         ] : [
             'Inzidenz',
             'Fälle',
+            // 'dlt_incdc',
             // 'Gesamt',
             'avg_cases',
             'reg_cases',
@@ -102,18 +105,24 @@ export class DatasetIncidence implements IDataset {
             popsKeys.forEach(popsKey => {
 
                 // const caseAll = dataRoot.data[dateKeys[i]][popsKey][0] * 5000 / this.getPopulation(popsKey)
-                const incdnc1 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
-                const incdnc7 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
+                const incdnc01 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
+                const incdnc07 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
+                // const incdnc14 = (dataRoot.data[dateKeys[i - 7]][popsKey][0] - dataRoot.data[dateKeys[i - 14]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
+                // const trend = (incdnc07 - incdnc14) / incdnc14;
 
                 incidenceData[popsKey] = [];
                 incidenceData[popsKey].push({ // incidence
-                    value: incdnc7,
-                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc7)
+                    value: incdnc07,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc07)
                 });
                 incidenceData[popsKey].push({ // cases
-                    value: incdnc1,
-                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc1 * this.getPopulation(popsKey) / 700000)
+                    value: incdnc01,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc01 * this.getPopulation(popsKey) / 700000)
                 });
+                // incidenceData[popsKey].push({ // trend
+                //     value: trend,
+                //     label: () => FormattingDefinition.FORMATTER_PERCENT.format(trend)
+                // });
                 // incidenceData[popsKey].push({ // gesamt
                 //     value: caseAll,
                 //     label: () => FormattingDefinition.FORMATTER_PERCENT.format(caseAll / 5000)
@@ -148,11 +157,11 @@ export class DatasetIncidence implements IDataset {
                         label: () => FormattingDefinition.FORMATTER____FIXED.format(incdncA * this.getPopulation(popsKey) / 700000)
                     }); // average
 
-                    stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store how far off the actual value is from the average
+                    stats[popsKey][weekday].addValue((incdnc01 / incdncA)); // store how far off the actual value is from the average
 
                     if (instant > statsInstantReg) {
 
-                        stats[popsKey][weekday].addValue((incdnc1 / incdncA)); // store again to give more weight to more recent values store how far off the actual value is from the average
+                        stats[popsKey][weekday].addValue((incdnc01 / incdncA)); // store again to give more weight to more recent values store how far off the actual value is from the average
 
                         const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
                         const rgresY = this.toRegressionY(incdncA);

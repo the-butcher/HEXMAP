@@ -501,30 +501,30 @@ export default (props: IChartProps) => {
 
   }
 
-  const updateInstants = (chartState: IChartState) => {
+  // const updateInstants = (chartState: IChartState) => {
 
-    // let positionMin = 0;
-    // let positionMax = 1;
+  //   // let positionMin = 0;
+  //   // let positionMax = 1;
 
-    // if (instantMin > 0 && instantMax > 0) {
+  //   // if (instantMin > 0 && instantMax > 0) {
 
-    //   positionMin = chartState.xAxisVal.valueToPosition(instantMin);
-    //   positionMax = chartState.xAxisVal.valueToPosition(instantMax);
+  //   //   positionMin = chartState.xAxisVal.valueToPosition(instantMin);
+  //   //   positionMax = chartState.xAxisVal.valueToPosition(instantMax);
 
-    // }
+  //   // }
 
-    // let positionDst = (chartState.xAxisVal.valueToPosition(instant) - positionMin) / (positionMax - positionMin);
-    // if (positionDst < 0 || positionDst > 1) {
-    //   // chartState.cursor.hide();
-    // } else {
-    //   // chartState.cursor.show();
-    // }
+  //   // let positionDst = (chartState.xAxisVal.valueToPosition(instant) - positionMin) / (positionMax - positionMin);
+  //   // if (positionDst < 0 || positionDst > 1) {
+  //   //   // chartState.cursor.hide();
+  //   // } else {
+  //   //   // chartState.cursor.show();
+  //   // }
 
-    // if (!Number.isNaN(positionDst)) {
-    //   chartState.cursor.set('positionX', positionDst);
-    // }
+  //   // if (!Number.isNaN(positionDst)) {
+  //   //   chartState.cursor.set('positionX', positionDst);
+  //   // }
 
-  }
+  // }
 
   const updateCallbacks = () => {
 
@@ -581,7 +581,7 @@ export default (props: IChartProps) => {
 
     console.debug('🔧 updating chart component (instant)', props);
     if (chartState) {
-      updateInstants(chartState);
+      // updateInstants(chartState);
       updateCallbacks();
     }
 

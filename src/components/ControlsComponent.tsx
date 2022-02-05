@@ -5,14 +5,29 @@ import { Plane } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ScreenshotUtil } from '../util/ScreenshotUtil';
 import { IControlsProps } from './IControlsProps';
+import { ViewOrientation } from './IHexagonsProps';
 
+/**
+ * component handling map controls (no actualy contribution to the dom)
+ * 
+ * @author h.fleischer
+ * @since 05.02.2022
+ */
 export default (props: IControlsProps) => {
 
+    const MOUSE_COORD_INDEX_WHEEL = 2;
+
     const { invalidate, gl, camera, scene } = useThree(); // camera, gl, scene
+    let { onViewChange } = props;
+
     let controls = useRef<OrbitControls>();
     let navplane = useRef<Plane>(new three.Plane(new three.Vector3(0, 1, 0), 0));
     let mousepos = useRef<[number, number, number]>([0, 0, 0]);
-    let northray = useRef<boolean>(true);
+    let view = useRef<ViewOrientation>('northwards');
+
+    const handleViewChange = useRef<(view: ViewOrientation) => void>((view: ViewOrientation) => {
+        // no op initially 
+    });
 
     const resetAngleConstraints = () => {
 
@@ -35,7 +50,7 @@ export default (props: IControlsProps) => {
 
         controls.current = new OrbitControls(camera, gl.domElement);
         controls.current.screenSpacePanning = false; // https://threejs.org/docs/#examples/en/controls/OrbitControls.screenSpacePanning
-        controls.current.enableZoom = false;
+        // controls.current.enableZoom = false;
 
         controls.current.addEventListener('change', invalidate)
         controls.current.rotateSpeed = 0.25;
@@ -45,12 +60,14 @@ export default (props: IControlsProps) => {
         // controls.current.enableKeys = true;
 
         controls.current.addEventListener('change', e => {
+
             // console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
 
-            const _northray = controls.current.target.z < camera.position.z;
-            if (_northray !== northray.current) {
-                console.log('northray.current', northray.current);
-                northray.current = _northray;
+            const _view: ViewOrientation = controls.current.target.z < camera.position.z ? 'northwards' : 'southwards';
+            if (_view !== view.current) {
+                // console.log('northray.current', view.current);
+                view.current = _view;
+                handleViewChange.current(view.current);
             }
 
 
@@ -100,24 +117,37 @@ export default (props: IControlsProps) => {
 
         });
 
+        // window.addEventListener('mousemove', e => {
+        //     const x = (e.clientX / window.innerWidth) * 2 - 1;
+        //     const y = - (e.clientY / window.innerHeight) * 2 + 1;
+        //     mousepos.current = [x, y, 0];
+        // });
 
+        gl.domElement.addEventListener('wheel', (e: WheelEvent) => {
 
-        window.addEventListener('mousemove', e => {
+            e.stopPropagation();
+            controls.current.enableZoom = false;
+
             const x = (e.clientX / window.innerWidth) * 2 - 1;
             const y = - (e.clientY / window.innerHeight) * 2 + 1;
             mousepos.current = [x, y, 0];
-        });
-
-        gl.domElement.addEventListener('wheel', (e: WheelEvent) => {
-            // console.log('wheel', e.deltaY);
-            const x = (e.clientX / window.innerWidth) * 2 - 1;
-            const y = - (e.clientY / window.innerHeight) * 2 + 1;
-            mousepos.current = [x, y, e.deltaY];
+            mousepos.current[MOUSE_COORD_INDEX_WHEEL] = e.deltaY;
             invalidate();
+
         });
 
 
     }, []);
+
+    useEffect(() => {
+
+        console.debug('🔧 updating controls component (onViewChange)');
+
+        handleViewChange.current = (view: ViewOrientation) => {
+            onViewChange(view);
+        }
+
+    }, [onViewChange]);
 
     useFrame(({ gl, scene, camera }) => {
 
@@ -127,9 +157,9 @@ export default (props: IControlsProps) => {
         } else {
 
 
-            if (mousepos.current[2] !== 0) {
+            if (mousepos.current[MOUSE_COORD_INDEX_WHEEL] !== 0) {
 
-                const zoomFactor = mousepos.current[2] / 1000;
+                const zoomFactor = mousepos.current[MOUSE_COORD_INDEX_WHEEL] / 1000;
 
                 var raycaster = new three.Raycaster();
 
@@ -164,7 +194,7 @@ export default (props: IControlsProps) => {
                 resetAngleConstraints();
 
                 // reset so there is no further zooming
-                mousepos.current[2] = 0;
+                mousepos.current[MOUSE_COORD_INDEX_WHEEL] = 0;
 
             }
 
