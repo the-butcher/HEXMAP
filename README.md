@@ -1,6 +1,5 @@
 # Issues in Hexmap
 - outlines only show partially (maybe an issue connected to key sorting)
-- click on undefined data causes error (salzburg only)
 - move base config to file (maybe multiple files)
 
 # later
@@ -11,6 +10,7 @@
 - export options for chart, map, data (csv export)
 
 # solved
+- ~~click on undefined data causes error (salzburg only)~~
 - ~~show a plus symbol on the percentage change~~
 - ~~apply copyright as of indicator~~
 - ~~selecting in the map resets fold of the chart~~

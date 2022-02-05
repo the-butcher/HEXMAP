@@ -75,7 +75,6 @@ export class DataRepository {
       copy: 'https://www.data.gv.at/covid-19/',
       label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
       label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
       onExpand: () => { },
       onInstantChange: () => { },
       onInstantRangeChange: () => { },

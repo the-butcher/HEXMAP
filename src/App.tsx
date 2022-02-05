@@ -231,17 +231,26 @@ export default () => {
     console.debug('📞 handling path change', source, name, path, appState.fold);
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    dataSetting.setPath(name, path); // the setting will try to adjust the path if needed (i.e. vienna district codes)
+    const validatedPath = dataSetting.validatePath(name, path);
+    if (validatedPath) {
 
-    setAppState({
-      ...appState,
-      action: {
-        stamp: ObjectUtil.createId(),
-        updateScene: true,
-        updateLight: true,
-        updateDelay: 0
-      },
-    });
+      dataSetting.setPath(name, path); // the setting will try to adjust the path if needed (i.e. vienna district codes)
+
+      setAppState({
+        ...appState,
+        action: {
+          stamp: ObjectUtil.createId(),
+          updateScene: true,
+          updateLight: true,
+          updateDelay: 0
+        },
+      });
+
+    } else {
+      console.debug('💣 skipping path change', source, name, path, appState.fold);
+    }
+
+
 
   };
 
@@ -708,7 +717,7 @@ export default () => {
             let validPath = path;
             keyset.getKeys().forEach(key => {
               const keyTrimmed = key.replaceAll('#', '');
-              if (keyTrimmed !== '' && path !== key && path.startsWith(keyTrimmed)) { // includes #####, but will match 
+              if (keyTrimmed !== '' && path !== key && path?.startsWith(keyTrimmed)) { // includes #####, but will match 
                 validPath = key;
               }
             });
@@ -721,7 +730,7 @@ export default () => {
               onPathChange: handlePathChange,
             });
 
-            if (keyset.hasSubset(validPath)) {
+            if (validPath && keyset.hasSubset(validPath)) {
 
               const subset = keyset.getSubset(validPath);
               let validSubpath = path;
@@ -946,30 +955,46 @@ export default () => {
                   height: lookupState.height + ele
                 }
               } else {
+
                 // data
                 let lookupState = valueLookup[hexagon.gkz];
                 if (!lookupState) {
 
                   const _prefKey = dataSetting.validatePath(dataSetting.getDataset().getKeysetKeys()[0], hexagon.gkz.substring(0, prefKey.length));
-                  const dataKey = _prefKey + postKey;
-                  const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
-                  const col = getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value);
+                  if (!_prefKey) {
 
-                  if (entry00.hasKey(dataKey)) {
+                    // for cases where there is partial data (like salzburg only)
+
                     lookupState = {
-                      color: col,
-                      col_h: col.hilight(),
-                      col_o: col.outline(),
-                      height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
-                    }
-                  } else {
-                    return {
                       ...defaultState,
                       height: defaultState.height + ele
                     }
+
+                  } else {
+
+                    const dataKey = _prefKey + postKey;
+                    const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant());
+                    const col = getColor(entry00.getValue(dataKey, dataSetting.getIndex()).value);
+
+                    if (entry00.hasKey(dataKey)) {
+                      lookupState = {
+                        color: col,
+                        col_h: col.hilight(),
+                        col_o: col.outline(),
+                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
+                      }
+                    } else {
+                      lookupState = {
+                        ...defaultState,
+                        height: defaultState.height + ele
+                      }
+                    }
+
                   }
                   valueLookup[hexagon.gkz] = lookupState;
+
                 }
+
                 return {
                   ...lookupState,
                   height: lookupState.height + ele

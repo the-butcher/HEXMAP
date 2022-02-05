@@ -24,7 +24,6 @@ export default (props: IInstantProps) => {
     const handleInstantIncr = useRef<() => void>(() => {
         // no op initially 
     });
-    const handleInstantTo = useRef<number>(-1);
 
     const minDate = new Date(props.instantMin); // 2020
     const maxDate = new Date(props.instantMax); // 2020
@@ -49,8 +48,11 @@ export default (props: IInstantProps) => {
         window.addEventListener('keyup', e => {
 
             if (e.key === 'ArrowLeft') {
+                // console.log('!!! key change', e);
+                e.stopPropagation();
                 handleInstantDecr.current();
             } else if (e.key === 'ArrowRight') {
+                e.stopPropagation();
                 handleInstantIncr.current();
             }
 
@@ -66,7 +68,7 @@ export default (props: IInstantProps) => {
             onInstantChange(instant - props.instantDif);
         }
         handleInstantIncr.current = () => {
-            onInstantChange(instant + props.instantDif);
+            onInstantChange(instant - props.instantDif);
         }
 
     }, [source, instant, instantMin, instantMax, instantDif]);
@@ -77,12 +79,8 @@ export default (props: IInstantProps) => {
      * @param value 
      */
     const handleInstantChange = (event: React.SyntheticEvent | Event, value: number | Array<number>) => {
-        window.clearTimeout(handleInstantTo.current);
-        handleInstantTo.current = window.setTimeout(() => {
-            onInstantChange(value as number);
-        }, 1);
+        onInstantChange(value as number);
     }
-
 
     /**
      * have slider values (timestamps) formatted to a readable date 
@@ -94,6 +92,13 @@ export default (props: IInstantProps) => {
         return <div>{TimeUtil.formatCategoryDateFull(value)}</div>;
     });
 
+    /**
+     * stop standard left-right keys from interfering with our manual left-right handlers
+     */
+    const handleKeyUp = (e) => {
+        e.stopPropagation();
+    }
+
     return (
         <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '100' }}>
             <Tooltip title="Vorheriger Tag [<]">
@@ -103,7 +108,7 @@ export default (props: IInstantProps) => {
                     </IconButton>
                 </span>
             </Tooltip>
-            <Slider key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instant} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 6px' }} />
+            <Slider onKeyUp={handleKeyUp} key={key} marks={marks} onChange={handleInstantChange} valueLabelFormat={formatLabel} size="small" value={props.instant} min={props.instantMin} max={props.instantMax} step={TimeUtil.MILLISECONDS_PER____DAY} aria-label="Small" valueLabelDisplay="auto" style={{ margin: '10px 6px' }} />
             <Tooltip title="Nächster Tag [>]">
                 <span>
                     <IconButton onClick={handleInstantIncr.current} style={{ width: '30px', height: '28px', marginTop: '6px' }} disabled={instant >= instantMax}>

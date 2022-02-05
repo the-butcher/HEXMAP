@@ -42,11 +42,11 @@ export class DataSetting implements IDataSetting {
 
     validatePath(key: string, value: string): string {
         while (!this.dataSet.getKeyset(key).hasKey(value)) {
+            if (value.charAt(0) === '#') {
+                return undefined;
+            }
             const indexOfFirstHash = value.indexOf('#') >= 0 ? value.indexOf('#') - 1 : value.length - 1;
             value = value.substring(0, indexOfFirstHash).padEnd(value.length, '#');
-            if (value.charAt(1) === '#') {
-                break;
-            }
         }
         return value;
     }

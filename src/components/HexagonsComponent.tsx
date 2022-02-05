@@ -256,7 +256,6 @@ export default (props: IHexagonsProps) => {
 
   }
 
-
   return (
     <instancedMesh ref={meshRef} args={[null as unknown as BufferGeometry, null as unknown as Material, hexagonCount]} castShadow receiveShadow onClick={handleClick}>
       <bufferGeometry ref={geomRef}>
