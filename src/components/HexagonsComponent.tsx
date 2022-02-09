@@ -146,37 +146,11 @@ export default (props: IHexagonsProps) => {
 
     const keys = props.keys; // .sort().reverse();
     keys.forEach(key => {
-      HexagonRepository.getInstance().getBorder(key, props).then(borderHexagons => {
-        // console.log('borderHexagons', key, props, borderHexagons);
-        borderHexagons.forEach(borderHexagon => {
-
-          sortkey = borderHexagon.sortkeyN;
-          state = props.getState(borderHexagon);
-          rgb = state.col_o.getRgb();
-
-          colrkey = sortkey * 3;
-          colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
-          colorOrig[colrkey + 1] = colorCurr[colrkey + 1];
-          colorOrig[colrkey + 2] = colorCurr[colrkey + 2];
-          colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
-          colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
-          colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
-
-        });
-      });
-    });
-
-    const shortProps = {
-      ...props,
-      keys: [props.path]
-    }
-    HexagonRepository.getInstance().getBorder(shortProps.path, shortProps).then(borderHexagons => {
-      // console.log('borderHexagons', shortProps.path, shortProps, borderHexagons);
-      borderHexagons.forEach(borderHexagon => {
+      HexagonRepository.getInstance().getBorder(key, props).forEach(borderHexagon => {
 
         sortkey = borderHexagon.sortkeyN;
-        state = shortProps.getState(borderHexagon);
-        rgb = state.col_h.getRgb();
+        state = props.getState(borderHexagon);
+        rgb = state.col_o.getRgb();
 
         colrkey = sortkey * 3;
         colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
@@ -186,7 +160,28 @@ export default (props: IHexagonsProps) => {
         colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
         colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
 
+
       });
+    });
+
+    const shortProps = {
+      ...props,
+      keys: [props.path]
+    }
+    HexagonRepository.getInstance().getBorder(shortProps.path, shortProps).forEach(borderHexagon => {
+
+      sortkey = borderHexagon.sortkeyN;
+      state = shortProps.getState(borderHexagon);
+      rgb = state.col_h.getRgb();
+
+      colrkey = sortkey * 3;
+      colorOrig[colrkey + 0] = colorCurr[colrkey + 0];
+      colorOrig[colrkey + 1] = colorCurr[colrkey + 1];
+      colorOrig[colrkey + 2] = colorCurr[colrkey + 2];
+      colorDiff[colrkey + 0] = rgb[0] - colorCurr[colrkey + 0];
+      colorDiff[colrkey + 1] = rgb[1] - colorCurr[colrkey + 1];
+      colorDiff[colrkey + 2] = rgb[2] - colorCurr[colrkey + 2];
+
     });
 
     console.debug('🕓 updating hexagons component (stamp, done)', Date.now() - tsA);

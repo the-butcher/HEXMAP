@@ -3,6 +3,7 @@ import { IHexagonBorders } from "../components/IHexagonBorders";
 import { IHexagonsProps } from "../components/IHexagonsProps";
 import { PbfHexagonsLoader } from "../protobuf/PbfHexagonsLoader";
 import { SpatialUtil } from "../util/SpatialUtil";
+import { Statistics } from "./Statistics";
 
 export class HexagonRepository {
 
@@ -25,6 +26,7 @@ export class HexagonRepository {
     private readonly hexagons: IHexagon[];
     private readonly borderHexagons: { [K in string]: IHexagon[] };
     private readonly pathLengthHistory: number[];
+    private readonly elevationStats: { [K in string]: Statistics };
 
     private hexagonIndicesN: number[];
 
@@ -32,6 +34,7 @@ export class HexagonRepository {
         this.hexagons = [];
         this.borderHexagons = {};
         this.pathLengthHistory = [];
+        this.elevationStats = {};
     }
 
     getHexagons(): IHexagon[] {
@@ -46,7 +49,7 @@ export class HexagonRepository {
         return hexagonBorder ? hexagonBorder.path === path : false;
     }
 
-    calculateBorders(props: IHexagonsProps): void {
+    calculateBordersAndStats(props: IHexagonsProps): void {
 
         console.debug('⚙ calculating borders');
 
@@ -87,22 +90,27 @@ export class HexagonRepository {
                 joinableHexagon = this.hexagons[joinableBorder.i];
                 joinablePath = joinableBorder.path;
 
+                if (!this.elevationStats[joinablePath]) {
+                    this.elevationStats[joinablePath] = new Statistics();
+                }
+                this.elevationStats[joinablePath].addValue(joinableHexagon.ele);
+
                 // // south
-                joinableBorder.b090 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 2]);
+                joinableBorder.b090 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row - 2]);
 
                 // // north
-                joinableBorder.b270 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 2]);
+                joinableBorder.b270 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col]?.[joinableHexagon.row + 2]);
 
                 if (joinableHexagon.col % 2 === 0) {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row + 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row + 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
                 } else {
-                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
-                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
-                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]) || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b030 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b150 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row + 1]);
+                    joinableBorder.b210 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 1]?.[joinableHexagon.row - 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col - 2]?.[joinableHexagon.row - 1]);
+                    joinableBorder.b330 = !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 1]?.[joinableHexagon.row - 1]); // || !this.hasPath(joinablePath, joinableHexagonsByColAndRow[joinableHexagon.col + 2]?.[joinableHexagon.row - 1]);
                 }
 
                 const isBorderHexagon = [joinableBorder.b030, joinableBorder.b090, joinableBorder.b150, joinableBorder.b210, joinableBorder.b270, joinableBorder.b330].find(v => v);
@@ -119,7 +127,26 @@ export class HexagonRepository {
 
     }
 
-    async getBorder(path: string, props: IHexagonsProps): Promise<IHexagon[]> {
+    getAverageElevation(path: string, props: IHexagonsProps): number {
+
+        if (this.hexagons.length === 0) {
+            return 0;
+        }
+
+        if (this.pathLengthHistory.indexOf(path.length) < 0) {
+            this.calculateBordersAndStats(props);
+            this.pathLengthHistory.push(path.length);
+        }
+        const pathTrimmed = path.replaceAll('#', '');
+
+        const averageElevation = this.elevationStats[pathTrimmed] ? this.elevationStats[pathTrimmed].getAverage() : 0;
+        // console.log(path, averageElevation);
+
+        return averageElevation;
+
+    }
+
+    getBorder(path: string, props: IHexagonsProps): IHexagon[] {
 
         // console.debug('⚙ get border', path);
 
@@ -128,7 +155,7 @@ export class HexagonRepository {
         }
 
         if (this.pathLengthHistory.indexOf(path.length) < 0) {
-            this.calculateBorders(props);
+            this.calculateBordersAndStats(props);
             this.pathLengthHistory.push(path.length);
         }
         const pathTrimmed = path.replaceAll('#', '');

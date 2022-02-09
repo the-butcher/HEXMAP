@@ -23,6 +23,8 @@ export interface IIndicatorProps extends IChartProps {
      */
     label07: string;
 
+
+
     /**
      * callback to be triggered when an indicator wants to open horizontally
      */

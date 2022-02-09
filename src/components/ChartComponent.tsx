@@ -24,11 +24,11 @@ export default (props: IChartProps) => {
   let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, logarithmic, onInstantRangeChange, onSeriesVisibilityChange } = props;
 
   const openHorizontal = fold === 'open-horizontal' || fold === 'open-vertical';
-  const openVertical = fold === 'open-vertical';
-  let expandTransform = 'rotate(-90deg)'
-  if (openHorizontal) {
-    expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
-  }
+  // const openVertical = fold === 'open-vertical';
+  // let expandTransform = 'rotate(-90deg)'
+  // if (openHorizontal) {
+  //   expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
+  // }
 
   const [chartState, setChartState] = useState<IChartState>();
   const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin1: number, instantMax1: number) => {
@@ -122,7 +122,7 @@ export default (props: IChartProps) => {
           fill: am5.color(0x42423a),
           fillOpacity: doExport ? 1.0 : 0.0
         }),
-        maxTooltipDistance: 8
+        maxTooltipDistance: 8,
       })
     );
 
@@ -136,16 +136,24 @@ export default (props: IChartProps) => {
     yRendererVal.labels.template.setAll({
       fontFamily,
       fontSize: 10,
-      fill: labelColor,
+      fill: labelColor
     });
+    yRendererVal.labels.template.adapters.add('text', (value, target) => {
+      // console.log('value', value?.replace('.', '').replace(',', '.')); // .replace
+      if (value) {
+        return props.formatter.format(parseFloat(value.replace('.', '').replace(',', '.')));
+      } else {
+        return value;
+      }
+    })
+
     const _yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY> = _chart.yAxes.push(am5xy.ValueAxis.new(_root, {
       renderer: yRendererVal,
       interpolationDuration: 0,
       stateAnimationDuration: 0,
       min: 0,
-      // logarithmic: true,
-      // treatZeroAs: 0.000001,
-      // min: 1
+      extraMax: 0,
+      strictMinMax: true
     }));
     const _yAxisLabel = am5.Label.new(_root, {
       text: name,
@@ -162,8 +170,8 @@ export default (props: IChartProps) => {
       paddingLeft: 0
     });
     _yAxisVal.children.moveValue(_yAxisLabel, 0);
-    _yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
-    _yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
+    // _yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+    // _yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
 
     const dateFormats = {
       day: 'dd.MM.yyyy',
@@ -310,14 +318,18 @@ export default (props: IChartProps) => {
         stroke: am5.color(seriesStyle.color),
         fill: am5.color(seriesStyle.fill),
         stacked: seriesStyle.stacked,
-        visible: visibility
+        visible: visibility,
+
       }));
 
       seriesVal.fills.template.setAll({
         fillOpacity: seriesStyle.fillOpacity,
         visible: seriesStyle.fillOpacity > 0,
       });
-      seriesVal.strokes.template.set('strokeWidth', seriesStyle.strokeWidth);
+      seriesVal.strokes.template.setAll({
+        'strokeWidth': seriesStyle.strokeWidth,
+        'strokeOpacity': seriesStyle.strokeOpacity
+      });
       if (seriesStyle.strokeDasharray) {
         seriesVal.strokes.template.set('strokeDasharray', seriesStyle.strokeDasharray);
       }
@@ -478,8 +490,8 @@ export default (props: IChartProps) => {
   const updateFold = (chartState: IChartState) => {
 
     chartState.xAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
-    chartState.yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
-    chartState.yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
+    // chartState.yAxisLabel?.set('visible', fold === 'open-vertical' || doExport);
+    // chartState.yAxisVal?.set('visible', fold === 'open-vertical' || doExport);
 
   };
 

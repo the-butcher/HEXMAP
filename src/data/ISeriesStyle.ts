@@ -16,4 +16,6 @@ export interface ISeriesStyle {
 
     fillOpacity: number;
 
+    strokeOpacity: number;
+
 }

@@ -824,8 +824,6 @@ export default () => {
           return new Color(h, s, v);
         }
 
-
-
         const valueKey = prefKey + postKey;
         const entry00 = dataSetting.getDataset().getEntryByInstant(clampedInstant00);
         const entry07 = dataSetting.getDataset().getEntryByInstant(clampedInstant07);
@@ -905,7 +903,7 @@ export default () => {
               return hexagon.gkz.substring(0, prefKey.length);
             },
             getState: (hexagon) => {
-              let ele = hexagon.ele / 2 - 7.5;
+              let ele = hexagon.ele / 2;
               if (hexagon.luc === 0) {
                 // legend
                 let lookupState = valueLookup['l' + hexagon.x];
@@ -981,7 +979,7 @@ export default () => {
                         color: col,
                         col_h: col.hilight(),
                         col_o: col.outline(),
-                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value)
+                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value) // - HexagonRepository.getInstance().getAverageElevation(_prefKey, _hexagonProps) / 2 // 
                       }
                     } else {
                       lookupState = {

@@ -132,6 +132,9 @@ export default (props: IUserInterfaceProps) => {
             fontFamily,
             fontSize: '14px',
           },
+          ol: {
+            flexWrap: 'nowrap'
+          }
         },
       },
       MuiAppBar: {
@@ -281,6 +284,12 @@ export default (props: IUserInterfaceProps) => {
     buttons.push(<Button key={`expandmobile_${indicatorProps[i].id}`} style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={() => handleExpand(i)}>{indicatorProps[i].desc}</Button>);
   }
 
+  const availableIndicatorWidth = window.innerWidth - 18;
+  const closedWidth = mobileView ? 0 : 190;
+  const openedWidth = availableIndicatorWidth - (indicatorProps.length - 1) * closedWidth;
+
+  // console.log(availableIndicatorWidth, indicatorProps.length, (indicatorProps.length - 1) * closedWidth, closedWidth, openedWidth);
+
   return (
     <ThemeProvider theme={theme}>
       {mobileView ?
@@ -289,7 +298,7 @@ export default (props: IUserInterfaceProps) => {
         </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div>}
       <div style={{ width: '100%', position: 'relative', display: 'flex', flexDirection: 'column' }}>
         <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
-          {indicatorProps.map(props => <IndicatorComponent key={`indicator_${props.id}`} {...props} style={{ display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />)}
+          {indicatorProps.map(props => <IndicatorComponent key={`indicator_${props.id}`} {...props} style={{ minWidth: `${props.fold === 'open-horizontal' || props.fold === 'open-vertical' ? openedWidth : closedWidth}px`, display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />)}
         </div>
       </div>
       <div style={{ width: 'calc(100%-24px)', display: 'flex', pointerEvents: 'none', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '120px', padding: '0px', margin: '0px' }}>
@@ -304,5 +313,3 @@ export default (props: IUserInterfaceProps) => {
   );
 
 }
-
-// 

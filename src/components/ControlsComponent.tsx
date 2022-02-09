@@ -61,7 +61,7 @@ export default (props: IControlsProps) => {
 
         controls.current.addEventListener('change', e => {
 
-            // console.log('polar angle', controls.current.getPolarAngle(), camera.position,  controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
+            console.log('polar angle', controls.current.getPolarAngle(), camera.position, controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
 
             const _view: ViewOrientation = controls.current.target.z < camera.position.z ? 'northwards' : 'southwards';
             if (_view !== view.current) {
@@ -105,13 +105,20 @@ export default (props: IControlsProps) => {
                 controls.current.maxAzimuthAngle = 0;
                 controls.current.minPolarAngle = 0.43; // Math.PI / 4; // how far above ground the map can be tilted
                 controls.current.maxPolarAngle = 0.43;
-                // camera.position.set(6.78513577491969, 443.84028283902745, 186.7686468436712);
-                // controls.current.target.set(6.78513577491969, 0, 34.74231275973837);
-                camera.position.set(-16.907294646056016, 411.01271753556387, 260.12818711663294);
-                controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
+
+                camera.position.set(0.2523004231104948, 426.44562179111864, 233.07234703781495);
+                controls.current.target.set(0.2523004231104948, -1.0771583963911797e-17, 37.49541951103807);
+                // camera.position.set(-16.907294646056016, 411.01271753556387, 260.12818711663294);
+                // controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
+
                 controls.current.update();
 
                 resetAngleConstraints();
+
+            } else if (e.key === 'p') {
+
+                console.log(`camera.position.set(${camera.position.x}, ${camera.position.y}, ${camera.position.z});`);
+                console.log(`controls.current.target.set(${controls.current.target.x}, ${controls.current.target.y}, ${controls.current.target.z});`);
 
             }
 

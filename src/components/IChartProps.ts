@@ -1,4 +1,5 @@
 import React from "react";
+import { IFormattingDefinition } from "../util/IFormattingDefinition";
 import { IBreadcrumbProps } from "./IBreadcrumbProps";
 import { IndicatorPropsFold } from "./IIndicatorProps";
 import { IInstantProps } from "./IInstantProps";
@@ -10,6 +11,8 @@ import { IInstantProps } from "./IInstantProps";
  * @since 03.02.2022
  */
 export interface IChartProps extends IInstantProps {
+
+    formatter: IFormattingDefinition;
 
     /**
      * unique id that should not change over time

@@ -68,7 +68,7 @@ export default (props: IInstantProps) => {
             onInstantChange(instant - props.instantDif);
         }
         handleInstantIncr.current = () => {
-            onInstantChange(instant - props.instantDif);
+            onInstantChange(instant + props.instantDif);
         }
 
     }, [source, instant, instantMin, instantMax, instantDif]);

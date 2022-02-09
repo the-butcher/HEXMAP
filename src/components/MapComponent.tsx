@@ -1,18 +1,12 @@
-import { ControlPoint } from "@mui/icons-material";
-import { Stats } from "@react-three/drei";
-import { Canvas, RootState, useFrame } from "@react-three/fiber";
-import { PCFSoftShadowMap, PlaneGeometry } from "three";
-import { ObjectUtil } from "../util/ObjectUtil";
+import { Canvas, RootState } from "@react-three/fiber";
+import { PCFSoftShadowMap } from "three";
 import BoundariesComponent from "./BoundariesComponent";
 import ControlsComponent from "./ControlsComponent";
 import HexagonsComponent from "./HexagonsComponent";
 import HyperlinkComponent from "./HyperlinkComponent";
-import { IHyperlinkProps } from "./IHyperlinkProps";
 import { IMapProps } from "./IMapProps";
 import LabelComponent from "./LabelComponent";
 import LightCompoment from "./LightCompoment";
-import * as three from 'three';
-import { useEffect, useRef, useState } from "react";
 
 /**
  * functional react component describing the entire map / scene
@@ -40,8 +34,9 @@ export default (props: IMapProps) => {
                 <ambientLight intensity={0.07} />
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']} /> */}
                 <group name={'root'}>
-                    <HexagonsComponent {...hexagonProps} />
                     <BoundariesComponent />
+                    <HexagonsComponent {...hexagonProps} />
+
                     {labelProps.map(props => <LabelComponent key={props.id} {...props} />)}
                     <LabelComponent key={legendLabelProps.title.id} {...legendLabelProps.title} />
                     <LabelComponent key={legendLabelProps.min.id} {...legendLabelProps.min} />
@@ -50,9 +45,13 @@ export default (props: IMapProps) => {
                     <LabelComponent key={courseLabelProps.min.id} {...courseLabelProps.min} />
                     <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} />
                     {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
-                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.2, 0]}>
+                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
                         <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
-                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} />
+                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.25} />
+                    </mesh>
+                    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 11.25, 0]}>
+                        <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
+                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.25} />
                     </mesh> */}
                 </group>
             </Canvas>
