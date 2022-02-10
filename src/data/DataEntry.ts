@@ -27,9 +27,9 @@ export class DataEntry implements IDataEntry {
     }
 
     getValue(key: string | number, index: number): IDataValue {
-        // if (!this.dataRaw[key]?.[index]) {
-        //     Math.random();
-        // }
+        if (!this.dataRaw[key]?.[index]) {
+            Math.random();
+        }
         return this.dataRaw[key][index];
     }
 

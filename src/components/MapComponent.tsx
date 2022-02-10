@@ -47,9 +47,9 @@ export default (props: IMapProps) => {
                     {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
                     {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
                         <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
-                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.25} />
-                    </mesh>
-                    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 11.25, 0]}>
+                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.75} />
+                    </mesh> */}
+                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 11.25, 0]}>
                         <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
                         <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.25} />
                     </mesh> */}

@@ -12,6 +12,9 @@ import { IScreenshot } from "./IScreenshot";
  */
 export class ScreenshotUtil {
 
+    static readonly OUTPUT_DIM_X = 1200;
+    static readonly OUTPUT_DIM_Y = 675; // 675
+
     static createInstance(invalidate: () => void): void {
         if (!this.instance) {
             this.instance = new ScreenshotUtil(invalidate);
@@ -61,8 +64,8 @@ export class ScreenshotUtil {
     renderToFrame(gl: WebGLRenderer, scene: Scene, camera: Camera) {
 
         let canvas = this.renderToCanvas(gl, scene, camera);
-        canvas.style.width = '120px';
-        canvas.style.height = '67px';
+        canvas.style.width = `${ScreenshotUtil.OUTPUT_DIM_X / 10}px`;
+        canvas.style.height = `${ScreenshotUtil.OUTPUT_DIM_Y / 10}px`;
         this.frames.push({
             canvas,
             delay: 200
@@ -74,7 +77,7 @@ export class ScreenshotUtil {
 
     exportToGif() {
 
-        const gifEncoder = new GIFEncoder(1200, 675, 'neuquant', false);
+        const gifEncoder = new GIFEncoder(ScreenshotUtil.OUTPUT_DIM_X, ScreenshotUtil.OUTPUT_DIM_Y, 'neuquant', false);
         gifEncoder.setDelay(200);
         gifEncoder.createReadStream().pipe(concat((buffer: Uint8Array) => {
 
@@ -120,15 +123,15 @@ export class ScreenshotUtil {
         gl.render(scene, camera);
 
         const outputCanvas = document.createElement('canvas');
-        outputCanvas.width = 1200;
-        outputCanvas.height = 675;
+        outputCanvas.width = ScreenshotUtil.OUTPUT_DIM_X;
+        outputCanvas.height = ScreenshotUtil.OUTPUT_DIM_Y;
         const outputContext = outputCanvas.getContext('2d');
 
         const scaleY = outputCanvas.height / gl.domElement.height;
         const dimX = gl.domElement.width * scaleY;
         const dimY = gl.domElement.height * scaleY;
-        const offX = (1200 - dimX) / 2;
-        const offY = (675 - dimY) / 2;
+        const offX = (ScreenshotUtil.OUTPUT_DIM_X - dimX) / 2;
+        const offY = (ScreenshotUtil.OUTPUT_DIM_Y - dimY) / 2;
 
         outputContext.drawImage(gl.domElement, offX, offY, dimX, dimY);
 

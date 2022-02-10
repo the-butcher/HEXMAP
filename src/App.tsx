@@ -979,7 +979,7 @@ export default () => {
                         color: col,
                         col_h: col.hilight(),
                         col_o: col.outline(),
-                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value) // - HexagonRepository.getInstance().getAverageElevation(_prefKey, _hexagonProps) / 2 // 
+                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value) - HexagonRepository.getInstance().getAverageElevation(_prefKey, _hexagonProps) / 2 // 
                       }
                     } else {
                       lookupState = {

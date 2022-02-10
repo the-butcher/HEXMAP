@@ -3,6 +3,7 @@ import { IExportingImageOptions } from '@amcharts/amcharts5/.internal/plugins/ex
 import am5locales_de_DE from '@amcharts/amcharts5/locales/de_DE';
 import * as am5exporting from "@amcharts/amcharts5/plugins/exporting";
 import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
+// import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { useTheme } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,7 +17,7 @@ export type SERIES_TYPE = 'line' | 'step';
 
 export default (props: IChartProps) => {
 
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const fontFamily = 'Courier Prime Sans';
   const fontColor = 0xc1c1aa;
@@ -50,7 +51,8 @@ export default (props: IChartProps) => {
 
     const _root = am5.Root.new(`chartdiv_${id}`);
     _root.setThemes([
-      am5themes_Dark.new(_root)
+      am5themes_Dark.new(_root),
+      // am5themes_Animated.new(_root)
     ]);
     _root.dateFormatter.set('dateFormat', 'dd.MM.yyyy');
     _root.locale = am5locales_de_DE;
@@ -113,7 +115,7 @@ export default (props: IChartProps) => {
         // wheelX: 'panX',
         wheelY: 'zoomX',
         layout: _root.verticalLayout,
-        stateAnimationDuration: 0,
+        // stateAnimationDuration: 2000,
         paddingTop: 8,
         paddingRight: 5,
         paddingLeft: 5,
@@ -149,8 +151,8 @@ export default (props: IChartProps) => {
 
     const _yAxisVal: am5xy.ValueAxis<am5xy.AxisRendererY> = _chart.yAxes.push(am5xy.ValueAxis.new(_root, {
       renderer: yRendererVal,
-      interpolationDuration: 0,
-      stateAnimationDuration: 0,
+      // interpolationDuration: 2000,
+      // stateAnimationDuration: 2000,
       min: 0,
       extraMax: 0,
       strictMinMax: true
@@ -250,6 +252,7 @@ export default (props: IChartProps) => {
       positionX
     }));
     _cursor.lineY.set('visible', false);
+    _cursor.hide();
 
     const tooltip = _xAxisVal.get('tooltip')!;
     tooltip.setAll({
@@ -312,8 +315,8 @@ export default (props: IChartProps) => {
         yAxis: _yAxisVal,
         valueYField: `value_${valueIndex}`,
         valueXField: 'instant',
-        interpolationDuration: 0,
-        sequencedInterpolation: false,
+        // interpolationDuration: 2000,
+        // sequencedInterpolation: false,
         tooltip: am5.Tooltip.new(_root, {}),
         stroke: am5.color(seriesStyle.color),
         fill: am5.color(seriesStyle.fill),
@@ -481,6 +484,8 @@ export default (props: IChartProps) => {
     chartState.series.forEach(s => {
       (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
       s.data.setAll(chartData.entries);
+      // s.appear();
+      // s.appear();
     });
     chartState.legend.data.setAll(chartState.series);
     chartState.chart?.show();

@@ -112,44 +112,43 @@ export class DataRepository {
       constructDataset: dataRoot => new DatasetIncidence(dataRoot),
       seriesVisibilities: {}
     },
-    {
-      id: 'i_paa',
-      instant: -1,
-      instantMin: -1,
-      instantMax: -1,
-      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-      name: 'Inzidenz',
-      desc: 'Bundesland und Alter',
-      copy: 'https://www.data.gv.at/covid-19/',
-      formatter: FormattingDefinition.FORMATTER____FIXED,
-      label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-      label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
-      onExpand: () => { },
-      onInstantChange: () => { },
-      onInstantRangeChange: () => { },
-      onExport: () => { },
-      onSeriesVisibilityChange: () => { },
-      onLogarithmicChange: () => { },
-      doExport: false,
-      logarithmic: false,
-      fold: 'closed',
-      source: './hexmap-data-incidence-age.json',
-      loaded: false,
-      path: '',
-      breadcrumbProps: [],
-      getRendererProps: (index: number, name: string) => {
-        return {
-          interpolatedEle: DataRepository.interpolatedEle7di3,
-          interpolatedHue: DataRepository.interpolatedHue7di3,
-          interpolatedSat: new FixedValue(1.00),
-          interpolatedVal: new FixedValue(0.40),
-          interpolatedInt: DataRepository.interpolatedInt7diX,
-        }
-      },
-      constructDataset: dataRoot => new DatasetIncidence(dataRoot),
-      seriesVisibilities: {}
-    },
+    // {
+    //   id: 'i_paa',
+    //   instant: -1,
+    //   instantMin: -1,
+    //   instantMax: -1,
+    //   instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+    //   name: 'Inzidenz',
+    //   desc: 'Bundesland und Alter',
+    //   copy: 'https://www.data.gv.at/covid-19/',
+    //   formatter: FormattingDefinition.FORMATTER____FIXED,
+    //   label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+    //   label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+    //   onExpand: () => { },
+    //   onInstantChange: () => { },
+    //   onInstantRangeChange: () => { },
+    //   onExport: () => { },
+    //   onSeriesVisibilityChange: () => { },
+    //   onLogarithmicChange: () => { },
+    //   doExport: false,
+    //   logarithmic: false,
+    //   fold: 'closed',
+    //   source: './hexmap-data-incidence-age.json',
+    //   loaded: false,
+    //   path: '',
+    //   breadcrumbProps: [],
+    //   getRendererProps: (index: number, name: string) => {
+    //     return {
+    //       interpolatedEle: DataRepository.interpolatedEle7di3,
+    //       interpolatedHue: DataRepository.interpolatedHue7di3,
+    //       interpolatedSat: new FixedValue(1.00),
+    //       interpolatedVal: new FixedValue(0.40),
+    //       interpolatedInt: DataRepository.interpolatedInt7diX,
+    //     }
+    //   },
+    //   constructDataset: dataRoot => new DatasetIncidence(dataRoot),
+    //   seriesVisibilities: {}
+    // },
     {
       id: 'i_dst',
       instant: -1,
@@ -162,7 +161,6 @@ export class DataRepository {
       formatter: FormattingDefinition.FORMATTER____FIXED,
       label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
       label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-      // valueFormatter: FormattingDefinition.FORMATTER____FIXED,
       onExpand: () => { },
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
@@ -228,7 +226,7 @@ export class DataRepository {
     //   onLogarithmicChange: () => { },
     //   doExport: false,
     //   logarithmic: false,
-    //   fold: 'closed',
+    //   fold: 'open-horizontal',
     //   source: './hexmap-data-vacc-gemeinde.json',
     //   loaded: false,
     //   path: '',
@@ -264,10 +262,10 @@ export class DataRepository {
     //       }
     //     } else {
     //       return {
-    //         interpolatedEle: new InterpolatedValue(-7.2, 1.6, 0, 1, 1),
+    //         interpolatedEle: new InterpolatedValue(-7.2, 10, 0, 1, 1),
     //         interpolatedHue: new InterpolatedValue(0.00, 0.25, 0.50, 0.85, 1),
     //         interpolatedSat: new FixedValue(1.00),
-    //         interpolatedVal: new FixedValue(0.40),
+    //         interpolatedVal: new FixedValue(0.50),
     //         interpolatedInt: new FixedValue(1.25),
     //       }
     //     }
@@ -320,7 +318,6 @@ export class DataRepository {
     //       interpolatedVal: new FixedValue(0.40),
     //       interpolatedInt: new FixedValue(1.25),
     //     }
-
     //   },
     //   constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
     //   seriesVisibilities: {}
@@ -335,6 +332,7 @@ export class DataRepository {
     //   desc: 'Bezirk',
     //   label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
     //   label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+    //   formatter: FormattingDefinition.FORMATTER_PERCENT,
     //   copy: '',
     //   onExpand: () => { },
     //   onInstantChange: () => { },
