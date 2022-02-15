@@ -884,6 +884,8 @@ export default () => {
           height: 4.0
         };
 
+        const eleMult = 0.5;
+
         if (selected) {
 
           // performance
@@ -903,7 +905,7 @@ export default () => {
               return hexagon.gkz.substring(0, prefKey.length);
             },
             getState: (hexagon) => {
-              let ele = hexagon.ele / 2;
+              let ele = hexagon.ele * eleMult;
               if (hexagon.luc === 0) {
                 // legend
                 let lookupState = valueLookup['l' + hexagon.x];
@@ -979,7 +981,7 @@ export default () => {
                         color: col,
                         col_h: col.hilight(),
                         col_o: col.outline(),
-                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value) - HexagonRepository.getInstance().getAverageElevation(_prefKey, _hexagonProps) / 2 // 
+                        height: rendererPropsInstance.interpolatedEle.getOut(entry00.getValue(dataKey, dataSetting.getIndex()).value) - HexagonRepository.getInstance().getAverageElevation(_prefKey, _hexagonProps) * eleMult
                       }
                     } else {
                       lookupState = {

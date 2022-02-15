@@ -61,7 +61,7 @@ export default (props: IControlsProps) => {
 
         controls.current.addEventListener('change', e => {
 
-            console.log('polar angle', controls.current.getPolarAngle(), camera.position, controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
+            // console.log('polar angle', controls.current.getPolarAngle(), camera.position, controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
 
             const _view: ViewOrientation = controls.current.target.z < camera.position.z ? 'northwards' : 'southwards';
             if (_view !== view.current) {

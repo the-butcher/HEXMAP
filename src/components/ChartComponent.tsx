@@ -209,7 +209,8 @@ export default (props: IChartProps) => {
       periodChangeDateFormats: dateFormats,
       exportable: true,
       min: instantMin > 0 ? instantMin : undefined,
-      max: instantMax > 0 ? instantMax : undefined
+      max: instantMax > 0 ? instantMax : undefined,
+      // start: TimeUtil.parseCategoryDateFull('01.01.2022'),
     }));
     const _xAxisLabel = am5.Label.new(_root, {
       text: 'Datum',
@@ -434,6 +435,7 @@ export default (props: IChartProps) => {
     // write to state
     setChartState(_chartState);
 
+    // empty data
     _xAxisVal.data.setAll([]);
 
     // https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/
@@ -471,7 +473,22 @@ export default (props: IChartProps) => {
 
       });
 
-    };
+    } else {
+
+      let zoomToStartTo = -1;
+      const frameendedDisposer = _root.events.on('frameended', () => {
+
+        window.clearTimeout(zoomToStartTo);
+        zoomToStartTo = window.setTimeout(() => {
+
+          const position = _xAxisVal.valueToPosition(TimeUtil.trimInstant(TimeUtil.parseCategoryDateFull('01.11.2021')));
+          _xAxisVal.set('start', position);
+          _chart.zoomOutButton.show();
+
+        }, 500);
+      });
+
+    }
 
     console.debug('🕓 updating chart component (done)', Date.now() - tsA);
 

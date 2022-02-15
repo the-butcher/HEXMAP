@@ -27,6 +27,7 @@ export default (props: IMapProps) => {
     return (
         <div style={{ position: 'absolute', height: '100%', width: '100%' }}>
             <Canvas frameloop='demand' shadows={{ type: PCFSoftShadowMap, enabled: true }} onCreated={onCreated} camera={{ position: [0, 300, 0], fov: 40, far: 10000 }}>
+                {/* <fog attach="fog" args={["#42423a", 2000, 3000]} /> */}
                 <ControlsComponent key={controlsProps.id} {...controlsProps} />
                 {/* demand | always */}
                 {/* <Stats /> */}
@@ -45,14 +46,10 @@ export default (props: IMapProps) => {
                     <LabelComponent key={courseLabelProps.min.id} {...courseLabelProps.min} />
                     <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} />
                     {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
-                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-                        <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
-                        <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.75} />
-                    </mesh> */}
-                    {/* <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 11.25, 0]}>
+                    {/* {[0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1.0].map(v => <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, v, 0]} receiveShadow>
                         <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
                         <meshStandardMaterial color={[0.02, 0.02, 0.015]} wireframe={false} transparent opacity={0.25} />
-                    </mesh> */}
+                    </mesh>)} */}
                 </group>
             </Canvas>
         </div>
