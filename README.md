@@ -1,3 +1,10 @@
+# HEXMAP
+## 3D-Hexagon map of Austria, built with react-three-fiber. Suitable to visualize arbitrary data on province, regional and municipality level.
+#
+![alt text](https://github.com/the-butcher/HEXMAP/blob/master/public/canvas_3d_1644612756926.gif?raw=true)
+
+Example of GIF animation generated with built-in GIF exporter.
+#
 # Issues in Hexmap
 - outlines only show partially (maybe an issue connected to key sorting)
 - move base config to file (maybe multiple files)
@@ -52,8 +59,8 @@
 - ~~export option~~
   - ~~shadows appear to be clipped to a much smaller area than needed~~
 
-
-# Getting Started with Create React App
+#
+# As of Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
