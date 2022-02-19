@@ -36,15 +36,15 @@ export default (props: IMapProps) => {
                 {/* <gridHelper args={[1000, 10, '#ff0000', '#666666']} /> */}
                 <group name={'root'}>
                     <BoundariesComponent />
-                    <HexagonsComponent {...hexagonProps} />
+                    {/* <HexagonsComponent {...hexagonProps} /> */}
 
                     {labelProps.map(props => <LabelComponent key={props.id} {...props} />)}
-                    <LabelComponent key={legendLabelProps.title.id} {...legendLabelProps.title} />
+                    {/* <LabelComponent key={legendLabelProps.title.id} {...legendLabelProps.title} />
                     <LabelComponent key={legendLabelProps.min.id} {...legendLabelProps.min} />
                     <LabelComponent key={legendLabelProps.max.id} {...legendLabelProps.max} />
                     <LabelComponent key={courseLabelProps.title.id} {...courseLabelProps.title} />
                     <LabelComponent key={courseLabelProps.min.id} {...courseLabelProps.min} />
-                    <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} />
+                    <LabelComponent key={courseLabelProps.max.id} {...courseLabelProps.max} /> */}
                     {hyperlinkProps.map(props => <HyperlinkComponent key={props.id} {...props} />)}
                     {/* {[0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1.0].map(v => <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, v, 0]} receiveShadow>
                         <planeBufferGeometry attach="geometry" args={[1000, 1000]} />

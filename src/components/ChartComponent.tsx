@@ -48,7 +48,7 @@ export default (props: IChartProps) => {
     const dataSetting = DataRepository.getInstance().getDataSetting(source);
 
     const labelColor = am5.color(fontColor);
-    const valueCount = dataSetting.getDataset().getIndexKeyset().getRawCount(); // data.data[date][dataPointer].length;
+    const rawCount = dataSetting.getDataset().getIndexKeyset().getRawCount(); // data.data[date][dataPointer].length;
 
     const _root = am5.Root.new(`chartdiv_${id}`);
     _root.setThemes([
@@ -86,7 +86,7 @@ export default (props: IChartProps) => {
       y: 5
     });
     if (!doExport) {
-      document.getElementById(`legenddiv_${id}`).style.height = `${valueCount * 18 - 2}px`;
+      document.getElementById(`legenddiv_${id}`).style.height = `${rawCount * 18 - 2}px`;
     }
 
 
@@ -293,15 +293,20 @@ export default (props: IChartProps) => {
 
     const _series: am5xy.LineSeries[] = [];
 
-    for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
+    console.log('rawCount', rawCount);
+    for (let rawIndex = 0; rawIndex < rawCount; rawIndex++) {
 
-      const hasTooltip = !doExport && dataSetting.getDataset().getIndexKeyset().hasKey(valueIndex);
+      // const value = dataSetting.getDataset().getIndexKeyset().getKeys()[rawIndex];
+
+
+      const hasTooltip = !doExport && dataSetting.getDataset().getIndexKeyset().hasKey(rawIndex);
+      console.log(rawIndex, ' >>> ', hasTooltip)
       // const tooltip: am5.Tooltip = hasTooltip ? am5.Tooltip.new(_root, {}) : null;
 
       let seriesClass = am5xy.LineSeries;
 
-      const seriesLabel = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex);
-      const seriesStyle = dataSetting.getDataset().getIndexKeyset().getSeriesStyle(valueIndex);
+      const seriesLabel = dataSetting.getDataset().getIndexKeyset().getValue(rawIndex);
+      const seriesStyle = dataSetting.getDataset().getIndexKeyset().getSeriesStyle(rawIndex);
       if (seriesStyle.type === 'step') {
         seriesClass = am5xy.StepLineSeries;
       }
@@ -318,7 +323,7 @@ export default (props: IChartProps) => {
         name: seriesLabel,
         xAxis: _xAxisVal,
         yAxis: _yAxisVal,
-        valueYField: `value_${valueIndex}`,
+        valueYField: `value_${rawIndex}`,
         valueXField: 'instant',
         // interpolationDuration: 2000,
         // sequencedInterpolation: false,
@@ -350,7 +355,7 @@ export default (props: IChartProps) => {
       if (hasTooltip) {
         const tooltip = seriesVal.get('tooltip')!;
         tooltip.setAll({
-          labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${valueIndex}}`, // '{valueY}',
+          labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${rawIndex}}`, // '{valueY}',
           paddingTop: 4,
           paddingRight: 4,
           paddingBottom: 4,
@@ -421,19 +426,28 @@ export default (props: IChartProps) => {
 
     };
     _chartState.xAxisVal.adapters.add('start', (value, target) => {
-      instantMinC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
-      requestAnimationFrame(() => {
-        handleStartEndChanged(_chartState);
-      });
-      return Math.max(0, _chartState.xAxisVal.valueToPosition(instantMinC));
+      const _value = Math.max(0, value);
+      const _instantMinC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(_value));
+      if (_instantMinC !== instantMinC) {
+        instantMinC = _instantMinC;
+        requestAnimationFrame(() => {
+          console.log('start', TimeUtil.formatCategoryDateFull(instantMinC));
+          handleStartEndChanged(_chartState);
+        });
+      }
+      return _value; // Math.max(0, _chartState.xAxisVal.valueToPosition(instantMinC));
     });
     _chartState.xAxisVal.adapters.add('end', (value, target) => {
-      instantMaxC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(value));
-      // console.log('instantMaxC', TimeUtil.formatCategoryDateFull(instantMaxC));
-      requestAnimationFrame(() => {
-        handleStartEndChanged(_chartState);
-      });
-      return Math.min(1, _chartState.xAxisVal.valueToPosition(instantMaxC));
+      const _value = Math.min(1, value);
+      const _instantMaxC = TimeUtil.trimInstant(_chartState.xAxisVal.positionToValue(_value));
+      if (_instantMaxC !== instantMaxC) {
+        instantMaxC = _instantMaxC;
+        requestAnimationFrame(() => {
+          console.log('end', TimeUtil.formatCategoryDateFull(instantMaxC));
+          handleStartEndChanged(_chartState);
+        });
+      }
+      return _value; // Math.min(1, _chartState.xAxisVal.valueToPosition(instantMaxC));
     });
 
     // write to state
@@ -489,6 +503,8 @@ export default (props: IChartProps) => {
           _xAxisVal.set('start', position);
           _chart.zoomOutButton.show();
 
+          frameendedDisposer.dispose();
+
         }, 500);
       });
 
@@ -526,13 +542,13 @@ export default (props: IChartProps) => {
     if (logarithmic) {
       chartState.yAxisVal.setAll({
         logarithmic: true,
-        treatZeroAs: 0.000001,
-        min: 1
+        treatZeroAs: 0.01,
+        min: 0.01
       });
     } else {
       chartState.yAxisVal.setAll({
         logarithmic: false,
-        treatZeroAs: 0.000001,
+        treatZeroAs: 0.01,
         min: 0
       });
     }

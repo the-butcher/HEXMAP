@@ -50,7 +50,7 @@ export class SeriesStyle {
     static readonly SERIES_STYLE________RED: ISeriesStyle = {
         type: 'line',
         color: 0xffffff,
-        fill: 0xff0000,
+        fill: 0xaa3333,
         strokeWidth: 0,
         fillOpacity: 0.5,
         strokeOpacity: 0.0,

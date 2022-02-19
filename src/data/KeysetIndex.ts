@@ -62,11 +62,11 @@ export class KeysetIndex implements IKeyset {
     }
 
     hasKey(key: string | number): boolean {
-        return this.keys[key] !== undefined;
+        return this.keys.includes(key.toString());
     }
 
     hasRaw(key: string | number): boolean {
-        return this.raws[key] !== undefined;
+        return this.raws.includes(key.toString()); // this.raws[key] !== undefined;
     }
 
     getValue(key: string): string {
