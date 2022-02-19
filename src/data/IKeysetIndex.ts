@@ -10,17 +10,6 @@ import { ISeriesStyle } from "./ISeriesStyle";
  */
 export interface IKeysetIndex extends IKeyset {
 
-    // /**
-    //  * get the type of series suitable to display this index' data
-    //  */
-    // getSeriesType(key: number): SERIES_TYPE;
-
-
-    // getSeriesColor(key: number): number;
-
     getSeriesStyle(key: number): ISeriesStyle;
-
-
-    getBreadcrumbKeys(): string[];
 
 }

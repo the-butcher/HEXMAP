@@ -112,7 +112,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating hexagons component (stamp)', props);
+    console.debug('⚙ updating hexagons component (stamp)', props);
     const tsA = Date.now();
 
     let sortkey = 0;
@@ -190,7 +190,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating hexagons component (onPathChange)', props);
+    console.debug('⚙ updating hexagons component (onPathChange)', props);
 
     handlePathChange.current = (source: string, name: string, path: string) => {
       onPathChange(source, name, path);
@@ -200,7 +200,7 @@ export default (props: IHexagonsProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating hexagons component (frac)', frac);
+    console.debug('⚙ updating hexagons component (frac)', frac);
     const tsA = Date.now();
 
     let sortkey = 0;

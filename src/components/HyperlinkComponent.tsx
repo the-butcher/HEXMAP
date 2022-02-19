@@ -40,7 +40,7 @@ export default (props: IHyperlinkProps) => {
 
     if (font) {
 
-      console.debug('🔧 updating hyperlink component', props);
+      console.debug('⚙ updating hyperlink component', props);
 
       const shapes = font!.generateShapes(props.label, size);
       geomTextRef.current = new three.ShapeGeometry(shapes);

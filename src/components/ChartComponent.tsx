@@ -6,6 +6,7 @@ import am5themes_Dark from '@amcharts/amcharts5/themes/Dark';
 // import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import { useTheme } from '@mui/material';
+import { is } from 'date-fns/locale';
 import React, { useEffect, useRef, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
 import { ObjectUtil } from '../util/ObjectUtil';
@@ -47,7 +48,7 @@ export default (props: IChartProps) => {
     const dataSetting = DataRepository.getInstance().getDataSetting(source);
 
     const labelColor = am5.color(fontColor);
-    const valueCount = dataSetting.getDataset().getIndexKeyset().size(); // data.data[date][dataPointer].length;
+    const valueCount = dataSetting.getDataset().getIndexKeyset().getRawCount(); // data.data[date][dataPointer].length;
 
     const _root = am5.Root.new(`chartdiv_${id}`);
     _root.setThemes([
@@ -294,6 +295,9 @@ export default (props: IChartProps) => {
 
     for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
 
+      const hasTooltip = !doExport && dataSetting.getDataset().getIndexKeyset().hasKey(valueIndex);
+      // const tooltip: am5.Tooltip = hasTooltip ? am5.Tooltip.new(_root, {}) : null;
+
       let seriesClass = am5xy.LineSeries;
 
       const seriesLabel = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex);
@@ -318,13 +322,13 @@ export default (props: IChartProps) => {
         valueXField: 'instant',
         // interpolationDuration: 2000,
         // sequencedInterpolation: false,
-        tooltip: am5.Tooltip.new(_root, {}),
+        tooltip: hasTooltip ? am5.Tooltip.new(_root, {}) : null,
         stroke: am5.color(seriesStyle.color),
         fill: am5.color(seriesStyle.fill),
         stacked: seriesStyle.stacked,
         visible: visibility,
-
       }));
+
 
       seriesVal.fills.template.setAll({
         fillOpacity: seriesStyle.fillOpacity,
@@ -343,7 +347,7 @@ export default (props: IChartProps) => {
         handleSeriesVisibilityChange.current(seriesLabel, visible);
       });
 
-      if (!doExport) {
+      if (hasTooltip) {
         const tooltip = seriesVal.get('tooltip')!;
         tooltip.setAll({
           labelText: `[fontSize: 10px]${seriesLabel}:[/] {label_${valueIndex}}`, // '{valueY}',
@@ -580,7 +584,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating chart component (path)', props);
+    console.debug('⚙ updating chart component (path)', props);
 
     if (chartState) {
       updatePath(chartState);
@@ -591,7 +595,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating chart component (fold)', props);
+    console.debug('⚙ updating chart component (fold)', props);
 
     if (chartState) {
       updateFold(chartState);
@@ -602,7 +606,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating chart component (fold)', props);
+    console.debug('⚙ updating chart component (fold)', props);
 
     if (chartState) {
       updateLogarithmic(chartState);
@@ -613,7 +617,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating chart component (instant)', props);
+    console.debug('⚙ updating chart component (instant)', props);
     if (chartState) {
       // updateInstants(chartState);
       updateCallbacks();
@@ -623,7 +627,7 @@ export default (props: IChartProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating chart component (chartState)', props);
+    console.debug('⚙ updating chart component (chartState)', props);
     if (chartState) {
       updatePath(chartState);
       updateFold(chartState);

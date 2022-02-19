@@ -1,17 +1,15 @@
+import { FormattingDefinition } from "../util/FormattingDefinition";
 import { TimeUtil } from "../util/TimeUtil";
 import { DataEntry } from "./DataEntry";
-import { DataRepository } from "./DataRepository";
 import { IDataEntry } from "./IDataEntry";
+import { IDataIndex } from "./IDataIndex";
 import { IDataRoot } from "./IDataRoot";
 import { IDataset } from "./IDataset";
+import { IDataValue } from "./IDataValue";
 import { IKeyset } from "./IKeyset";
 import { IKeysetIndex } from "./IKeysetIndex";
 import { KeysetGeneric } from "./KeysetGeneric";
 import { KeysetIndex } from "./KeysetIndex";
-import { Statistics } from "./Statistics";
-import regression from 'regression';
-import { IDataValue } from "./IDataValue";
-import { FormattingDefinition } from "../util/FormattingDefinition";
 
 /**
  * implementation of IDataSet
@@ -46,11 +44,16 @@ export class DatasetMortality implements IDataset {
             console.log('defaultKey', defaultKey);
             this.keysets[keysetKey] = new KeysetGeneric(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
         });
+        const indexes: IDataIndex[] = ['Non-COVID / 100.000', 'COVID / 100.000',].map(k => {
+            return {
+                name: k,
+                isHiddenOption: false,
+                minY: this.minY,
+                maxY: this.maxY
+            }
+        });
 
-        this.indexKeyset = new KeysetIndex(1, [
-            'Non-COVID / 100.000',
-            'COVID / 100.000',
-        ]);
+        this.indexKeyset = new KeysetIndex(1, indexes);
 
         const dateKeys = Object.keys(dataRoot.data);
         this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[1]);

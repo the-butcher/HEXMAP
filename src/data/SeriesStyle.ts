@@ -1,7 +1,7 @@
 import { ISeriesStyle } from "./ISeriesStyle";
 
 
-export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'xlo_cases' | 'xhi_cases' | 'avg_cases' | 'reg_cases' | 'dlt_incdc' | 'icu_100pc' | 'icu_033pc' | 'icu_010pc';
+export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'xlo_cases' | 'xhi_cases' | 'avg_cases' | 'reg_cases' | 'dlt_incdc' | 'hsp__high' | 'hsp__med2' | 'hsp__med1' | 'hsp___low';
 
 export class SeriesStyle {
 
@@ -47,7 +47,7 @@ export class SeriesStyle {
         stacked: false
     };
 
-    static readonly SERIES_STYLE________100: ISeriesStyle = {
+    static readonly SERIES_STYLE________RED: ISeriesStyle = {
         type: 'line',
         color: 0xffffff,
         fill: 0xff0000,
@@ -57,23 +57,36 @@ export class SeriesStyle {
         stacked: true
     };
 
-    static readonly SERIES_STYLE________033: ISeriesStyle = {
+    static readonly SERIES_STYLE_____ORANGE: ISeriesStyle = {
         type: 'line',
         color: 0xffffff,
-        fill: 0xffff00,
-        strokeWidth: 0,
+        fill: 0xff8000,
+        strokeWidth: 0.5,
         fillOpacity: 0.2,
-        strokeOpacity: 0.0,
+        strokeOpacity: 0.5,
+        strokeDasharray: [4, 3],
         stacked: true
     };
 
-    static readonly SERIES_STYLE________010: ISeriesStyle = {
+    static readonly SERIES_STYLE_____YELLOW: ISeriesStyle = {
+        type: 'line',
+        color: 0xffffff,
+        fill: 0xffff00,
+        strokeWidth: 0.5,
+        fillOpacity: 0.2,
+        strokeOpacity: 0.5,
+        strokeDasharray: [4, 3],
+        stacked: true
+    };
+
+    static readonly SERIES_STYLE______GREEN: ISeriesStyle = {
         type: 'line',
         color: 0xffffff,
         fill: 0x00ff00,
-        strokeWidth: 0,
+        strokeWidth: 0.5,
         fillOpacity: 0.2,
-        strokeOpacity: 0.0,
+        strokeOpacity: 0.5,
+        strokeDasharray: [4, 3],
         stacked: true
     };
 
@@ -98,9 +111,10 @@ export class SeriesStyle {
         'avg_cases': this.SERIES_STYLE____AVERAGE,
         'reg_cases': this.SERIES_STYLE_REGRESSION,
         'dlt_incdc': this.SERIES_STYLE____AVERAGE,
-        'icu_100pc': this.SERIES_STYLE________100,
-        'icu_033pc': this.SERIES_STYLE________033,
-        'icu_010pc': this.SERIES_STYLE________010,
+        'hsp__high': this.SERIES_STYLE________RED,
+        'hsp__med2': this.SERIES_STYLE_____ORANGE,
+        'hsp__med1': this.SERIES_STYLE_____YELLOW,
+        'hsp___low': this.SERIES_STYLE______GREEN,
     }
 
 }

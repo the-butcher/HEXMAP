@@ -1,11 +1,11 @@
-import * as three from 'three';
 import { useEffect, useRef, useState } from 'react';
+import * as three from 'three';
 import ChartComponent from './components/ChartComponent';
 import { IBreadcrumbProps } from './components/IBreadcrumbProps';
 import { IChartProps } from './components/IChartProps';
 import { IHexagonsProps, ViewOrientation } from './components/IHexagonsProps';
 import { IHexagonState } from './components/IHexagonState';
-import { IndicatorPropsFold } from './components/IIndicatorProps';
+import { IIndicatorProps, IndicatorPropsFold } from './components/IIndicatorProps';
 import { IInstantProps } from './components/IInstantProps';
 import { ILegendProps } from './components/ILegendProps';
 import { IMapProps } from './components/IMapProps';
@@ -18,7 +18,6 @@ import { IAppState } from './IAppState';
 import { Color } from './util/Color';
 import { ColorUtil } from './util/ColorUtil';
 import { FormattingDefinition } from './util/FormattingDefinition';
-import { InterpolatedValue } from './util/InterpolatedValue';
 import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
 
@@ -287,12 +286,24 @@ export default () => {
 
   }
 
+  const indicatorProps: IIndicatorProps[] = [];
+  if (window.location.hash.indexOf('VACCINATION') >= 0) {
+    indicatorProps.push(...DataRepository.VACCINATION_____INDICATOR_PROPS);
+  };
+  if (window.location.hash.indexOf('HOSPITALIZATION') >= 0) {
+    indicatorProps.push(...DataRepository.HOSPITALIZATION_INDICATOR_PROPS);
+  };
+  if (window.location.hash.indexOf('MISCALLANEOUS') >= 0) {
+    indicatorProps.push(...DataRepository.MISCALLANEOUS___INDICATOR_PROPS);
+  };
+  if (window.location.hash.indexOf('INCIDENCE') >= 0 || indicatorProps.length === 0) {
+    indicatorProps.push(...DataRepository.INCIDENCE_______INDICATOR_PROPS);
+  };
+
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
-    indicatorProps: [
-      ...DataRepository.DEFAULT_INDICATOR_PROPS
-    ],
+    indicatorProps,
     navigationBotProps: {
       instantProps: {
         source: '',
@@ -570,16 +581,16 @@ export default () => {
   }, [dimensions]);
 
 
-  const indicatorProps = userInterfaceProps.indicatorProps[0];
+  const firstIndicatorProps = userInterfaceProps.indicatorProps[0];
   const [appState, setAppState] = useState<IAppState>({
-    source: indicatorProps.source,
+    source: firstIndicatorProps.source,
     action: {
       stamp: ObjectUtil.createId(),
       updateScene: false,
       updateLight: false,
       updateDelay: 1000
     },
-    fold: indicatorProps.fold,
+    fold: firstIndicatorProps.fold,
     view: 'northwards'
   });
 
@@ -755,7 +766,7 @@ export default () => {
         };
 
         // const indexKeyset = dataSetting.getDataset().getIndexKeyset();
-        const indexSizeFiltered = indexKeysetInstance.getBreadcrumbKeys().length; // indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
+        const indexSizeFiltered = indexKeysetInstance.getKeys().length; // indexKeyset.getKeys().filter(k => indexKeyset.getValue(k) !== DataRepository.FAELLE).length;
         if (indexSizeFiltered > 1) {
 
           if (selected) {

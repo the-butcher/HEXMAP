@@ -52,7 +52,7 @@ export default (props: ILightProps) => {
 
     useEffect(() => {
 
-        console.debug('🔧 updating light component', props);
+        console.debug('⚙ updating light component', props);
 
         pointLightSlow.current!.visible = shadowEnabled;
         pointLightFast.current!.visible = !shadowEnabled;

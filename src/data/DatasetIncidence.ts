@@ -1,18 +1,15 @@
-import { TimeUtil } from "../util/TimeUtil";
-import { DataEntry } from "./DataEntry";
-import { DataRepository } from "./DataRepository";
-import { IDataEntry } from "./IDataEntry";
-import { IDataRoot } from "./IDataRoot";
-import { IDataset } from "./IDataset";
-import { IKeyset } from "./IKeyset";
-import { IKeysetIndex } from "./IKeysetIndex";
-import { KeysetGeneric } from "./KeysetGeneric";
-import { KeysetIndex } from "./KeysetIndex";
-import { Statistics } from "./Statistics";
 import regression from 'regression';
-import { IDataValue } from "./IDataValue";
 import { FormattingDefinition } from "../util/FormattingDefinition";
+import { TimeUtil } from "../util/TimeUtil";
+import { ADataset } from "./ADataset";
+import { DataEntry } from "./DataEntry";
+import { IDataIndex } from './IDataIndex';
+import { IDataRoot } from "./IDataRoot";
+import { IDataValue } from "./IDataValue";
+import { IKeysetIndex } from "./IKeysetIndex";
+import { KeysetIndex } from "./KeysetIndex";
 import { SeriesKey } from "./SeriesStyle";
+import { Statistics } from "./Statistics";
 
 /**
  * implementation of IDataSet
@@ -21,31 +18,20 @@ import { SeriesKey } from "./SeriesStyle";
  * @author h.fleischer
  * @since 16.01.2021
  */
-export class DatasetIncidence implements IDataset {
+export class DatasetIncidence extends ADataset {
 
-    // private readonly dataRoot: IDataRoot;
-    private readonly populations: { [K in string]: number[] };
-    private readonly keysetKeys: string[];
-    private readonly keysets: { [K in string]: IKeyset };
-    private readonly entryKeys: string[]; // the actual formatted dates
-    private readonly entries: { [K in string]: IDataEntry };
     private readonly indexKeyset: IKeysetIndex;
 
-    private readonly instantMin: number;
-    private readonly instantMax: number;
     private readonly minY: number;
     private readonly maxY: number;
 
     constructor(dataRoot: IDataRoot) {
 
-        this.populations = dataRoot.pops;
+        super(dataRoot);
 
-        this.keysetKeys = Object.keys(dataRoot.keys);
-        this.keysets = {};
-        this.keysetKeys.forEach(keysetKey => {
-            const defaultKey = Object.keys(dataRoot.keys[keysetKey]).sort()[0];
-            this.keysets[keysetKey] = new KeysetGeneric(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
-        });
+
+        this.minY = dataRoot.idxs[0].minY;
+        this.maxY = dataRoot.idxs[0].maxY;
 
         const hasFatal = (dataRoot.idxs.length === 2 && dataRoot.idxs[1].name === 'fatal');
         const indexKeys: SeriesKey[] = hasFatal ? [
@@ -70,14 +56,18 @@ export class DatasetIncidence implements IDataset {
             'xlo_cases',
             'xhi_cases'
         ];
+        const indexes: IDataIndex[] = indexKeys.map(k => {
+            return {
+                name: k,
+                isHiddenOption: false,
+                minY: this.minY,
+                maxY: this.maxY
+            }
+        });
 
-        this.indexKeyset = new KeysetIndex(0, indexKeys);
+        this.indexKeyset = new KeysetIndex(0, indexes);
 
         const dateKeys = Object.keys(dataRoot.data);
-        this.instantMin = TimeUtil.parseCategoryDateFull(dateKeys[7]);
-        this.instantMax = TimeUtil.parseCategoryDateFull(dateKeys[dateKeys.length - 1]);
-        this.entryKeys = [];
-        this.entries = {};
         const popsKeys = Object.keys(this.populations);
 
         const stats: { [K in string]: Statistics[] } = {};
@@ -119,18 +109,10 @@ export class DatasetIncidence implements IDataset {
                     value: incdnc01,
                     label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc01 * this.getPopulation(popsKey) / 700000)
                 });
-                // incidenceData[popsKey].push({ // trend
-                //     value: trend,
-                //     label: () => FormattingDefinition.FORMATTER_PERCENT.format(trend)
-                // });
-                // incidenceData[popsKey].push({ // gesamt
-                //     value: caseAll,
-                //     label: () => FormattingDefinition.FORMATTER_PERCENT.format(caseAll / 5000)
-                // });
 
                 if (hasFatal) {
 
-                    // attention multiplied
+                    // attention multiplied -> so for label it needs to be demultiplied
 
                     const fatal1 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 1]][popsKey][1]) * 700000 / this.getPopulation(popsKey);
                     const fatal7 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 7]][popsKey][1]) * 100000 / this.getPopulation(popsKey);
@@ -181,12 +163,14 @@ export class DatasetIncidence implements IDataset {
 
 
             });
-            this.entryKeys.push(dateKeys[i]);
-            this.entries[dateKeys[i]] = new DataEntry(instant, incidenceData);
+
+            this.addEntry(dateKeys[i], new DataEntry(instant, incidenceData));
+
         }
 
         for (let i = 7; i < dateKeys.length; i++) { // each date
 
+            const entry = this.getEntryByDate(dateKeys[i]);
             const instant = TimeUtil.parseCategoryDateFull(dateKeys[i]);
             const weekday = new Date(instant).getDay();
             popsKeys.forEach(popsKey => {
@@ -209,30 +193,30 @@ export class DatasetIncidence implements IDataset {
                     //     console.log(popsKey, weekday, stats[popsKey][weekday].getStandardDeviation());
                     // }
 
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: rgresY,
                         label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * this.getPopulation(popsKey) / 700000)
                     }); // regression
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: rgresY * ratioAL,
                         label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAL * this.getPopulation(popsKey) / 700000)
                     }); // lower expectation
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: rgresY * ratioAU,
                         label: () => FormattingDefinition.FORMATTER____FIXED.format((rgresY * ratioAL + rgresY * ratioAU) * this.getPopulation(popsKey) / 700000)
                     }); // upper expectation
 
                 } else {
 
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: 0,
                         label: () => ''
                     }); // regression
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: 0,
                         label: () => ''
                     }); // lower expectation                    
-                    this.entries[dateKeys[i]].addValue(popsKey, {
+                    entry.addValue(popsKey, {
                         value: 0,
                         label: () => ''
                     }); // upper expectation
@@ -256,15 +240,12 @@ export class DatasetIncidence implements IDataset {
                 // if (popsKey === '#') {
                 //     console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, weekday, ratioAv, Math.round(rgresY * ratioAv * this.populations[popsKey] / 700000));
                 // }
-
                 // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(rgresY * ratioAv)); // expectation 
 
             });
 
         }
 
-        this.minY = dataRoot.idxs[0].minY;
-        this.maxY = dataRoot.idxs[0].maxY;
 
     }
 
@@ -292,67 +273,8 @@ export class DatasetIncidence implements IDataset {
         return this.maxY;
     }
 
-    getEntryByDate(date: string): IDataEntry {
-        return this.entries[date];
-    }
-
-    getEntryByInstant(instant: number): IDataEntry {
-        return this.entries[TimeUtil.formatCategoryDateFull(instant)];
-    }
-
-    getEntryKeys(): string[] {
-        return this.entryKeys;
-    }
-
     getIndexKeyset(): IKeysetIndex {
         return this.indexKeyset;
-    }
-
-    getKeysetKeys(): string[] {
-        return this.keysetKeys;
-    }
-
-    getValidInstant(instant: number): number {
-
-        instant = Math.max(instant, this.instantMin);
-        instant = Math.min(instant, this.instantMax);
-
-        // that very date not contained
-        const categoryFullDate = TimeUtil.formatCategoryDateFull(instant);
-        if (this.entryKeys.indexOf(categoryFullDate) < 0) {
-
-            let curInstantDif: number;
-            let minInstantDif = Number.MAX_SAFE_INTEGER;
-            let entryInstant: number;
-            let minInstant: number;
-            for (let i = 0; i < this.entryKeys.length; i++) {
-                entryInstant = this.entries[this.entryKeys[i]].getInstant(); // parseInt(entryKey); // TimeUtil.parseCategoryDateFull(date);
-                curInstantDif = Math.abs(entryInstant - instant);
-                if (curInstantDif < minInstantDif) {
-                    minInstantDif = curInstantDif;
-                    minInstant = entryInstant;
-                } else {
-                    break;
-                }
-            }
-            instant = minInstant;
-
-        }
-
-        return instant;
-
-    }
-
-    getInstantMin(): number {
-        return this.instantMin;
-    }
-
-    getInstantMax(): number {
-        return this.instantMax;
-    }
-
-    getKeyset(key: string): IKeyset {
-        return this.keysets[key];
     }
 
 }

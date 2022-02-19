@@ -65,8 +65,12 @@ export class KeysetGeneric implements IKeyset {
 
     }
 
-    size(): number {
+    getKeyCount(): number {
         return this.keys.length;
+    }
+
+    getRawCount(): number {
+        return this.raws.length;
     }
 
     getDefaultKey(): string {

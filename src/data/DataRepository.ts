@@ -28,7 +28,7 @@ export class DataRepository {
   static readonly interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
   static readonly interpolatedInt7diX = new InterpolatedValue(1.75, 1.50, 0, 2000, 1.00);
 
-  static readonly DEFAULT_INDICATOR_PROPS: IIndicatorProps[] = [
+  static readonly INCIDENCE_______INDICATOR_PROPS: IIndicatorProps[] = [
     // {
     //   id: 'i_sbg',
     //   instant: -1,
@@ -204,7 +204,10 @@ export class DataRepository {
       },
       constructDataset: dataRoot => new DatasetIncidence(dataRoot),
       seriesVisibilities: {}
-    },
+    }
+  ];
+
+  static readonly VACCINATION_____INDICATOR_PROPS: IIndicatorProps[] = [
     {
       id: 'v_mnc',
       instant: -1,
@@ -226,7 +229,7 @@ export class DataRepository {
       onLogarithmicChange: () => { },
       doExport: false,
       logarithmic: false,
-      fold: 'closed',
+      fold: 'open-horizontal',
       source: './hexmap-data-03-vacc-gemeinde.json',
       loaded: false,
       path: '',
@@ -272,14 +275,68 @@ export class DataRepository {
       },
       constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
       seriesVisibilities: {}
-    },
+    }
+  ];
+
+  static readonly HOSPITALIZATION_INDICATOR_PROPS: IIndicatorProps[] = [
     {
       id: 'i_prv',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
       instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-      name: 'Bettenbelegung',
+      name: 'Intensivstation',
+      desc: 'Bundesland',
+      copy: 'https://www.data.gv.at/covid-19/',
+      formatter: FormattingDefinition.FORMATTER_PERCENT,
+      label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      // valueFormatter: FormattingDefinition.FORMATTER_PERCENT,
+      onExpand: () => { },
+      onInstantChange: () => { },
+      onInstantRangeChange: () => { },
+      onExport: () => { },
+      onSeriesVisibilityChange: () => { },
+      onLogarithmicChange: () => { },
+      doExport: false,
+      logarithmic: false,
+      fold: 'open-horizontal',
+      source: './hexmap-data-04-hospitalizazion-icu.json',
+      loaded: false,
+      path: '',
+      breadcrumbProps: [],
+      getRendererProps: (index: number, name: string) => {
+        return {
+          interpolatedEle: new InterpolatedValue(-5, 20, 0, 0.5, 1),
+          interpolatedHue: {
+            getOut: (val: number) => {
+              if (val < 0.1) {
+                return 0.33; // green
+              } else if (val < 0.25) {
+                return 0.17; // yellow
+              } else if (val < 0.33) {
+                return 0.08; // orange
+              } else {
+                return 0.00; // red
+              }
+            }
+          },
+          interpolatedSat: new FixedValue(1.00),
+          interpolatedVal: new FixedValue(0.40),
+          interpolatedInt: new FixedValue(1.25),
+        }
+
+      },
+      constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
+      seriesVisibilities: {}
+    },
+    {
+      id: 'h_prv',
+      instant: -1,
+      instantMin: -1,
+      instantMax: -1,
+      instantDif: TimeUtil.MILLISECONDS_PER____DAY,
+      name: 'Normalstation',
       desc: 'Bundesland',
       copy: 'https://www.data.gv.at/covid-19/',
       formatter: FormattingDefinition.FORMATTER_PERCENT,
@@ -295,52 +352,37 @@ export class DataRepository {
       doExport: false,
       logarithmic: false,
       fold: 'closed',
-      source: './hexmap-data-05-icu-province.json',
+      source: './hexmap-data-05-hospitalizazion-reg.json',
       loaded: false,
       path: '',
       breadcrumbProps: [],
       getRendererProps: (index: number, name: string) => {
-        if (index === 0) { // icu
-          return {
-            interpolatedEle: new InterpolatedValue(-5, 20, 0, 0.5, 1),
-            interpolatedHue: {
-              getOut: (val: number) => {
-                if (val < 0.1) {
-                  return 0.33; // green
-                } else if (val < 0.33) {
-                  return 0.17; // yellow
-                } else {
-                  return 0.00; // red
-                }
+        return {
+          interpolatedEle: new InterpolatedValue(-5, 20, 0, 0.5, 1),
+          interpolatedHue: {
+            getOut: (val: number) => {
+              if (val < 0.04) {
+                return 0.33; // green
+              } else if (val < 0.08) {
+                return 0.17; // yellow
+              } else if (val < 0.11) {
+                return 0.08; // orange
+              } else {
+                return 0.00; // red
               }
-            },
-            interpolatedSat: new FixedValue(1.00),
-            interpolatedVal: new FixedValue(0.40),
-            interpolatedInt: new FixedValue(1.25),
-          }
-        } else { // regular
-          return {
-            interpolatedEle: new InterpolatedValue(-4, 20, 0, 0.24, 1),
-            interpolatedHue: {
-              getOut: (val: number) => {
-                if (val < 0.04) {
-                  return 0.33; // green
-                } else if (val < 0.10) {
-                  return 0.17; // yellow
-                } else {
-                  return 0.00; // red
-                }
-              }
-            },
-            interpolatedSat: new FixedValue(1.00),
-            interpolatedVal: new FixedValue(0.40),
-            interpolatedInt: new FixedValue(1.25),
-          }
+            }
+          },
+          interpolatedSat: new FixedValue(1.00),
+          interpolatedVal: new FixedValue(0.40),
+          interpolatedInt: new FixedValue(1.25),
         }
       },
       constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
       seriesVisibilities: {}
-    },
+    }
+  ];
+
+  static readonly MISCALLANEOUS___INDICATOR_PROPS: IIndicatorProps[] = [
     // {
     //   id: 'v_dst',
     //   instant: -1,
@@ -380,6 +422,13 @@ export class DataRepository {
     // }
   ];
 
+  static readonly ALL_INDICATOR_PROPS: IIndicatorProps[] = [
+    ...this.INCIDENCE_______INDICATOR_PROPS,
+    ...this.VACCINATION_____INDICATOR_PROPS,
+    ...this.HOSPITALIZATION_INDICATOR_PROPS,
+    ...this.MISCALLANEOUS___INDICATOR_PROPS,
+  ];
+
   static getInstance(): DataRepository {
     if (!this.instance) {
       this.instance = new DataRepository();
@@ -409,7 +458,7 @@ export class DataRepository {
     /**
      * how many series are going to be needed
      */
-    const valueCount = dataSetting.getDataset().getIndexKeyset().size();
+    const valueCount = dataSetting.getDataset().getIndexKeyset().getRawCount();
 
     const entries: IChartEntry[] = [];
     const dates = dataSetting.getDataset().getEntryKeys(); // Object.keys(data.data);
@@ -475,7 +524,7 @@ export class DataRepository {
   async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
     if (!this.dataSettings[source]) {
       const dataRoot: IDataRoot = await new JsonLoader().load(source);
-      const indicatorProps = DataRepository.DEFAULT_INDICATOR_PROPS.find(p => p.source === source);
+      const indicatorProps = DataRepository.ALL_INDICATOR_PROPS.find(p => p.source === source);
       const dataset = indicatorProps.constructDataset(dataRoot);
       this.dataSettings[source] = new DataSetting(dataset);
     }

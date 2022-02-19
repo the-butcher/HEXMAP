@@ -11,7 +11,7 @@ export interface IKeyset {
     /**
      * get the size (the keycount) of this keyset
      */
-    size(): number;
+    getKeyCount(): number;
 
     /**
      * return the default key for this keyset
@@ -47,5 +47,10 @@ export interface IKeyset {
      * get the raw keys of this keyset, root and, if any, subsets
      */
     getRaws(): string[];
+
+    /**
+     * get the size (the keycount) of this keyset
+     */
+    getRawCount(): number;
 
 }

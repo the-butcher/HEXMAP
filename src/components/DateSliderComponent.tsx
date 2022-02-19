@@ -63,7 +63,7 @@ export default (props: IInstantProps) => {
 
     useEffect(() => {
 
-        console.debug('✨ updating date slider component (instant)', props);
+        console.debug('⚙ updating date slider component (instant)', props);
         handleInstantDecr.current = () => {
             onInstantChange(instant - props.instantDif);
         }

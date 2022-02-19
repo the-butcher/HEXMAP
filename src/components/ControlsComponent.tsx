@@ -148,7 +148,7 @@ export default (props: IControlsProps) => {
 
     useEffect(() => {
 
-        console.debug('🔧 updating controls component (onViewChange)');
+        console.debug('⚙ updating controls component (onViewChange)');
 
         handleViewChange.current = (view: ViewOrientation) => {
             onViewChange(view);

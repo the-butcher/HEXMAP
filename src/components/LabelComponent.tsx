@@ -33,7 +33,7 @@ export default (props: ILabelProps) => {
 
   useEffect(() => {
 
-    console.debug('🔧 updating label component', props);
+    console.debug('⚙ updating label component', props);
 
     if (font && font instanceof three.Font) {
 
