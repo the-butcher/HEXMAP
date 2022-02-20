@@ -18,6 +18,11 @@ export interface IUserInterfaceProps {
     onDataPicked: (source: string) => void;
 
     /**
+     * callback to be triggered when a thematic (incidence | vaccination | hospitalization) is requested
+     */
+    onThemaChange: (thema: string) => void;
+
+    /**
      * properties for the indicator area
      */
     indicatorProps: IIndicatorProps[];

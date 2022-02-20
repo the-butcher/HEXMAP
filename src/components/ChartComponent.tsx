@@ -293,14 +293,14 @@ export default (props: IChartProps) => {
 
     const _series: am5xy.LineSeries[] = [];
 
-    console.log('rawCount', rawCount);
+    // console.log('rawCount', rawCount);
     for (let rawIndex = 0; rawIndex < rawCount; rawIndex++) {
 
       // const value = dataSetting.getDataset().getIndexKeyset().getKeys()[rawIndex];
 
 
       const hasTooltip = !doExport && dataSetting.getDataset().getIndexKeyset().hasKey(rawIndex);
-      console.log(rawIndex, ' >>> ', hasTooltip)
+      // console.log(rawIndex, ' >>> ', hasTooltip)
       // const tooltip: am5.Tooltip = hasTooltip ? am5.Tooltip.new(_root, {}) : null;
 
       let seriesClass = am5xy.LineSeries;
@@ -431,7 +431,7 @@ export default (props: IChartProps) => {
       if (_instantMinC !== instantMinC) {
         instantMinC = _instantMinC;
         requestAnimationFrame(() => {
-          console.log('start', TimeUtil.formatCategoryDateFull(instantMinC));
+          // console.log('start', TimeUtil.formatCategoryDateFull(instantMinC));
           handleStartEndChanged(_chartState);
         });
       }
@@ -443,7 +443,7 @@ export default (props: IChartProps) => {
       if (_instantMaxC !== instantMaxC) {
         instantMaxC = _instantMaxC;
         requestAnimationFrame(() => {
-          console.log('end', TimeUtil.formatCategoryDateFull(instantMaxC));
+          // console.log('end', TimeUtil.formatCategoryDateFull(instantMaxC));
           handleStartEndChanged(_chartState);
         });
       }

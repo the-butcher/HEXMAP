@@ -12,7 +12,6 @@ import { IChartEntry } from "./IChartEntry";
 import { IDataRoot } from "./IDataRoot";
 import { IDataSetting } from "./IDataSetting";
 
-
 /**
  * utility type for managing data that needs to be loaded or has already been loaded
  * 
@@ -28,7 +27,7 @@ export class DataRepository {
   static readonly interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
   static readonly interpolatedInt7diX = new InterpolatedValue(1.75, 1.50, 0, 2000, 1.00);
 
-  static readonly INCIDENCE_______INDICATOR_PROPS: IIndicatorProps[] = [
+  static readonly INDICATOR_PROPS: IIndicatorProps[] = [
     // {
     //   id: 'i_sbg',
     //   instant: -1,
@@ -66,7 +65,9 @@ export class DataRepository {
     //   seriesVisibilities: {}
     // },
     {
+
       id: 'i_ems',
+      thema: 'INCIDENCE',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -114,6 +115,7 @@ export class DataRepository {
     },
     {
       id: 'i_paa',
+      thema: 'INCIDENCE',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -151,6 +153,7 @@ export class DataRepository {
     },
     {
       id: 'i_dst',
+      thema: 'INCIDENCE',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -204,12 +207,10 @@ export class DataRepository {
       },
       constructDataset: dataRoot => new DatasetIncidence(dataRoot),
       seriesVisibilities: {}
-    }
-  ];
-
-  static readonly VACCINATION_____INDICATOR_PROPS: IIndicatorProps[] = [
+    },
     {
       id: 'v_mnc',
+      thema: 'VACCINATION',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -275,12 +276,10 @@ export class DataRepository {
       },
       constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
       seriesVisibilities: {}
-    }
-  ];
-
-  static readonly HOSPITALIZATION_INDICATOR_PROPS: IIndicatorProps[] = [
+    },
     {
       id: 'i_prv',
+      thema: 'HOSPITALIZATION',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -332,6 +331,7 @@ export class DataRepository {
     },
     {
       id: 'h_prv',
+      thema: 'HOSPITALIZATION',
       instant: -1,
       instantMin: -1,
       instantMax: -1,
@@ -422,12 +422,12 @@ export class DataRepository {
     // }
   ];
 
-  static readonly ALL_INDICATOR_PROPS: IIndicatorProps[] = [
-    ...this.INCIDENCE_______INDICATOR_PROPS,
-    ...this.VACCINATION_____INDICATOR_PROPS,
-    ...this.HOSPITALIZATION_INDICATOR_PROPS,
-    ...this.MISCALLANEOUS___INDICATOR_PROPS,
-  ];
+  // static readonly ALL_INDICATOR_PROPS: IIndicatorProps[] = [
+  //   ...this.INCIDENCE_______INDICATOR_PROPS,
+  //   ...this.VACCINATION_____INDICATOR_PROPS,
+  //   ...this.HOSPITALIZATION_INDICATOR_PROPS,
+  //   ...this.MISCALLANEOUS___INDICATOR_PROPS,
+  // ];
 
   static getInstance(): DataRepository {
     if (!this.instance) {
@@ -458,7 +458,7 @@ export class DataRepository {
     /**
      * how many series are going to be needed
      */
-    const valueCount = dataSetting.getDataset().getIndexKeyset().getRawCount();
+    const rawCount = dataSetting.getDataset().getIndexKeyset().getRawCount();
 
     const entries: IChartEntry[] = [];
     const dates = dataSetting.getDataset().getEntryKeys(); // Object.keys(data.data);
@@ -484,16 +484,16 @@ export class DataRepository {
           instant: dataEntry.getInstant(),
         };
 
-        for (let valueIndex = 0; valueIndex < valueCount; valueIndex++) {
+        for (let rawIndex = 0; rawIndex < rawCount; rawIndex++) {
 
-          if (chartEntry[valueIndex] !== 0) {
+          if (chartEntry[rawIndex] !== 0) {
 
-            const indexName = dataSetting.getDataset().getIndexKeyset().getValue(valueIndex.toString());
+            const indexName = dataSetting.getDataset().getIndexKeyset().getValue(rawIndex.toString());
 
-            let valueY = dataEntry.getValue(dataPointer, valueIndex);
-            if (dataSetting.getDataset().acceptsZero() || valueY.value > 0) {
-              chartEntry[`value_${valueIndex}`] = valueY.value;
-              chartEntry[`label_${valueIndex}`] = valueY.label();
+            let valueY = dataEntry.getValue(dataPointer, rawIndex);
+            if (dataSetting.getDataset().acceptsZero(rawIndex) || valueY.value > 0) {
+              chartEntry[`value_${rawIndex}`] = valueY.value;
+              chartEntry[`label_${rawIndex}`] = valueY.label();
             }
             maxY = Math.max(maxY, valueY.value);
 
@@ -508,7 +508,7 @@ export class DataRepository {
 
     return {
       entries,
-      valueCount,
+      valueCount: rawCount,
       minX,
       maxX,
       minY: dataSetting.getDataset().getMinY(),
@@ -521,10 +521,11 @@ export class DataRepository {
     return this.dataSettings[source];
   }
 
+
   async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
     if (!this.dataSettings[source]) {
       const dataRoot: IDataRoot = await new JsonLoader().load(source);
-      const indicatorProps = DataRepository.ALL_INDICATOR_PROPS.find(p => p.source === source);
+      const indicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.source === source);
       const dataset = indicatorProps.constructDataset(dataRoot);
       this.dataSettings[source] = new DataSetting(dataset);
     }

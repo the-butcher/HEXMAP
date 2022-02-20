@@ -12,6 +12,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: "Courier Prime Sans";
   src: url("Courier Prime Sans Bold.ttf") format("truetype");
@@ -26,4 +27,15 @@ body {
   color: #c1c1aa;
 }
 
+.contextIcon {
+  color: #c1c1aa;
+  filter: drop-shadow(2px 2px 2px black);
+  padding: 8px;
+  opacity: 0.5;
+  transition: all 250ms ease-in-out;
+  font-size: 1.5em;
+}
 
+.contextIcon:hover {
+  opacity: 1;
+}

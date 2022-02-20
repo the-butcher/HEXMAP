@@ -25,15 +25,17 @@ export class DatasetIncidence extends ADataset {
     private readonly minY: number;
     private readonly maxY: number;
 
+    private readonly indexZeroIsAcceptable: number;
+
     constructor(dataRoot: IDataRoot) {
 
         super(dataRoot);
-
 
         this.minY = dataRoot.idxs[0].minY;
         this.maxY = dataRoot.idxs[0].maxY;
 
         const hasFatal = (dataRoot.idxs.length === 2 && dataRoot.idxs[1].name === 'fatal');
+        this.indexZeroIsAcceptable = hasFatal ? 4 : 2;
         const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
@@ -86,6 +88,19 @@ export class DatasetIncidence extends ADataset {
         const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 3 - TimeUtil.MILLISECONDS_PER____DAY * 4;
         const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 4;
 
+        let lastValidEntry = {};
+        for (let instant = this.instantMin + TimeUtil.MILLISECONDS_PER___WEEK; instant <= this.instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dateKey = TimeUtil.formatCategoryDateFull(instant);
+            if (dataRoot.data[dateKey]) {
+                lastValidEntry = dataRoot.data[dateKey];
+            } else {
+                // console.log('missingKey', dateKey);
+                dateKeys.push(dateKey);
+                dataRoot.data[dateKey] = { ...lastValidEntry };
+            }
+        }
+        dateKeys.sort((a, b) => TimeUtil.parseCategoryDateFull(a) - TimeUtil.parseCategoryDateFull(b));
+
         for (let i = 7; i < dateKeys.length; i++) { // each date
 
             const instant = TimeUtil.parseCategoryDateFull(dateKeys[i]);
@@ -94,11 +109,8 @@ export class DatasetIncidence extends ADataset {
             const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
-                // const caseAll = dataRoot.data[dateKeys[i]][popsKey][0] * 5000 / this.getPopulation(popsKey)
                 const incdnc01 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
                 const incdnc07 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
-                // const incdnc14 = (dataRoot.data[dateKeys[i - 7]][popsKey][0] - dataRoot.data[dateKeys[i - 14]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
-                // const trend = (incdnc07 - incdnc14) / incdnc14;
 
                 incidenceData[popsKey] = [];
                 incidenceData[popsKey].push({ // incidence
@@ -249,8 +261,8 @@ export class DatasetIncidence extends ADataset {
 
     }
 
-    acceptsZero(): boolean {
-        return false;
+    acceptsZero(rawIndex: number): boolean {
+        return rawIndex < this.indexZeroIsAcceptable;
     }
 
     toRegressionY(cases: number): number {

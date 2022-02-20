@@ -48,6 +48,10 @@ export class DatasetHospitalization extends ADataset {
 
     }
 
+    acceptsZero(rawIndex: number): boolean {
+        return true;
+    }
+
     getMinY(): number {
         return this.minY;
     }

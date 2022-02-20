@@ -9,9 +9,11 @@ export interface IAppState {
      */
     source: string;
 
+    thema: string;
+
     action: IAppAction;
 
-    fold: IndicatorPropsFold;
+    // fold: IndicatorPropsFold;
 
     view: ViewOrientation;
 

@@ -52,6 +52,10 @@ export class DatasetGeneric extends ADataset {
 
     }
 
+    acceptsZero(rawIndex: number): boolean {
+        return false;
+    }
+
     getMinY(): number {
         return this.minY;
     }

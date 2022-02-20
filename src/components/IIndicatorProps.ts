@@ -13,6 +13,8 @@ export type IndicatorPropsFold = 'closed' | 'open-horizontal' | 'open-vertical';
  */
 export interface IIndicatorProps extends IChartProps {
 
+    thema: string;
+
     /**
      * current value
      */

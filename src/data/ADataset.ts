@@ -55,9 +55,7 @@ export abstract class ADataset implements IDataset {
         this.entries[entryKey] = entry;
     }
 
-    acceptsZero(): boolean {
-        return false;
-    }
+    abstract acceptsZero(rawIndex: number): boolean;
 
     getPopulation(key: string): number {
         return this.populations[key][0];

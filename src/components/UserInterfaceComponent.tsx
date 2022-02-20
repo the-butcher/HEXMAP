@@ -1,5 +1,5 @@
-import { AddAPhoto, Crop54, Delete, Download, ExpandMore, GifBox, KeyboardArrowLeft, KeyboardArrowRight, PhotoLibrary } from "@mui/icons-material";
-import { Badge, Button, ButtonGroup, createTheme, IconButton, ListItem, Paper, Select, ThemeProvider } from "@mui/material";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, ButtonGroup, createTheme, Paper, ThemeProvider } from "@mui/material";
 import "./../styles.css";
 import DatePickerComponent from "./DatePickerComponent";
 import DateSliderComponent from "./DateSliderComponent";
@@ -10,7 +10,7 @@ import { IUserInterfaceProps } from "./IUserInterfaceProps";
 
 export default (props: IUserInterfaceProps) => {
 
-  const { indicatorProps, navigationBotProps, exportSceneProps } = props;
+  const { indicatorProps, navigationBotProps, exportSceneProps, onThemaChange: onThematicChange } = props;
 
   const backgroundColor = 'rgba(77, 77, 68, 0.85)';
   const fontFamily = '"Courier Prime Sans", Consolas, Courier-New, monospace';
@@ -273,6 +273,10 @@ export default (props: IUserInterfaceProps) => {
     indicatorProps[index].onExpand(indicatorProps[index].id);
   }
 
+  const handleThematicChange = (thema: string) => {
+    onThematicChange(thema);
+  }
+
   const buttons: JSX.Element[] = [];
   let activeIndicatorSource: string;
   for (let i = 0; i < indicatorProps.length; i++) {
@@ -300,8 +304,17 @@ export default (props: IUserInterfaceProps) => {
         <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
           {indicatorProps.map(props => <IndicatorComponent key={`indicator_${props.id}`} {...props} style={{ minWidth: `${props.fold === 'open-horizontal' || props.fold === 'open-vertical' ? openedWidth : closedWidth}px`, display: (activeIndicatorSource === props.source || !mobileView) ? 'block' : 'none' }} />)}
         </div>
+        <div style={{ paddingLeft: '12px', display: 'flex', flexDirection: 'row' }}>
+          <div style={{ paddingLeft: '12px', display: 'flex', flexDirection: 'column' }}>
+            <FontAwesomeIcon icon="chart-line" className="contextIcon" onClick={e => handleThematicChange('INCIDENCE')} />
+            <FontAwesomeIcon icon="syringe" className='contextIcon' onClick={e => handleThematicChange('VACCINATION')} />
+            <FontAwesomeIcon icon="bed-pulse" className='contextIcon' onClick={e => handleThematicChange('HOSPITALIZATION')} />
+          </div>
+        </div>
+
       </div>
       <div style={{ width: 'calc(100%-24px)', display: 'flex', pointerEvents: 'none', flexDirection: 'row', position: 'absolute', top: 'auto', bottom: '12px', left: '12px', right: '12px', height: '120px', padding: '0px', margin: '0px' }}>
+
         <ExportSceneComponent {...exportSceneProps} />
         <div style={{ minWidth: '6px ' }}></div>
         <Paper elevation={4} style={{ overflow: 'unset', pointerEvents: 'visible', flexGrow: 100, display: 'flex', flexDirection: 'row', position: 'relative', height: '40px', top: '80px' }} >

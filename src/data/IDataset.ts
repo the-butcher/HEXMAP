@@ -4,7 +4,7 @@ import { IKeysetIndex } from "./IKeysetIndex";
 
 export interface IDataset {
 
-    acceptsZero(): boolean;
+    acceptsZero(rawIndex: number): boolean;
 
     getEntryByInstant(instant: number): IDataEntry;
 

@@ -21,6 +21,12 @@ import { FormattingDefinition } from './util/FormattingDefinition';
 import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
 
+import { library } from '@fortawesome/fontawesome-svg-core' //allows later to just use icon name to render-them
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { faCheckSquare, faCoffee } from '@fortawesome/free-solid-svg-icons'
+
+library.add(fas, faCheckSquare, faCoffee)
+
 export default () => {
 
   const fracTo = useRef<number>(-1);
@@ -92,7 +98,7 @@ export default () => {
     console.debug('📞 handling logarithmic change', logarithmic);
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    const userInterfaceProp = DataRepository.INDICATOR_PROPS.find(p => p.source === appState.source);
     userInterfaceProp.logarithmic = logarithmic;
 
     setAppState({
@@ -112,7 +118,7 @@ export default () => {
     console.debug('📞 handling series visibility change', name, visibility);
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    const userInterfaceProp = DataRepository.INDICATOR_PROPS.find(p => p.source === appState.source);
     userInterfaceProp.seriesVisibilities[name] = visibility;
 
     // setAppState({
@@ -131,8 +137,8 @@ export default () => {
 
     console.debug('📞 handling instant range change', TimeUtil.formatCategoryDateFull(instantMin), TimeUtil.formatCategoryDateFull(instantMax), appState.source);
 
-    const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
-    const userInterfaceProp = userInterfaceProps.indicatorProps.find(p => p.source === appState.source);
+    // const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
+    const userInterfaceProp = DataRepository.INDICATOR_PROPS.find(p => p.source === appState.source);
     if (instantMin) {
       // dataSetting.setInstantMin(instantMin);
       userInterfaceProp.instantMin = instantMin;
@@ -171,34 +177,50 @@ export default () => {
 
   }
 
-  const handleDataLoaded = (source: string) => {
+  const loadThema = (thema: string) => {
 
-    console.debug('📞 handling data loaded', source);
-    userInterfaceProps.indicatorProps.find(p => p.source === source).loaded = true;
+    const indicatorProps = DataRepository.INDICATOR_PROPS.filter(p => p.thema === thema);
+    let delay = 1;
+    indicatorProps.filter(p => !p.loaded).forEach(props => {
+      setTimeout(() => {
+        DataRepository.getInstance().getOrLoadDataSetting(props.source).then(dataSetting => {
 
-    setAppState({
-      ...appState,
-      action: {
-        stamp: ObjectUtil.createId(),
-        updateScene: false,
-        updateLight: false,
-        updateDelay: 250
-      }
+          console.debug('📞 handling props loaded', props.source);
+          props.loaded = true;
+
+          setAppState({
+            ...appState,
+            action: {
+              stamp: ObjectUtil.createId(),
+              updateScene: true,
+              updateLight: true,
+              updateDelay: 250
+            },
+            thema: props.thema
+          });
+
+
+        });
+      }, delay);
+      delay += 2000;
     });
 
   }
 
+
+
   const handleIndicatorExpand = async (id: string) => {
 
-    const indicatorProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
+    const indicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.id === id);
     const isSourceChange = indicatorProps.source !== appState.source;
 
     console.debug('📞 handling indicator fold', id, appState.source, ' >> ', indicatorProps.source);
 
-    let fold: IndicatorPropsFold = appState.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
+    let fold: IndicatorPropsFold = indicatorProps.fold === 'open-horizontal' ? 'open-vertical' : 'open-horizontal'
     if (isSourceChange) {
 
       fold = 'open-horizontal';
+
 
       // get previous settings
       const prevSettings = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
@@ -210,24 +232,27 @@ export default () => {
 
     }
 
+    // close anyting in the same theme, then reopen specific
+    DataRepository.INDICATOR_PROPS.filter(p => p.thema === indicatorProps.thema).forEach(p => p.fold = 'closed');
+    indicatorProps.fold = fold;
+
     setAppState({
       ...appState,
       source: indicatorProps.source,
-      // instant: DataRepository.getInstance().clampInstant(source1, appState.instant),
       action: {
         stamp: ObjectUtil.createId(),
         updateScene: isSourceChange,
         updateLight: isSourceChange,
         updateDelay: 350
       },
-      fold
+      // fold
     });
 
   }
 
   const handlePathChange = async (source: string, name: string, path: string) => {
 
-    console.debug('📞 handling path change', source, name, path, appState.fold);
+    console.debug('📞 handling path change', source, name, path);
 
     const dataSetting = await DataRepository.getInstance().getOrLoadDataSetting(appState.source);
     const validatedPath = dataSetting.validatePath(name, path);
@@ -246,7 +271,7 @@ export default () => {
       });
 
     } else {
-      console.debug('💣 skipping path change', source, name, path, appState.fold);
+      console.debug('💣 skipping path change', source, name, path);
     }
 
 
@@ -258,7 +283,7 @@ export default () => {
 
     console.debug('📞 handling indicator export', id);
 
-    const exportableChartProps = userInterfaceProps.indicatorProps.find(p => p.id === id);
+    const exportableChartProps = DataRepository.INDICATOR_PROPS.find(p => p.id === id);
     setExportableChart({
       ...exportableChartProps,
       id: ObjectUtil.createId(),
@@ -266,6 +291,36 @@ export default () => {
     });
 
   }
+
+  const handleThemaChange = (thema: string) => {
+
+    console.debug('📞 handling thematic change', thema);
+
+    const isThemaChange = thema !== appState.thema;
+    if (isThemaChange) {
+
+      const indicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.thema === thema && p.fold !== 'closed');
+
+      loadThema(thema);
+      location.hash = thema;
+
+      setAppState({
+        ...appState,
+        source: indicatorProps.source,
+        action: {
+          stamp: ObjectUtil.createId(),
+          updateScene: true,
+          updateLight: true,
+          updateDelay: 250
+        },
+        thema
+      });
+
+    }
+
+  }
+
+
 
   const handleIndxChange = async (source: string, name: string, indexRaw: string) => {
 
@@ -286,23 +341,22 @@ export default () => {
 
   }
 
-  const indicatorProps: IIndicatorProps[] = [];
-  if (window.location.hash.indexOf('VACCINATION') >= 0) {
-    indicatorProps.push(...DataRepository.VACCINATION_____INDICATOR_PROPS);
-  };
-  if (window.location.hash.indexOf('HOSPITALIZATION') >= 0) {
-    indicatorProps.push(...DataRepository.HOSPITALIZATION_INDICATOR_PROPS);
-  };
-  if (window.location.hash.indexOf('MISCALLANEOUS') >= 0) {
-    indicatorProps.push(...DataRepository.MISCALLANEOUS___INDICATOR_PROPS);
-  };
-  if (window.location.hash.indexOf('INCIDENCE') >= 0 || indicatorProps.length === 0) {
-    indicatorProps.push(...DataRepository.INCIDENCE_______INDICATOR_PROPS);
-  };
+  const getThema = (themaRaw: string) => {
+
+    if (themaRaw === 'VACCINATION' || themaRaw === 'HOSPITALIZATION' || themaRaw === 'MISCALLANEOUS') {
+      return themaRaw;
+    };
+    return 'INCIDENCE';
+
+  }
+
+  const thema = getThema(window.location.hash.substring(1));
+  const indicatorProps = DataRepository.INDICATOR_PROPS.filter(p => p.thema === thema);
 
   const instant = TimeUtil.parseCategoryDateFull(TimeUtil.formatCategoryDateFull(Date.now()));
   const [userInterfaceProps, setUserInterfaceProps] = useState<IUserInterfaceProps>({
     onDataPicked: handleIndicatorExpand,
+    onThemaChange: handleThemaChange,
     indicatorProps,
     navigationBotProps: {
       instantProps: {
@@ -584,22 +638,38 @@ export default () => {
   const firstIndicatorProps = userInterfaceProps.indicatorProps[0];
   const [appState, setAppState] = useState<IAppState>({
     source: firstIndicatorProps.source,
+    thema,
     action: {
       stamp: ObjectUtil.createId(),
       updateScene: false,
       updateLight: false,
       updateDelay: 1000
     },
-    fold: firstIndicatorProps.fold,
     view: 'northwards'
   });
 
 
   useEffect(() => {
 
-    console.debug('🔄 updating app');
+    console.debug('🔄 updating app', appState.source, appState.thema);
 
-    // const refEle = 0;
+    // change source if this is the first indicator props instance of a fresh thema
+    let source = appState.source;
+    const appIndicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.source === source);
+    if (appIndicatorProps.thema !== appState.thema) {
+      const themeIndicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.thema === thema && p.fold !== 'closed');
+      appState.source = themeIndicatorProps.source;
+    }
+
+
+
+    // // const refEle = 0;
+    // const isThemaChange = userInterfaceProps.indicatorProps[0].thema !== appState.thema;
+    // if (isThemaChange) {
+
+    //   thema
+
+    // }
 
     /**
      * update instant props with current source
@@ -644,8 +714,8 @@ export default () => {
       }
     });
 
-    for (let i = 0; i < userInterfaceProps.indicatorProps.length; i++) {
-      const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
+    for (let i = 0; i < DataRepository.INDICATOR_PROPS.length; i++) {
+      const indicatorPropsInstance = DataRepository.INDICATOR_PROPS[i];
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
       const selected = indicatorPropsInstance.source === appState.source;
       if (dataSetting && selected) {
@@ -656,9 +726,9 @@ export default () => {
     }
     let mapKeys: string[] = [];
 
-    for (let i = 0; i < userInterfaceProps.indicatorProps.length; i++) {
+    for (let i = 0; i < DataRepository.INDICATOR_PROPS.length; i++) {
 
-      const indicatorPropsInstance = userInterfaceProps.indicatorProps[i];
+      const indicatorPropsInstance = DataRepository.INDICATOR_PROPS[i];
       const dataSetting = DataRepository.getInstance().getDataSetting(indicatorPropsInstance.source);
       if (dataSetting) {
 
@@ -846,13 +916,13 @@ export default () => {
 
         if (selected) {
 
-          userInterfaceProps.indicatorProps[i] = {
+          DataRepository.INDICATOR_PROPS[i] = {
             ...indicatorPropsInstance,
             label00: value00.label(),
             label07,
             breadcrumbProps: breadcrumbProps,
             path: valueKey,
-            fold: appState.fold,
+            // fold: appState.fold,
             instant: clampedInstant00,
             // instantMin: dataSetting.getInstantMin(),
             // instantMax: dataSetting.getInstantMax(),
@@ -870,11 +940,11 @@ export default () => {
 
         } else {
 
-          userInterfaceProps.indicatorProps[i] = {
+          DataRepository.INDICATOR_PROPS[i] = {
             ...indicatorPropsInstance,
             label00: value00.label(),
             label07,
-            fold: 'closed',
+            // fold: 'closed',
             instant: clampedInstant00,
             // instantMin: dataSetting.getInstantMin(),
             // instantMax: dataSetting.getInstantMax(),
@@ -1023,17 +1093,25 @@ export default () => {
 
     };
 
+    const _indicatorProps = DataRepository.INDICATOR_PROPS.filter(p => p.thema === appState.thema).map(props => {
+      return {
+        ...props
+      }
+    });
+
+    console.debug('🔄 updating userInterfaceProps');
     /**
      * actual update of user interface props
      */
     setUserInterfaceProps({
       ...userInterfaceProps,
-      // userInterfaceProps.indicatorProps,
+      indicatorProps: _indicatorProps,
       navigationBotProps: {
         ...userInterfaceProps.navigationBotProps,
         instantProps: _instantProps
       },
       onDataPicked: handleIndicatorExpand,
+      onThemaChange: handleThemaChange,
     });
 
     /**
@@ -1104,20 +1182,9 @@ export default () => {
   }, [appState]);
 
   useEffect(() => {
-
     console.debug('✨ building app component');
     window.addEventListener('resize', handleResize);
-
-    let delay = 1;
-    userInterfaceProps.indicatorProps.forEach(props => {
-      setTimeout(() => {
-        DataRepository.getInstance().getOrLoadDataSetting(props.source).then(dataSetting => {
-          handleDataLoaded(props.source)
-        });
-      }, delay);
-      delay += 2000;
-    });
-
+    loadThema(appState.thema);
   }, []);
 
 
