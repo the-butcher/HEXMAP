@@ -6,17 +6,18 @@
 Example of GIF animation generated with built-in GIF exporter.
 #
 # Issues in Hexmap
+- a thema change will have to alter global min/max instant
 - outlines only show partially (maybe an issue connected to key sorting)
 - move base config to file (maybe multiple files)
 
 # later
 - add median population as indicator
-- add hospitalization as indicator
 - add cumulative numbers for cases and deaths (?)
 - tabular view
 - export options for chart, map, data (csv export)
 
 # solved
+- ~~add hospitalization as indicator~~
 - ~~click on undefined data causes error (salzburg only)~~
 - ~~show a plus symbol on the percentage change~~
 - ~~apply copyright as of indicator~~

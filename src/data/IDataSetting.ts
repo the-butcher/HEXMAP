@@ -36,6 +36,12 @@ export interface IDataSetting {
      */
     setPath(key: string, value: string): void;
 
+    /**
+     * try to find a match for this path regarding the available data
+     * i.e. a path of '50212' (municipality) may be altered to '502##' (district) as best match
+     * @param key 
+     * @param value 
+     */
     validatePath(key: string, value: string): string;
 
     /**

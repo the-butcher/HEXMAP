@@ -41,7 +41,7 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
   return (
     <div style={{ ...props.style, transition: 'all 500ms ease-in-out', userSelect: 'none' }}>
       <Card elevation={4}>
-        <CardContent style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'all 500ms ease-in-out' }} >
+        <CardContent style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'all 500ms ease-in-out', pointerEvents: 'visible' }} >
           <div style={{ display: 'flex', justifyContent: 'right', flexDirection: 'row', minHeight: '21px' }}>
             <div style={{ fontSize: '14px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden', paddingTop: '1px', paddingRight: '12px' }}>{ObjectUtil.buildIndicatorTitle(props)}</div>
             <div style={{ flexGrow: '1' }}></div>
