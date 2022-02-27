@@ -5,10 +5,11 @@
 
 Example of GIF animation generated with built-in GIF exporter.
 #
-# Issues in Hexmap
+# issues
+- changing thema away from an open indicator causes an error when returning to that indicator
+- find a way to release memory (maybe upon changing the thema)
 - a thema change will have to alter global min/max instant
 - outlines only show partially (maybe an issue connected to key sorting)
-- move base config to file (maybe multiple files)
 
 # later
 - add median population as indicator
@@ -16,7 +17,9 @@ Example of GIF animation generated with built-in GIF exporter.
 - tabular view
 - export options for chart, map, data (csv export)
 
-# solved
+# solved / done
+- ~~chart pre-zoom is not honored by export~~
+- ~~NO: move base config to file (maybe multiple files)~~
 - ~~add hospitalization as indicator~~
 - ~~click on undefined data causes error (salzburg only)~~
 - ~~show a plus symbol on the percentage change~~

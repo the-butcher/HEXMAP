@@ -183,6 +183,8 @@ export default (props: IChartProps) => {
       year: 'dd.MM.yyyy'
     }
 
+    // console.log('i, e', instantMin, doExport);
+
     const xRendererVal = am5xy.AxisRendererX.new(_root, {
       // pan: 'zoom',
     });
@@ -209,8 +211,9 @@ export default (props: IChartProps) => {
       dateFormats,
       periodChangeDateFormats: dateFormats,
       exportable: true,
-      min: instantMin > 0 ? instantMin : undefined,
+      min: (instantMin > 0 && doExport) ? instantMin : undefined,
       max: instantMax > 0 ? instantMax : undefined,
+      extraMax: 0.005 //TimeUtil.MILLISECONDS_PER____DAY
       // start: TimeUtil.parseCategoryDateFull('01.01.2022'),
     }));
     const _xAxisLabel = am5.Label.new(_root, {
@@ -422,6 +425,7 @@ export default (props: IChartProps) => {
       //     s.show();
       //   }
       // });
+      // console.log('startend', instantMinC, instantMaxC);
       handleInstantRangeChange.current(instantMinC, instantMaxC);
 
     };
@@ -491,7 +495,7 @@ export default (props: IChartProps) => {
 
       });
 
-    } else {
+    } else if (instantMin >= 0) {
 
       let zoomToStartTo = -1;
       const frameendedDisposer = _root.events.on('frameended', () => {
@@ -499,7 +503,7 @@ export default (props: IChartProps) => {
         window.clearTimeout(zoomToStartTo);
         zoomToStartTo = window.setTimeout(() => {
 
-          const position = _xAxisVal.valueToPosition(TimeUtil.trimInstant(TimeUtil.parseCategoryDateFull('01.11.2021')));
+          const position = _xAxisVal.valueToPosition(TimeUtil.trimInstant(instantMin));
           _xAxisVal.set('start', position);
           _chart.zoomOutButton.show();
 
@@ -539,6 +543,7 @@ export default (props: IChartProps) => {
 
   const updateLogarithmic = (chartState: IChartState) => {
 
+    console.log('max-y', chartState.yAxisVal.get('max'));
     if (logarithmic) {
       chartState.yAxisVal.setAll({
         logarithmic: true,

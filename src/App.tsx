@@ -187,6 +187,10 @@ export default () => {
 
           console.debug('📞 handling props loaded', props.source);
           props.loaded = true;
+          props.instantMin = TimeUtil.parseCategoryDateFull('01.12.2021');
+          props.instantMax = dataSetting.getDataset().getInstantMax();
+
+          console.log(TimeUtil.formatCategoryDateFull(props.instantMin), TimeUtil.formatCategoryDateFull(props.instantMax));
 
           setAppState({
             ...appState,
@@ -299,7 +303,11 @@ export default () => {
     const isThemaChange = thema !== appState.thema;
     if (isThemaChange) {
 
+      // within the the target thema find the first that ist not closed
       const indicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.thema === thema && p.fold !== 'closed');
+
+      // close any indicators that may be vertically open in other themes
+      DataRepository.INDICATOR_PROPS.filter(p => p.fold !== 'closed').forEach(p => p.fold = 'open-horizontal');
 
       loadThema(thema);
       location.hash = thema;
@@ -657,8 +665,13 @@ export default () => {
     let source = appState.source;
     const appIndicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.source === source);
     if (appIndicatorProps.thema !== appState.thema) {
+
+      // find first props within target thema that is open
       const themeIndicatorProps = DataRepository.INDICATOR_PROPS.find(p => p.thema === thema && p.fold !== 'closed');
+      // be sure there is no open-vertical state (which would cause an error in indicator- or chart component)
+      // themeIndicatorProps.fold = 'open-horizontal';
       appState.source = themeIndicatorProps.source;
+
     }
 
 
@@ -1099,7 +1112,7 @@ export default () => {
       }
     });
 
-    console.debug('🔄 updating userInterfaceProps');
+    // console.debug('🔄 updating userInterfaceProps');
     /**
      * actual update of user interface props
      */

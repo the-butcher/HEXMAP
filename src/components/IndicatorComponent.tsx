@@ -22,7 +22,7 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
     expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
   }
 
-  const handleExpand = () => {
+  const handleExpand = (e: React.PointerEvent) => {
     onExpand(id);
   }
 
@@ -35,6 +35,9 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
   }
 
   const chartBounds = document.getElementById(`chartdiv_${id}`)?.getBoundingClientRect();
+  if (!chartBounds && openVertical) {
+    Math.random();
+  }
   const indicatorMinHeight = '90px';
   const verticalHeight = openVertical ? `${Math.min(window.innerHeight - chartBounds.top - 62, 500)}px` : indicatorMinHeight
 

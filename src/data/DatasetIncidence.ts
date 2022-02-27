@@ -39,7 +39,7 @@ export class DatasetIncidence extends ADataset {
         const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
-            // 'dlt_incdc',
+            'dlt_incdc',
             // 'Gesamt',
             'Sterblichkeit',
             'Todesfälle',
@@ -51,7 +51,7 @@ export class DatasetIncidence extends ADataset {
         ] : [
             'Inzidenz',
             'Fälle',
-            // 'dlt_incdc',
+            'dlt_incdc',
             // 'Gesamt',
             'avg_cases',
             'reg_cases',
@@ -122,6 +122,27 @@ export class DatasetIncidence extends ADataset {
                     label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc01 * this.getPopulation(popsKey) / 700000)
                 });
 
+                if (i >= 14) {
+
+                    const incdnc14 = (dataRoot.data[dateKeys[i - 7]][popsKey][0] - dataRoot.data[dateKeys[i - 14]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
+                    const deltaIncidence = 1 - (incdnc14 / incdnc07);
+
+                    // console.log('deltaIncidence', deltaIncidence);
+
+                    incidenceData[popsKey].push({
+                        value: deltaIncidence,
+                        label: () => FormattingDefinition.FORMATTER_PERCENT.format(deltaIncidence)
+                    }); // average
+
+                } else {
+
+                    incidenceData[popsKey].push({
+                        value: 0,
+                        label: () => ''
+                    }); // average
+
+                }
+
                 if (hasFatal) {
 
                     // attention multiplied -> so for label it needs to be demultiplied
@@ -138,6 +159,9 @@ export class DatasetIncidence extends ADataset {
                     });
 
                 }
+
+
+
 
                 if (instant > statsInstantMin && instant <= statsInstantMax) {
 
@@ -171,6 +195,8 @@ export class DatasetIncidence extends ADataset {
                         label: () => ''
                     }); // average
                 }
+
+
 
 
 
