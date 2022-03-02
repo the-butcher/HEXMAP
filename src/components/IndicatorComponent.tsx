@@ -1,12 +1,10 @@
-import { Download, DownloadForOffline, DownloadForOfflineOutlined, ExpandMore } from '@mui/icons-material';
-import { Breadcrumbs, Card, CardActions, CardContent, IconButton, useTheme, FormLabel, FormControl, FormGroup, FormControlLabel, Switch } from '@mui/material';
-import { calcPosFromAngles } from '@react-three/drei';
-import { invalidate } from '@react-three/fiber';
-import { useRef } from 'react';
+import { Download, ExpandMore } from '@mui/icons-material';
+import { Breadcrumbs, Card, CardContent, FormControl, FormControlLabel, IconButton, Switch, useTheme } from '@mui/material';
 import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import BreadcrumbComponent from './BreadcrumbComponent';
 import ChartComponent from './ChartComponent';
+import EnhancedTable from './EnhancedTable';
 import { IIndicatorProps } from './IIndicatorProps';
 
 export default (props: IIndicatorProps & React.CSSProperties) => {
@@ -89,10 +87,14 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '999' }}>
               {
+                loaded ? <EnhancedTable {...props} /> : null
+              }
+
+              {/* {
                 loaded ? <div style={{ overflow: 'hidden', height: openVertical ? verticalHeight : indicatorMinHeight, transition: 'all 500ms ease-in-out', minWidth: '0px', flexGrow: '99' }}>
                   <ChartComponent {...props} style={{ width: 'inherit', height: 'inherit', overflow: 'hidden', display: openHorizontal ? 'block' : 'block' }} />
                 </div> : null
-              }
+              } */}
             </div>
 
           </div>

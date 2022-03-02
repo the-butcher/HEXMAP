@@ -33,7 +33,7 @@ export default (props: IChartProps) => {
   // }
 
   const [chartState, setChartState] = useState<IChartState>();
-  const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin1: number, instantMax1: number) => {
+  const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin: number, instantMax: number) => {
     // no op initially 
   });
   const handleSeriesVisibilityChange = useRef<(name: string, visibility: boolean) => void>((name: string, visibility: boolean) => {

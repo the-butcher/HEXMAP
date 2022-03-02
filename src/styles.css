@@ -39,3 +39,7 @@ body {
 .contextIcon:hover {
   opacity: 1;
 }
+
+input {
+  color: #c1c1aa;
+}

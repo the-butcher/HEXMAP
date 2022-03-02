@@ -470,7 +470,6 @@ export class DataRepository {
     for (let i = 0; i < keysetKeys.length; i++) {
       dataPointer += dataSetting.getPath(keysetKeys[i]);
     }
-    // const population = dataSetting.getDataset().getPopulation(dataPointer);
 
     /**
      * how many series are going to be needed
@@ -498,7 +497,7 @@ export class DataRepository {
         maxX = Math.max(maxX, valueX);
 
         const chartEntry: IChartEntry = {
-          instant: dataEntry.getInstant(),
+          instant: dataEntry.getInstant()
         };
 
         for (let rawIndex = 0; rawIndex < rawCount; rawIndex++) {
@@ -537,7 +536,6 @@ export class DataRepository {
   getDataSetting(source: string): IDataSetting {
     return this.dataSettings[source];
   }
-
 
   async getOrLoadDataSetting(source: string): Promise<IDataSetting> {
     if (!this.dataSettings[source]) {

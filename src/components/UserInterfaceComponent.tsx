@@ -21,6 +21,17 @@ export default (props: IUserInterfaceProps) => {
         styleOverrides: {
           root: {
             // backgroundColor: 'red'
+            // MuiButtonBase-root-MuiIconButton-root.Mui-disabled
+          }
+        }
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            '&.Mui-disabled': {
+              color: 'inherit',
+              opacity: '0.5'
+            }
           }
         }
       },
@@ -35,6 +46,50 @@ export default (props: IUserInterfaceProps) => {
               backgroundColor: 'rgba(77, 77, 68, 1)'
             }
           }
+        }
+      },
+      MuiTablePagination: {
+        styleOverrides: {
+          // actions: {
+          //   color: 'rgba(193, 193, 170, 0.33)',
+          // },
+          select: {
+            color: 'var(--color-text)',
+          },
+          selectLabel: {
+            color: 'var(--color-text)',
+          },
+          displayedRows: {
+            color: 'var(--color-text)',
+          }
+        }
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            fontFamily,
+            color: 'var(--color-text)',
+            borderBottom: '1px solid rgba(193, 193, 170, 0.33)',
+            // fontSize: '10px',
+          }
+        }
+      },
+      MuiTableSortLabel: {
+        styleOverrides: {
+          root: {
+            fontFamily,
+            color: 'var(--color-text)',
+            '&.Mui-active': {
+              color: 'var(--color-text)',
+            },
+            '&.Mui-active .MuiTableSortLabel-icon': {
+              color: 'var(--color-text)',
+            },
+            '&:hover': {
+              color: 'var(--color-text)',
+            }
+          },
+
         }
       },
       MuiButtonGroup: {
@@ -74,6 +129,10 @@ export default (props: IUserInterfaceProps) => {
       },
       MuiSvgIcon: {
         styleOverrides: {
+          // root: {
+          //   color: 'rgba(193, 193, 170, 0.33)',
+          // },
+
           // @ts-ignore
           fontSizeMedium: {
             width: '20px',
@@ -156,11 +215,19 @@ export default (props: IUserInterfaceProps) => {
             fontFamily,
             height: '48px',
             minHeight: '48px',
+            color: 'var(--color-text)',
             '@media (min-width: 600px)': {
               minHeight: "48px"
             }
           },
         },
+      },
+      MuiSelect: {
+        styleOverrides: {
+          icon: {
+            color: 'var(--color-text)',
+          }
+        }
       },
       MuiInput: {
         styleOverrides: {

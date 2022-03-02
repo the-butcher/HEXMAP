@@ -8,12 +8,14 @@ export interface IChartEntry {
 
     instant: number;
 
-    value_0?: number;
-    value_1?: number;
-    value_2?: number;
+    [K: string]: number | string;
 
-    label_0?: number;
-    label_1?: number;
-    label_2?: number;
+    // value_0?: number;
+    // value_1?: number;
+    // value_2?: number;
+
+    // label_0?: string;
+    // label_1?: string;
+    // label_2?: string;
 
 }
