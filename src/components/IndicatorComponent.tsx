@@ -86,15 +86,15 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
               }
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '999' }}>
-              {
-                loaded ? <EnhancedTable {...props} /> : null
-              }
-
               {/* {
+                loaded ? <EnhancedTable {...props} /> : null
+              } */}
+
+              {
                 loaded ? <div style={{ overflow: 'hidden', height: openVertical ? verticalHeight : indicatorMinHeight, transition: 'all 500ms ease-in-out', minWidth: '0px', flexGrow: '99' }}>
                   <ChartComponent {...props} style={{ width: 'inherit', height: 'inherit', overflow: 'hidden', display: openHorizontal ? 'block' : 'block' }} />
                 </div> : null
-              } */}
+              }
             </div>
 
           </div>

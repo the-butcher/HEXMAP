@@ -43,25 +43,25 @@ export class DatasetIncidence extends ADataset {
             // 'Gesamt',
             'Sterblichkeit',
             'Todesfälle',
-            'avg_cases',
+            'xmd_intrv',
             'reg_cases',
-            'xlo_cases',
-            'xhi_cases'
+            'xlo_stpln',
+            'xhi_stpln'
 
         ] : [
             'Inzidenz',
             'Fälle',
             'dlt_incdc',
             // 'Gesamt',
-            'avg_cases',
+            'xmd_intrv',
             'reg_cases',
-            'xlo_cases',
-            'xhi_cases'
+            'xlo_stpln',
+            'xhi_stpln'
         ];
         const indexes: IDataIndex[] = indexKeys.map(k => {
             return {
                 name: k,
-                isHiddenOption: false,
+                isHiddenOption: k.indexOf('_') >= 0,
                 minY: this.minY,
                 maxY: this.maxY
             }
@@ -109,17 +109,20 @@ export class DatasetIncidence extends ADataset {
             const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
-                const incdnc01 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]) * 700000 / this.getPopulation(popsKey);
+                const cases_01 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 1]][popsKey][0]);
+                const incdnc01 = cases_01 * 700000 / this.getPopulation(popsKey);
                 const incdnc07 = (dataRoot.data[dateKeys[i]][popsKey][0] - dataRoot.data[dateKeys[i - 7]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
 
                 incidenceData[popsKey] = [];
                 incidenceData[popsKey].push({ // incidence
+                    noscl: incdnc07,
                     value: incdnc07,
                     label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc07)
                 });
                 incidenceData[popsKey].push({ // cases
+                    noscl: cases_01,
                     value: incdnc01,
-                    label: () => FormattingDefinition.FORMATTER____FIXED.format(incdnc01 * this.getPopulation(popsKey) / 700000)
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(cases_01)
                 });
 
                 if (i >= 14) {
@@ -130,6 +133,7 @@ export class DatasetIncidence extends ADataset {
                     // console.log('deltaIncidence', deltaIncidence);
 
                     incidenceData[popsKey].push({
+                        noscl: deltaIncidence,
                         value: deltaIncidence,
                         label: () => FormattingDefinition.FORMATTER_PERCENT.format(deltaIncidence)
                     }); // average
@@ -137,6 +141,7 @@ export class DatasetIncidence extends ADataset {
                 } else {
 
                     incidenceData[popsKey].push({
+                        noscl: 0,
                         value: 0,
                         label: () => ''
                     }); // average
@@ -146,16 +151,19 @@ export class DatasetIncidence extends ADataset {
                 if (hasFatal) {
 
                     // attention multiplied -> so for label it needs to be demultiplied
-
-                    const fatal1 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 1]][popsKey][1]) * 700000 / this.getPopulation(popsKey);
+                    const death1 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 1]][popsKey][1]);
+                    const fatal1 = death1 * 700000 / this.getPopulation(popsKey);
                     const fatal7 = (dataRoot.data[dateKeys[i]][popsKey][1] - dataRoot.data[dateKeys[i - 7]][popsKey][1]) * 100000 / this.getPopulation(popsKey);
+
                     incidenceData[popsKey].push({ // mortality
+                        noscl: fatal7,
                         value: fatal7,
                         label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(fatal7)
                     });
                     incidenceData[popsKey].push({ // fatal
+                        noscl: death1,
                         value: fatal1,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(fatal1 * this.getPopulation(popsKey) / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(death1)
                     });
 
                 }
@@ -171,6 +179,7 @@ export class DatasetIncidence extends ADataset {
                     const incdncA = (cases25 * 25000 + cases34 * 50000 + cases43 * 25000) / this.getPopulation(popsKey);
 
                     incidenceData[popsKey].push({
+                        noscl: incdncA,
                         value: incdncA,
                         label: () => FormattingDefinition.FORMATTER____FIXED.format(incdncA * this.getPopulation(popsKey) / 700000)
                     }); // average
@@ -191,6 +200,7 @@ export class DatasetIncidence extends ADataset {
 
                 } else {
                     incidenceData[popsKey].push({
+                        noscl: 0,
                         value: 0,
                         label: () => ''
                     }); // average
@@ -221,40 +231,42 @@ export class DatasetIncidence extends ADataset {
                     }
 
                     const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
-                    // const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
                     const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 2) + rgres[popsKey].equation[1] * rgresX + rgres[popsKey].equation[2]) * 1000;
-                    // const rgresY = (rgres[popsKey].equation[0] * Math.pow(Math.E, rgres[popsKey].equation[1] * rgresX)) * 1000;
 
                     const ratioAL = stats[popsKey][weekday].getAverage() - stats[popsKey][weekday].getStandardDeviation();
                     const ratioAU = stats[popsKey][weekday].getStandardDeviation() * 2;
-                    // if (popsKey === '#') {
-                    //     console.log(popsKey, weekday, stats[popsKey][weekday].getStandardDeviation());
-                    // }
 
+                    const noscl = rgresY * this.getPopulation(popsKey) / 700000;
                     entry.addValue(popsKey, {
+                        noscl,
                         value: rgresY,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * this.getPopulation(popsKey) / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(noscl)
                     }); // regression
                     entry.addValue(popsKey, {
+                        noscl: noscl * ratioAL,
                         value: rgresY * ratioAL,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format(rgresY * ratioAL * this.getPopulation(popsKey) / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format(noscl * ratioAL)
                     }); // lower expectation
                     entry.addValue(popsKey, {
+                        noscl: noscl * ratioAU,
                         value: rgresY * ratioAU,
-                        label: () => FormattingDefinition.FORMATTER____FIXED.format((rgresY * ratioAL + rgresY * ratioAU) * this.getPopulation(popsKey) / 700000)
+                        label: () => FormattingDefinition.FORMATTER____FIXED.format((noscl * (ratioAL + ratioAU)))
                     }); // upper expectation
 
                 } else {
 
                     entry.addValue(popsKey, {
+                        noscl: 0,
                         value: 0,
                         label: () => ''
                     }); // regression
                     entry.addValue(popsKey, {
+                        noscl: 0,
                         value: 0,
                         label: () => ''
                     }); // lower expectation                    
                     entry.addValue(popsKey, {
+                        noscl: 0,
                         value: 0,
                         label: () => ''
                     }); // upper expectation

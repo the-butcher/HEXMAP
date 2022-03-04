@@ -54,12 +54,15 @@ export default (props: IUserInterfaceProps) => {
           //   color: 'rgba(193, 193, 170, 0.33)',
           // },
           select: {
+            fontFamily,
             color: 'var(--color-text)',
           },
           selectLabel: {
+            fontFamily,
             color: 'var(--color-text)',
           },
           displayedRows: {
+            fontFamily,
             color: 'var(--color-text)',
           }
         }
@@ -70,6 +73,7 @@ export default (props: IUserInterfaceProps) => {
             fontFamily,
             color: 'var(--color-text)',
             borderBottom: '1px solid rgba(193, 193, 170, 0.33)',
+            padding: '3px 8px'
             // fontSize: '10px',
           }
         }
@@ -355,7 +359,7 @@ export default (props: IUserInterfaceProps) => {
     buttons.push(<Button key={`expandmobile_${indicatorProps[i].id}`} style={{ flexGrow: '1', marginLeft: marginL, marginRight: marginR }} onClick={() => handleExpand(i)}>{indicatorProps[i].desc}</Button>);
   }
 
-  const availableIndicatorWidth = window.innerWidth - 60;
+  const availableIndicatorWidth = window.innerWidth - 68;
   const closedWidth = mobileView ? 0 : 190;
   const openedWidth = availableIndicatorWidth - (indicatorProps.length - 1) * closedWidth;
 
@@ -368,7 +372,7 @@ export default (props: IUserInterfaceProps) => {
           {buttons}
         </ButtonGroup> : <div style={{ paddingBottom: '7px' }}></div>}
       <div style={{ width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', pointerEvents: 'none' }}>
-        <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 9px' }}>
+        <div style={{ width: 'calc(100%-18px)', zIndex: 100, display: 'flex', flexDirection: 'row', flex: 1, padding: '2px 9px 9px 13px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', pointerEvents: 'visible' }}>
             <FontAwesomeIcon icon="chart-line" className="contextIcon" onClick={e => handleThematicChange('INCIDENCE')} />
             <FontAwesomeIcon icon="syringe" className='contextIcon' onClick={e => handleThematicChange('VACCINATION')} />

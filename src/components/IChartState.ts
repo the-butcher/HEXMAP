@@ -26,6 +26,8 @@ export class IChartState {
      */
     series: am5xy.LineSeries[];
 
+    // legendSeries: 
+
     /**
      * the renderers of the respective axes
      */

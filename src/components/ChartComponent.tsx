@@ -26,11 +26,7 @@ export default (props: IChartProps) => {
   let { id, source, path, fold, name, instant, instantMin, instantMax, doExport, logarithmic, onInstantRangeChange, onSeriesVisibilityChange } = props;
 
   const openHorizontal = fold === 'open-horizontal' || fold === 'open-vertical';
-  // const openVertical = fold === 'open-vertical';
-  // let expandTransform = 'rotate(-90deg)'
-  // if (openHorizontal) {
-  //   expandTransform = openVertical ? 'rotate(180deg)' : 'rotate(0deg)';
-  // }
+
 
   const [chartState, setChartState] = useState<IChartState>();
   const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin: number, instantMax: number) => {
@@ -387,6 +383,8 @@ export default (props: IChartProps) => {
         tooltip.label.adapters.add('fill', (value, target) => {
           return labelColor;
         });
+      } else {
+        // TODO hide series from legend
       }
 
     }
@@ -525,7 +523,6 @@ export default (props: IChartProps) => {
     chartState.series.forEach(s => {
       (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
       s.data.setAll(chartData.entries);
-      // s.appear();
       // s.appear();
     });
     chartState.legend.data.setAll(chartState.series);

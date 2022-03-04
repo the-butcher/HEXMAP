@@ -62,7 +62,7 @@ export class DatasetMortality implements IDataset {
         this.entries = {};
         const popsKeys = Object.keys(this.populations);
 
-        for (let i = 1; i < dateKeys.length - 1; i++) { // each date
+        for (let i = 1; i < dateKeys.length - 1; i++) { // each date 
 
             const instant = TimeUtil.parseCategoryDateFull(dateKeys[i]);
             // const weekday = new Date(instant).getDay();
@@ -87,10 +87,12 @@ export class DatasetMortality implements IDataset {
                 //     label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdnc7)
                 // });
                 incidenceData[popsKey].push({
+                    noscl: incdncA,
                     value: incdncA,
                     label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdncA)
                 });
                 incidenceData[popsKey].push({
+                    noscl: incdncC,
                     value: incdncC,
                     label: () => FormattingDefinition.FORMATTER__FLOAT_2.format(incdncC)
                 });

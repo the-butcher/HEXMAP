@@ -40,6 +40,7 @@ export class DatasetGeneric extends ADataset {
             entryKeys.forEach(entryKey => {
                 dataValues[entryKey] = dataRoot.data[dateKey][entryKey].map(d => {
                     return {
+                        noscl: d,
                         value: d,
                         label: () => valueFormatter.format(d)
                     }
