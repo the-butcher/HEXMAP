@@ -2,17 +2,38 @@ import { ISeriesStyle } from "./ISeriesStyle";
 
 
 export type SeriesKey = 'Inzidenz' | 'Fälle' | 'Sterblichkeit' | 'Todesfälle' | 'Normalstation' | 'Intensivstation' |
-    'xlo_stpln' | 'xhi_stpln' | 'xlo____ln' | 'xhi____ln' | 'xmd_intrv' | 'reg_cases' |
+    'Prognose' | 'xlo_stpln' | 'xhi_stpln' | 'xlo____ln' | 'xhi____ln' | 'reg_cases' |
     'dlt_incdc' |
-    'hsp__high' | 'hsp__med2' | 'hsp__med1' | 'hsp___low';
+    'Grenzen' | 'hsp__med1' | 'hsp__med2' | 'hsp__high';
 
-export type Subset<T extends U, U> = U;
+export interface SeriesKeyGroup {
+    key: SeriesKey,
+    group: SeriesKey[]
+}
+
 
 export class SeriesStyle {
 
-    // static readonly SERIES_GROUPING: { [K in SeriesKey]: SeriesKey[] } = {
-
-    // }
+    static readonly SERIES_GROUPING: SeriesKeyGroup[] = [
+        {
+            key: 'Grenzen',
+            group: [
+                'hsp__med1',
+                'hsp__med2',
+                'hsp__high'
+            ]
+        },
+        {
+            key: 'Prognose',
+            group: [
+                'reg_cases',
+                'xlo_stpln',
+                'xhi_stpln',
+                'xhi____ln',
+                'xlo____ln'
+            ]
+        }
+    ]
 
     static readonly SERIES_STYLE______RANGE: ISeriesStyle = {
         type: 'line',
@@ -132,13 +153,13 @@ export class SeriesStyle {
         'xhi_stpln': { ... this.SERIES_STYLE__CASERANGE, stacked: true, fillOpacity: 0.3 },
         'xlo____ln': this.SERIES_STYLE______RANGE,
         'xhi____ln': { ... this.SERIES_STYLE______RANGE, stacked: true, fillOpacity: 0.2 },
-        'xmd_intrv': this.SERIES_STYLE____AVERAGE,
+        'Prognose': this.SERIES_STYLE____AVERAGE,
         'reg_cases': this.SERIES_STYLE_REGRESSION,
         'dlt_incdc': this.SERIES_STYLE____AVERAGE,
-        'hsp__high': this.SERIES_STYLE________RED,
-        'hsp__med2': this.SERIES_STYLE_____ORANGE,
+        'Grenzen': this.SERIES_STYLE______GREEN,
         'hsp__med1': this.SERIES_STYLE_____YELLOW,
-        'hsp___low': this.SERIES_STYLE______GREEN,
+        'hsp__med2': this.SERIES_STYLE_____ORANGE,
+        'hsp__high': this.SERIES_STYLE________RED,
 
     }
 

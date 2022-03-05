@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material';
 import { is } from 'date-fns/locale';
 import React, { useEffect, useRef, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
+import { SeriesKey, SeriesStyle } from '../data/SeriesStyle';
 import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import { IChartProps } from './IChartProps';
@@ -333,7 +334,6 @@ export default (props: IChartProps) => {
         visible: visibility,
       }));
 
-
       seriesVal.fills.template.setAll({
         fillOpacity: seriesStyle.fillOpacity,
         visible: seriesStyle.fillOpacity > 0,
@@ -525,7 +525,20 @@ export default (props: IChartProps) => {
       s.data.setAll(chartData.entries);
       // s.appear();
     });
-    chartState.legend.data.setAll(chartState.series);
+
+    const hiddenSeries: string[] = [];
+    const seriesGroup = SeriesStyle.SERIES_GROUPING.find(g => g.key === name);
+    SeriesStyle.SERIES_GROUPING.forEach(seriesGroup => {
+      seriesGroup.group.forEach(key => {
+        const attachedSeries = chartState.series.find(s => s.get('name') === key);
+        if (attachedSeries) {
+          hiddenSeries.push(key);
+        };
+      });
+    });
+    console.log('hidden', hiddenSeries);
+
+    chartState.legend.data.setAll(chartState.series.filter(s => hiddenSeries.indexOf(s.get('name')) === -1));
     chartState.chart?.show();
 
   };
@@ -595,6 +608,19 @@ export default (props: IChartProps) => {
     };
 
     handleSeriesVisibilityChange.current = (name: string, visibility: boolean) => {
+
+      // console.log('vis change', name, visibility);
+      const seriesGroup = SeriesStyle.SERIES_GROUPING.find(g => g.key === name);
+      if (seriesGroup) {
+        seriesGroup.group.forEach(key => {
+          const attachedSeries = chartState.series.find(s => s.get('name') === key);
+          if (attachedSeries) {
+            attachedSeries.set('visible', visibility);
+            // console.log('should also toggle', key);
+          };
+        });
+      }
+
       onSeriesVisibilityChange(name, visibility);
     }
 
