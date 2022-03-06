@@ -24,7 +24,7 @@ export abstract class ADataset implements IDataset {
     private readonly entries: { [K in string]: IDataEntry };
 
     protected readonly instantMin: number;
-    protected readonly instantMax: number;
+    protected instantMax: number;
 
     constructor(dataRoot: IDataRoot) {
 

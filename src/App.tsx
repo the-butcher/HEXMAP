@@ -881,7 +881,10 @@ export default () => {
           _labelProps[3].label = TimeUtil.formatCategoryDateFull(clampedInstant00);
 
           const entry00 = dataSetting.getDataset().getEntryByInstant(dataSetting.getInstant()); // dataSetting.data[dataSetting.date]; // TimeUtil.formatCategoryDateFull(clampedInstant00)
-
+          if (!entry00) {
+            console.log('failed to get entry', TimeUtil.formatCategoryDateFull(instant), dataSetting.getDataset(), appState.source);
+            Math.random();
+          }
           /**
            * find min and max values referring to the map display date
            */

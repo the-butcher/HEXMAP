@@ -6,7 +6,6 @@
 Example of GIF animation generated with built-in GIF exporter.
 #
 # issues
-- changing thema away from an open indicator causes an error when returning to that indicator
 - find a way to release memory (maybe upon changing the thema)
 - a thema change will have to alter global min/max instant
 - outlines only show partially (maybe an issue connected to key sorting)
@@ -18,6 +17,7 @@ Example of GIF animation generated with built-in GIF exporter.
 - export options for chart, map, data (csv export)
 
 # solved / done
+- ~~changing thema away from an open indicator causes an error when returning to that indicator~~
 - ~~chart pre-zoom is not honored by export~~
 - ~~NO: move base config to file (maybe multiple files)~~
 - ~~add hospitalization as indicator~~

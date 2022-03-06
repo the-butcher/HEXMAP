@@ -11,8 +11,8 @@ import { visuallyHidden } from '@mui/utils';
 import React, { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
 import { DataRepository } from '../data/DataRepository';
 import { ObjectUtil } from '../util/ObjectUtil';
+import { TimeUtil } from '../util/TimeUtil';
 import { IChartProps } from './IChartProps';
-
 
 function descendingComparator(rowA: ITableRow, rowB: ITableRow, sortk: string) {
     if (sortk) {
@@ -30,7 +30,7 @@ function descendingComparator(rowA: ITableRow, rowB: ITableRow, sortk: string) {
 
 type Order = 'asc' | 'desc';
 
-function getComparator(order: Order, sortk: string): (rowA: ITableRow, rowB: ITableRow) => number {
+function createComparator(order: Order, sortk: string): (rowA: ITableRow, rowB: ITableRow) => number {
     return order === 'desc' ? (rowA, rowB) => descendingComparator(rowA, rowB, sortk) : (rowA, rowB) => -descendingComparator(rowA, rowB, sortk);
 }
 
@@ -38,6 +38,7 @@ interface IHeadCell {
     id: string;
     label: string;
     numeric: boolean;
+    width: string
 }
 
 interface ITableRow {
@@ -50,7 +51,7 @@ interface IBodyCell {
     label: string,
     sortk: string,
     sortv: string | number,
-    numeric: boolean
+    numeric: boolean,
 }
 
 interface ITableHeadProps {
@@ -69,7 +70,7 @@ export default (props: IChartProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    let { source, breadcrumbProps } = props;
+    let { source, breadcrumbProps, instant } = props;
 
     useEffect(() => {
 
@@ -77,8 +78,17 @@ export default (props: IChartProps) => {
 
         const dataSetting = DataRepository.getInstance().getDataSetting(source);
         const keyCount = dataSetting.getDataset().getKeysetKeys().length;
+        const rawCount = dataSetting.getDataset().getIndexKeyset().getRawCount();
 
-        const _headCells: IHeadCell[] = [];
+        const keyCellWeight = 1.3;
+        const colWeightRatio = 100 / (keyCount * keyCellWeight + rawCount + 1);
+
+        const _headCells: IHeadCell[] = [{
+            id: 'date',
+            label: 'Datum',
+            numeric: false,
+            width: `${colWeightRatio}%`
+        }];
         let dataKeys: string[][] = [[]];
         for (let keyIndex = 0; keyIndex < keyCount; keyIndex++) {
 
@@ -97,13 +107,13 @@ export default (props: IChartProps) => {
             _headCells.push({
                 id: keyLabel,
                 label: keyLabel,
-                numeric: false
+                numeric: false,
+                width: `${colWeightRatio * keyCellWeight}%`
             });
 
         }
         // console.log('dataKeys', dataKeys);
 
-        const rawCount = dataSetting.getDataset().getIndexKeyset().getRawCount();
         for (let rawIndex = 0; rawIndex < rawCount; rawIndex++) {
             const indexLabel = dataSetting.getDataset().getIndexKeyset().getValue(rawIndex);
             const isKey = dataSetting.getDataset().getIndexKeyset().hasKey(rawIndex);
@@ -111,12 +121,15 @@ export default (props: IChartProps) => {
                 _headCells.push({
                     id: indexLabel,
                     label: indexLabel,
-                    numeric: true
+                    numeric: true,
+                    width: `${colWeightRatio}%`
                 });
             }
         }
 
-        const dataEntry = dataSetting.getDataset().getEntryByDate('01.03.2022');
+        const validatedInstant = dataSetting.getDataset().getValidInstant(instant);
+        const date = TimeUtil.formatCategoryDateFull(validatedInstant);
+        const dataEntry = dataSetting.getDataset().getEntryByDate(date);
         // console.log('dataEntry', dataEntry);
 
         // const fieldValues: string[] = [];
@@ -125,9 +138,16 @@ export default (props: IChartProps) => {
 
             const rowKey = k.join('');
 
+            const rowDate = TimeUtil.formatCategoryDateFull(dataEntry.getInstant());
             const _tableRow: ITableRow = {
                 id: rowKey,
-                cells: []
+                cells: [{
+                    id: ObjectUtil.createId(),
+                    sortk: 'date',
+                    sortv: rowDate,
+                    label: rowDate,
+                    numeric: false
+                }]
             }
 
             // console.log(k.join());
@@ -170,8 +190,7 @@ export default (props: IChartProps) => {
 
             // const dataKey = dataEntry.getValue(k.join());
         })
-        console.log('_tableRows', _tableRows);
-
+        // console.log('_tableRows', _tableRows);
 
         setTableHeadProps({
             ...tableHeadProps,
@@ -183,8 +202,7 @@ export default (props: IChartProps) => {
         // const data = dataSetting.getDataset();
         // console.log('data (table)', data);
 
-    }, [breadcrumbProps]);
-
+    }, [instant]);
 
     const createSortHandler = (key: string) => (event: MouseEvent<unknown>) => {
         handleRequestSort(event, key);
@@ -194,7 +212,7 @@ export default (props: IChartProps) => {
         const isAsc = sortk1 === sortk && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setSortk(sortk1);
-        console.log(sortk, order);
+        // console.log(sortk, order);
     };
 
     const [tableHeadProps, setTableHeadProps] = useState<ITableHeadProps>({
@@ -232,7 +250,6 @@ export default (props: IChartProps) => {
                     aria-labelledby="tableTitle"
                     size={'small'}
                 >
-                    {/* <EnhancedTableHead {...tableHeadProps} /> */}
                     <TableHead>
                         <TableRow>
 
@@ -242,6 +259,7 @@ export default (props: IChartProps) => {
                                     align={headCell.numeric ? 'right' : 'left'}
                                     padding={'normal'}
                                     sortDirection={sortk === headCell.id ? order : false}
+                                    width={headCell.width}
                                 >
                                     <TableSortLabel
                                         active={sortk === headCell.id}
@@ -261,26 +279,21 @@ export default (props: IChartProps) => {
                     </TableHead>
                     <TableBody>
 
-                        {rows.slice().sort(getComparator(order, sortk))
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => {
-
-                                // const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) => handleClick(event, row.id)}
-                                        role="checkbox"
-                                        tabIndex={-1}
-                                        key={row.id}
-                                    >
-                                        {row.cells.map(c => {
-                                            return <TableCell key={c.id} align={c.numeric ? 'right' : 'left'}>{c.label}</TableCell>
-                                        })}
-                                    </TableRow>
-                                );
-                            })}
+                        {rows.slice().sort(createComparator(order, sortk)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => {
+                            return (
+                                <TableRow
+                                    hover
+                                    onClick={(event) => handleClick(event, row.id)}
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.id}
+                                >
+                                    {row.cells.map(c => {
+                                        return <TableCell key={c.id} align={c.numeric ? 'right' : 'left'}>{c.label}</TableCell>
+                                    })}
+                                </TableRow>
+                            );
+                        })}
 
                         {emptyRows > 0 && (
                             <TableRow style={{ height: 33 * emptyRows, }}>
@@ -301,7 +314,6 @@ export default (props: IChartProps) => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
         </div >
-
 
     );
 }

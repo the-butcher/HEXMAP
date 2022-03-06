@@ -61,7 +61,7 @@ export class DatasetIncidence extends ADataset {
         const indexes: IDataIndex[] = indexKeys.map(k => {
             return {
                 name: k,
-                isHiddenOption: k.indexOf('_') >= 0,
+                isHiddenOption: false, // k.indexOf('_') >= 0,
                 minY: this.minY,
                 maxY: this.maxY
             }
@@ -88,6 +88,12 @@ export class DatasetIncidence extends ADataset {
         const statsInstantReg = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 3 - TimeUtil.MILLISECONDS_PER____DAY * 4;
         const statsInstantMax = this.instantMax - TimeUtil.MILLISECONDS_PER___WEEK * 0 - TimeUtil.MILLISECONDS_PER____DAY * 4;
 
+        const emptyDataValue: IDataValue = {
+            noscl: 0,
+            value: 0,
+            label: () => ''
+        }
+
         let lastValidEntry = {};
         for (let instant = this.instantMin + TimeUtil.MILLISECONDS_PER___WEEK; instant <= this.instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
             const dateKey = TimeUtil.formatCategoryDateFull(instant);
@@ -99,6 +105,7 @@ export class DatasetIncidence extends ADataset {
                 dataRoot.data[dateKey] = { ...lastValidEntry };
             }
         }
+
         dateKeys.sort((a, b) => TimeUtil.parseCategoryDateFull(a) - TimeUtil.parseCategoryDateFull(b));
 
         for (let i = 7; i < dateKeys.length; i++) { // each date
@@ -168,9 +175,6 @@ export class DatasetIncidence extends ADataset {
 
                 }
 
-
-
-
                 if (instant > statsInstantMin && instant <= statsInstantMax) {
 
                     const cases25 = dataRoot.data[dateKeys[i + 2]][popsKey][0] - dataRoot.data[dateKeys[i - 5]][popsKey][0];
@@ -199,16 +203,8 @@ export class DatasetIncidence extends ADataset {
                     }
 
                 } else {
-                    incidenceData[popsKey].push({
-                        noscl: 0,
-                        value: 0,
-                        label: () => ''
-                    }); // average
+                    incidenceData[popsKey].push({ ...emptyDataValue });
                 }
-
-
-
-
 
             });
 
@@ -255,44 +251,61 @@ export class DatasetIncidence extends ADataset {
 
                 } else {
 
-                    entry.addValue(popsKey, {
-                        noscl: 0,
-                        value: 0,
-                        label: () => ''
-                    }); // regression
-                    entry.addValue(popsKey, {
-                        noscl: 0,
-                        value: 0,
-                        label: () => ''
-                    }); // lower expectation                    
-                    entry.addValue(popsKey, {
-                        noscl: 0,
-                        value: 0,
-                        label: () => ''
-                    }); // upper expectation
+                    entry.addValue(popsKey, { ...emptyDataValue }); // regression
+                    entry.addValue(popsKey, { ...emptyDataValue }); // lower expectation                    
+                    entry.addValue(popsKey, { ...emptyDataValue }); // upper expectation
 
                 }
 
             });
         }
 
-        for (let instant = statsInstantMax + TimeUtil.MILLISECONDS_PER____DAY * 3; instant < statsInstantMax + TimeUtil.MILLISECONDS_PER____DAY * 7; instant += TimeUtil.MILLISECONDS_PER____DAY) { // each date
+        this.instantMax += TimeUtil.MILLISECONDS_PER____DAY * 0;
+        for (let instant = statsInstantMax + TimeUtil.MILLISECONDS_PER____DAY * 5; instant <= this.instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) { // each date
 
-            const weekday = new Date(instant).getDay();
+            const date = TimeUtil.formatCategoryDateFull(instant);
+
+            const incidenceData: { [x: string]: IDataValue[] } = {};
             popsKeys.forEach(popsKey => {
 
+                incidenceData[popsKey] = [];
+                incidenceData[popsKey].push({ ...emptyDataValue }); // incidence 
+                incidenceData[popsKey].push({ ...emptyDataValue }); // cases
+                if (hasFatal) {
+                    incidenceData[popsKey].push({ ...emptyDataValue }); // mortality 
+                    incidenceData[popsKey].push({ ...emptyDataValue }); // fatal
+                }
+                incidenceData[popsKey].push({ ...emptyDataValue }); // average
+
+
+                const weekday = new Date(instant).getDay();
+
                 const rgresX = this.toRegressionX(instant, statsInstantMin, statsInstantMax);
-                const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 3) + rgres[popsKey].equation[1] * Math.pow(rgresX, 2) + rgres[popsKey].equation[2] * rgresX + rgres[popsKey].equation[3]) * 1000;
+                const rgresY = (rgres[popsKey].equation[0] * Math.pow(rgresX, 2) + rgres[popsKey].equation[1] * rgresX + rgres[popsKey].equation[2]) * 1000;
 
-                const ratioAv = stats[popsKey][weekday].getAverage();
+                const ratioAL = stats[popsKey][weekday].getAverage() - stats[popsKey][weekday].getStandardDeviation();
+                const ratioAU = stats[popsKey][weekday].getStandardDeviation() * 2;
 
-                // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(casesEx)); // regression //  
-                // if (popsKey === '#') {
-                //     console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, weekday, ratioAv, Math.round(rgresY * ratioAv * this.populations[popsKey] / 700000));
-                // }
-                // console.log(TimeUtil.formatCategoryDateFull(instant), popsKey, Math.round(rgresY * ratioAv)); // expectation 
+                const noscl = rgresY * this.getPopulation(popsKey) / 700000;
+                incidenceData[popsKey].push({
+                    noscl,
+                    value: rgresY,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(noscl)
+                }); // regression
+                incidenceData[popsKey].push({
+                    noscl: noscl * ratioAL,
+                    value: rgresY * ratioAL,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format(noscl * ratioAL)
+                }); // lower expectation
+                incidenceData[popsKey].push({
+                    noscl: noscl * ratioAU,
+                    value: rgresY * ratioAU,
+                    label: () => FormattingDefinition.FORMATTER____FIXED.format((noscl * (ratioAL + ratioAU)))
+                }); // upper expectation                
 
             });
+
+            this.addEntry(date, new DataEntry(instant, incidenceData));
 
         }
 
@@ -300,7 +313,7 @@ export class DatasetIncidence extends ADataset {
     }
 
     acceptsZero(rawIndex: number): boolean {
-        return rawIndex < this.indexZeroIsAcceptable;
+        return false; // rawIndex < this.indexZeroIsAcceptable;
     }
 
     toRegressionY(cases: number): number {

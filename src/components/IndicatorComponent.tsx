@@ -4,8 +4,9 @@ import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import BreadcrumbComponent from './BreadcrumbComponent';
 import ChartComponent from './ChartComponent';
-import EnhancedTable from './EnhancedTable';
+import EnhancedTable from './TableComponent';
 import { IIndicatorProps } from './IIndicatorProps';
+import TableComponent from './TableComponent';
 
 export default (props: IIndicatorProps & React.CSSProperties) => {
 
@@ -87,7 +88,7 @@ export default (props: IIndicatorProps & React.CSSProperties) => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '999' }}>
               {/* {
-                loaded ? <EnhancedTable {...props} /> : null
+                loaded ? <TableComponent {...props} /> : null
               } */}
 
               {

@@ -536,7 +536,7 @@ export default (props: IChartProps) => {
         };
       });
     });
-    console.log('hidden', hiddenSeries);
+    // console.log('hidden', hiddenSeries);
 
     chartState.legend.data.setAll(chartState.series.filter(s => hiddenSeries.indexOf(s.get('name')) === -1));
     chartState.chart?.show();
@@ -553,7 +553,7 @@ export default (props: IChartProps) => {
 
   const updateLogarithmic = (chartState: IChartState) => {
 
-    console.log('max-y', chartState.yAxisVal.get('max'));
+    // console.log('max-y', chartState.yAxisVal.get('max'));
     if (logarithmic) {
       chartState.yAxisVal.setAll({
         logarithmic: true,
