@@ -61,7 +61,7 @@ export class DatasetIncidence extends ADataset {
         const indexes: IDataIndex[] = indexKeys.map(k => {
             return {
                 name: k,
-                isHiddenOption: false, // k.indexOf('_') >= 0,
+                isHiddenOption: k.indexOf('_') >= 0,
                 minY: this.minY,
                 maxY: this.maxY
             }
