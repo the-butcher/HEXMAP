@@ -26,6 +26,8 @@ export interface IDataset {
      */
     getEntryKeys(): string[];
 
+    getEntrySubkeys(): string[][];
+
     /**
      * get the keyset held by a given key
      * @param key 

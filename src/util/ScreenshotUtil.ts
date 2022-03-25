@@ -68,7 +68,7 @@ export class ScreenshotUtil {
         canvas.style.height = `${ScreenshotUtil.OUTPUT_DIM_Y / 10}px`;
         this.frames.push({
             canvas,
-            delay: 200
+            delay: 100
         });
         this.screenshotOptions.done();
         this.screenshotOptions = undefined;

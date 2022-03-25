@@ -190,7 +190,7 @@ export default () => {
           props.instantMin = TimeUtil.parseCategoryDateFull('01.12.2021');
           props.instantMax = dataSetting.getDataset().getInstantMax();
 
-          console.log(TimeUtil.formatCategoryDateFull(props.instantMin), TimeUtil.formatCategoryDateFull(props.instantMax));
+          // console.log(TimeUtil.formatCategoryDateFull(props.instantMin), TimeUtil.formatCategoryDateFull(props.instantMax));
 
           setAppState({
             ...appState,

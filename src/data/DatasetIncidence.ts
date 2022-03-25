@@ -61,7 +61,7 @@ export class DatasetIncidence extends ADataset {
         const indexes: IDataIndex[] = indexKeys.map(k => {
             return {
                 name: k,
-                isHiddenOption: k.indexOf('_') >= 0,
+                isHiddenOption: false, // k.indexOf('_') >= 0,
                 minY: this.minY,
                 maxY: this.maxY
             }
@@ -100,7 +100,8 @@ export class DatasetIncidence extends ADataset {
             if (dataRoot.data[dateKey]) {
                 lastValidEntry = dataRoot.data[dateKey];
             } else {
-                // console.log('missingKey', dateKey);
+                // if a full date may be missing, reuse the last entry to fill the gap
+                console.log('missingKey', dateKey);
                 dateKeys.push(dateKey);
                 dataRoot.data[dateKey] = { ...lastValidEntry };
             }

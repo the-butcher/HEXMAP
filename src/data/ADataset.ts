@@ -21,6 +21,7 @@ export abstract class ADataset implements IDataset {
     private readonly keysets: { [K in string]: IKeyset };
 
     private readonly entryKeys: string[]; // the actual formatted dates
+    private entrySubkeys: string[][] = [[]];
     private readonly entries: { [K in string]: IDataEntry };
 
     protected readonly instantMin: number;
@@ -30,12 +31,25 @@ export abstract class ADataset implements IDataset {
 
         this.populations = dataRoot.pops;
 
+        this.entrySubkeys = [[]];
+
         this.keysetKeys = Object.keys(dataRoot.keys);
         this.keysets = {};
         this.keysetKeys.forEach(keysetKey => {
+
             const defaultKey = Object.keys(dataRoot.keys[keysetKey]).sort()[0];
             this.keysets[keysetKey] = new KeysetGeneric(keysetKey, defaultKey, dataRoot.keys[keysetKey]);
+
+            const _dataKeys: string[][] = [];
+            this.keysets[keysetKey].getRaws().forEach(k => {
+                this.entrySubkeys.forEach(d => {
+                    _dataKeys.push([...d, k]);
+                });
+            });
+            this.entrySubkeys = [..._dataKeys];
+
         });
+
 
         this.entryKeys = [];
         this.entries = {};
@@ -123,6 +137,10 @@ export abstract class ADataset implements IDataset {
 
     getEntryKeys(): string[] {
         return this.entryKeys;
+    }
+
+    getEntrySubkeys(): string[][] {
+        return this.entrySubkeys;
     }
 
     protected getEntries(): { [K in string]: IDataEntry } {

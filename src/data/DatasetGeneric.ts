@@ -27,21 +27,30 @@ export class DatasetGeneric extends ADataset {
 
         this.indexKeyset = new KeysetIndex(dataRoot.indx, dataRoot.idxs);
 
+        let lastValidSubEntries: { [K in string]: number[] } = {};
+
         const dateKeys = Object.keys(dataRoot.data);
+        const entrySubKeys = this.getEntrySubkeys();
+
         dateKeys.forEach(dateKey => {
 
             const dataValues: { [K in string]: IDataValue[] } = {};
+            const currEntry = dataRoot.data[dateKey];
 
-            const entryKeys = Object.keys(dataRoot.data[dateKey]);
-            entryKeys.forEach(entryKey => {
-                dataValues[entryKey] = dataRoot.data[dateKey][entryKey].map(d => {
+            entrySubKeys.map(k => k.join('')).forEach(entrySubKey => {
+                if (dataRoot.data[dateKey][entrySubKey]) {
+                    lastValidSubEntries[entrySubKey] = dataRoot.data[dateKey][entrySubKey];
+                } else {
+                    console.log('missing entry sub key', dateKey, entrySubKey)
+                }
+                dataValues[entrySubKey] = lastValidSubEntries[entrySubKey].map(d => {
                     return {
                         noscl: d,
                         value: d,
                         label: () => valueFormatter.format(d)
                     }
                 });
-            })
+            });
 
             this.addEntry(dateKey, new DataEntry(TimeUtil.parseCategoryDateFull(dateKey), dataValues));
 
