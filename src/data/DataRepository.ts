@@ -14,7 +14,7 @@ import { IDataSetting } from "./IDataSetting";
 
 /**
  * utility type for managing data that needs to be loaded or has already been loaded
- * 
+ *
  * @author h.fleischer
  * @since 19.12.2021
  */
@@ -23,8 +23,8 @@ export class DataRepository {
   // mortality
   static readonly interpolatedEle7dm3 = new InterpolatedValue(0, 80, 0, 140, 1.00);
 
-  static readonly interpolatedEle7di3 = new InterpolatedValue(-7, 73, 0, 14000, 1.00);
-  static readonly interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 3500, 0.33);
+  static readonly interpolatedEle7di3 = new InterpolatedValue(-7, 73, 0, 5000, 1.00);
+  static readonly interpolatedHue7di3 = new InterpolatedValue(0.25, -0.01, 0, 1750, 0.25);
   static readonly interpolatedInt7diX = new InterpolatedValue(1.75, 1.50, 0, 2000, 1.00);
 
   // 0.33, 0.17, 0.08, 0.00
@@ -231,12 +231,12 @@ export class DataRepository {
       instantMin: -1,
       instantMax: -1,
       instantDif: TimeUtil.MILLISECONDS_PER____DAY,
-      name: 'Tests / 100.000 / Tag',
+      name: 'Positivitätsrate',
       desc: 'Bundesland',
       copy: 'https://www.data.gv.at/covid-19/',
-      formatter: FormattingDefinition.FORMATTER____FIXED,
-      label00: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
-      label07: FormattingDefinition.FORMATTER____FIXED.format(1111).replaceAll('1', '#'),
+      formatter: FormattingDefinition.FORMATTER_PERCENT,
+      label00: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
+      label07: FormattingDefinition.FORMATTER_PERCENT.format(0.1111).replaceAll('1', '#'),
       onExpand: () => { },
       onInstantChange: () => { },
       onInstantRangeChange: () => { },
@@ -252,14 +252,14 @@ export class DataRepository {
       breadcrumbProps: [],
       getRendererProps: (index: number, name: string) => {
         return {
-          interpolatedEle: new InterpolatedValue(-7, 50, 0, 20000, 1.00),
-          interpolatedHue: new FixedValue(0.50),
-          interpolatedSat: new InterpolatedValue(0.00, 1.00, 500, 5000, 0.33),
-          interpolatedVal: new FixedValue(0.40),
+          interpolatedEle: new InterpolatedValue(-7, 50, 0, 1, 1.00),
+          interpolatedHue: new FixedValue(0.08),
+          interpolatedSat: new InterpolatedValue(0.25, 1.00, 0.00, 0.25, 1.00),
+          interpolatedVal: new FixedValue(0.50),
           interpolatedInt: DataRepository.interpolatedInt7diX,
         }
       },
-      constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER____FIXED),
+      constructDataset: dataRoot => new DatasetGeneric(dataRoot, FormattingDefinition.FORMATTER_PERCENT),
       seriesVisibilities: {}
     },
     // {

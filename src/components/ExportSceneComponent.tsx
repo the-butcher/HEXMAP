@@ -14,7 +14,7 @@ export default (props: IExportSceneProps) => {
 
   const [frameCount, setFrameCount] = useState<number>(0);
   const [frameIndex, setFrameIndex] = useState<number>(0);
-  const [frameDelay, setFrameDelay] = useState<number>(100);
+  const [frameDelay, setFrameDelay] = useState<number>(200);
 
   useEffect(() => {
 

@@ -31,10 +31,10 @@ export default (props: IChartProps) => {
 
   const [chartState, setChartState] = useState<IChartState>();
   const handleInstantRangeChange = useRef<(instantMin1: number, instantMax1: number) => void>((instantMin: number, instantMax: number) => {
-    // no op initially 
+    // no op initially
   });
   const handleSeriesVisibilityChange = useRef<(name: string, visibility: boolean) => void>((name: string, visibility: boolean) => {
-    // no op initially 
+    // no op initially
   });
 
   useEffect(() => {
@@ -153,7 +153,7 @@ export default (props: IChartProps) => {
       // stateAnimationDuration: 2000,
       min: 0,
       extraMax: 0,
-      strictMinMax: true
+      // strictMinMax: true
     }));
     const _yAxisLabel = am5.Label.new(_root, {
       text: name,
@@ -521,7 +521,7 @@ export default (props: IChartProps) => {
 
     const chartData = DataRepository.getInstance().getChartData(source, Number.MIN_VALUE, Number.MAX_VALUE);
     chartState.series.forEach(s => {
-      (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
+      // (s.get('yAxis') as am5xy.ValueAxis<am5xy.AxisRendererY>).set('max', chartData.maxY); // chartData.maxY
       s.data.setAll(chartData.entries);
       // s.appear();
     });

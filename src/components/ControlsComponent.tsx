@@ -63,6 +63,8 @@ export default (props: IControlsProps) => {
 
             // console.log('polar angle', controls.current.getPolarAngle(), camera.position, controls.current.target, controls.current.getPolarAngle(), controls.current.getAzimuthalAngle());
 
+            console.log('pt', camera.position, controls.current.target);
+
             const _view: ViewOrientation = controls.current.target.z < camera.position.z ? 'northwards' : 'southwards';
             if (_view !== view.current) {
                 // console.log('northray.current', view.current);
@@ -101,13 +103,14 @@ export default (props: IControlsProps) => {
 
             } else if (e.key === 'c') {
 
-                controls.current.minAzimuthAngle = 0;
-                controls.current.maxAzimuthAngle = 0;
-                controls.current.minPolarAngle = 0.43; // Math.PI / 4; // how far above ground the map can be tilted
-                controls.current.maxPolarAngle = 0.43;
+                // controls.current.minAzimuthAngle = 0;
+                // controls.current.maxAzimuthAngle = 0;
+                // controls.current.minPolarAngle = 0.43; // Math.PI / 4; // how far above ground the map can be tilted
+                // controls.current.maxPolarAngle = 0.43;
 
-                camera.position.set(0.2523004231104948, 426.44562179111864, 233.07234703781495);
-                controls.current.target.set(0.2523004231104948, -1.0771583963911797e-17, 37.49541951103807);
+                camera.position.set(-151.85595444996528, 277.67792249991356, 373.9841653317079);
+                controls.current.target.set(-29.677668550003357, -2.832274779813475e-15, 17.939362481818677);
+
                 // camera.position.set(-16.907294646056016, 411.01271753556387, 260.12818711663294);
                 // controls.current.target.set(3.6580133669590973, -1.0771583963911797e-17, 34.84654770500994);
 

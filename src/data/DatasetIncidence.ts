@@ -39,7 +39,7 @@ export class DatasetIncidence extends ADataset {
         const indexKeys: SeriesKey[] = hasFatal ? [
             'Inzidenz',
             'Fälle',
-            // 'dlt_incdc',
+            'dlt_incdc',
             // 'Gesamt',
             'Sterblichkeit',
             'Todesfälle',
@@ -51,7 +51,7 @@ export class DatasetIncidence extends ADataset {
         ] : [
             'Inzidenz',
             'Fälle',
-            // 'dlt_incdc',
+            'dlt_incdc',
             // 'Gesamt',
             'Prognose',
             'reg_cases',
@@ -133,28 +133,28 @@ export class DatasetIncidence extends ADataset {
                     label: () => FormattingDefinition.FORMATTER____FIXED.format(cases_01)
                 });
 
-                // if (i >= 14) {
+                if (i >= 14) {
 
-                //     const incdnc14 = (dataRoot.data[dateKeys[i - 7]][popsKey][0] - dataRoot.data[dateKeys[i - 14]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
-                //     const deltaIncidence = 1 - (incdnc14 / incdnc07);
+                    const incdnc14 = (dataRoot.data[dateKeys[i - 7]][popsKey][0] - dataRoot.data[dateKeys[i - 14]][popsKey][0]) * 100000 / this.getPopulation(popsKey);
+                    const deltaIncidence = 1 - (incdnc14 / incdnc07);
 
-                //     // console.log('deltaIncidence', deltaIncidence);
+                    // console.log('deltaIncidence', deltaIncidence);
 
-                //     incidenceData[popsKey].push({
-                //         noscl: deltaIncidence,
-                //         value: deltaIncidence,
-                //         label: () => FormattingDefinition.FORMATTER_PERCENT.format(deltaIncidence)
-                //     }); // deltaIncidence
+                    incidenceData[popsKey].push({
+                        noscl: deltaIncidence,
+                        value: deltaIncidence,
+                        label: () => FormattingDefinition.FORMATTER_PERCENT.format(deltaIncidence)
+                    }); // deltaIncidence
 
-                // } else {
+                } else {
 
-                //     incidenceData[popsKey].push({
-                //         noscl: 0,
-                //         value: 0,
-                //         label: () => ''
-                //     }); // deltaIncidence
+                    incidenceData[popsKey].push({
+                        noscl: 0,
+                        value: 0,
+                        label: () => ''
+                    }); // deltaIncidence
 
-                // }
+                }
 
                 if (hasFatal) {
 

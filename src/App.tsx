@@ -53,9 +53,9 @@ export default () => {
    * handles changes originating from either date-slider or data-picker
    * updates all property instances holding an instant
    * TODO :: think about a central place to have instant (but then how could component update be triggered individually)
-   * 
-   * @param source 
-   * @param instant 
+   *
+   * @param source
+   * @param instant
    */
   const handleInstantChange = async (instant: number) => {
 
@@ -811,7 +811,7 @@ export default () => {
             let validPath = path;
             keyset.getKeys().forEach(key => {
               const keyTrimmed = key.replaceAll('#', '');
-              if (keyTrimmed !== '' && path !== key && path?.startsWith(keyTrimmed)) { // includes #####, but will match 
+              if (keyTrimmed !== '' && path !== key && path?.startsWith(keyTrimmed)) { // includes #####, but will match
                 validPath = key;
               }
             });
@@ -1060,7 +1060,7 @@ export default () => {
                   const _prefKey = dataSetting.validatePath(dataSetting.getDataset().getKeysetKeys()[0], hexagon.gkz.substring(0, prefKey.length));
                   if (!_prefKey) {
 
-                    // for cases where there is partial data (like salzburg only)
+                    // for cases where there is partial data (salzburg only)
 
                     lookupState = {
                       ...defaultState,
@@ -1216,4 +1216,4 @@ export default () => {
 
 };
 
-// 
+//

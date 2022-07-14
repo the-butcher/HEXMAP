@@ -5,7 +5,7 @@ import { ILightProps } from './ILightProps';
 
 /**
  * functional react component managing a single directional light
- * 
+ *
  * @author h.fleischer
  * @since 11.12.2021
  */

@@ -9,7 +9,7 @@ import { IHexagonState } from './IHexagonState';
 
 /**
  * functional react component responsible for drawing the hexagons
- * 
+ *
  * @author h.fleischer
  * @since 11.12.2021
  */
@@ -25,7 +25,7 @@ export default (props: IHexagonsProps) => {
   const meshRef = useRef<three.InstancedMesh>(new three.InstancedMesh(geomRef.current, mtrlRef.current, hexagonCount));
 
   const handlePathChange = useRef<(source: string, name: string, path: string) => void>((source: string, name: string, path: string) => {
-    // no op initially 
+    // no op initially
   });
 
   /**
@@ -236,7 +236,7 @@ export default (props: IHexagonsProps) => {
   }, [frac]);
 
 
-  let handleClick = (e: ThreeEvent<PointerEvent>) => { // 
+  let handleClick = (e: ThreeEvent<PointerEvent>) => { //
 
     e.stopPropagation();
     if (e.instanceId && e.delta < 5) {

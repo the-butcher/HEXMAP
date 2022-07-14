@@ -6,7 +6,7 @@ import { INavigationTopProps } from "./INavigationTopProps";
 
 /**
  * definition of properties for the UserInterfaceComponent
- * 
+ *
  * @author h.fleischer
  * @since 11.12.2021
  */
