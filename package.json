@@ -1,0 +1,48 @@
+{
+  "name": "hexmap_03",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.1.0",
+    "@date-io/date-fns": "^3.2.1",
+    "@emotion/styled": "^11.14.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@mui/material": "^7.0.2",
+    "@react-three/drei": "^10.0.7",
+    "@react-three/fiber": "^9.1.2",
+    "d3-array": "^3.2.4",
+    "date-fns": "^4.1.0",
+    "delaunator": "^5.0.1",
+    "fast-png": "^6.3.0",
+    "motion": "^12.9.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "suncalc": "^1.9.0",
+    "three": "^0.176.0",
+    "threejs-examples": "^60.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/delaunator": "^5.0.3",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/suncalc": "^1.9.2",
+    "@types/three": "^0.176.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.3.1"
+  }
+}
